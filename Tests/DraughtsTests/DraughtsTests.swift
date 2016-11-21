@@ -38,4 +38,19 @@ class DraughtsTests: XCTestCase {
         guard let position = Position(fen: fen) else { XCTFail(); return }
         XCTAssertEqual(position, Position(pieces: [Piece(player: .white, kind: .man, square: 33), Piece(player: .black, kind: .king, square: 28)]))
     }
+    
+    func testCoupTurc() {
+        let fen = "W:WK26:B9,12,13,23,24"
+        guard let position = Position(fen: fen) else { XCTFail(); return }
+        let moves = position.generateMoves()
+        guard let move = moves.first, moves.count == 1 else { XCTFail(); return }
+        
+        let next = position.playing(move: move)
+        let expected = Position(
+            pieces: [Piece(player: .white, kind: .king, square: 18), Piece(player: .black, kind: .man, square: 13)],
+            ply: Ply(player: .black)
+        )
+        
+        XCTAssertEqual(next, expected)
+    }
 }

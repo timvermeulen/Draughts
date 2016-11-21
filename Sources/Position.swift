@@ -73,7 +73,7 @@ public struct Position {
     }
     
     internal func emptySquares(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> [Square] {
-        guard let neighbor = square.neighbor(to: direction) else { return [] }
+        guard let neighbor = square.neighbor(to: direction), self.squareIsEmpty(neighbor) else { return [] }
         
         return Array(first: neighbor, next: {
             guard let neighbor = $0.neighbor(to: direction) else { return nil }
@@ -96,6 +96,10 @@ public struct Position {
         var maxCapture = 0
         
         while let step = steps.popLast() {
+            if step.square.humanValue == 18 {
+                print(step)
+            }
+            
             let theNeighbor: Square?
             
             switch piece.kind {
@@ -226,7 +230,7 @@ extension Position: Equatable {
 extension Position: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         let border = " " + String(repeating: "-", count: 21)
-        target.write("\(border)\n")
+        print(border, to: &target)
         
         for squares in [1, 11, 21, 31, 41].map({ ($0 ..< $0 + 10).map(Square.init(humanValue:)) }) {
             func addSquare(_ square: Square, onSide: Piece.Direction) {
@@ -258,6 +262,6 @@ extension Position: TextOutputStreamable {
             target.write("|\n")
         }
         
-        print(border, to: &target)
+        target.write(border)
     }
 }

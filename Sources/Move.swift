@@ -22,7 +22,8 @@ public struct Move {
         
         let promotion = piece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(destination) : .empty
         let capturedKings = Bitboard(squares: self.over.filter { $0.kind == .king }.map { $0.square })
-        kings = promotion ^ capturedKings
+        let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
+        kings = promotion ^ capturedKings ^ movedKing
     }
 }
 
