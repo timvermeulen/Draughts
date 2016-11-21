@@ -153,7 +153,7 @@ public struct Position {
         let maxCaptures = captures.filter { $0.amount == maxCapture }
         return maxCaptures.flatMap { $0.captures }
     }
-
+    
     internal func slidingMoves(of player: Player) -> [Move] {
         return self.slidingManMoves(of: player) + self.slidingKingMoves(of: player)
     }
@@ -226,7 +226,7 @@ extension Position: Equatable {
 extension Position: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         let border = " " + String(repeating: "-", count: 21)
-        target.write("\n\(border)\n")
+        target.write("\(border)\n")
         
         for squares in [1, 11, 21, 31, 41].map({ ($0 ..< $0 + 10).map(Square.init(humanValue:)) }) {
             func addSquare(_ square: Square, onSide: Piece.Direction) {
@@ -258,6 +258,6 @@ extension Position: TextOutputStreamable {
             target.write("|\n")
         }
         
-        target.write(border)
+        print(border, to: &target)
     }
 }
