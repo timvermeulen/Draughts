@@ -96,10 +96,6 @@ public struct Position {
         var maxCapture = 0
         
         while let step = steps.popLast() {
-            if step.square.humanValue == 18 {
-                print(step)
-            }
-            
             let theNeighbor: Square?
             
             switch piece.kind {
