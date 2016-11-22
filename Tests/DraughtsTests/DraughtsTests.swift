@@ -34,6 +34,18 @@ class DraughtsTests: XCTestCase {
         XCTAssertEqual(moves, expected)
     }
     
+    func testReturnMoves() {
+        let pos1 = Position.beginPosition
+        let openingMoves = pos1.generateMoves()
+        let move = XCTUnwrap(openingMoves.first)
+        
+        let pos2 = pos1.playing(move)
+        let returnMoves = Set(pos2.generateMoves().map { $0.notation })
+        let expected: Set = ["16-21", "17-21", "17-22", "18-22", "18-23", "19-23", "19-24", "20-24", "20-25"]
+        
+        XCTAssertEqual(returnMoves, expected)
+    }
+    
     func testKingSlidingMoves() {
         let fen = "W:WK33:B"
         let position = XCTUnwrap(Position(fen: fen))
@@ -94,7 +106,7 @@ class DraughtsTests: XCTestCase {
         let move = XCTUnwrap(moves.first)
         XCTAssertEqual(moves.count, 1)
         
-        let next = position.playing(move: move)
+        let next = position.playing(move)
         let expected = Position(
             pieces: [
                 Piece(player: .white, kind: .king, square: 18),
@@ -104,5 +116,15 @@ class DraughtsTests: XCTestCase {
         )
         
         XCTAssertEqual(next, expected)
+    }
+    
+    func testGame() {
+        let positions = sequence(first: Position.beginPosition) { position in
+            let moves = position.generateMoves()
+            guard let move = moves.first else { return nil }
+            return position.playing(move)
+        }
+        
+        print(positions.map(String.init(describing:)).joined(separator: "\n\n"))
     }
 }
