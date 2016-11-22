@@ -1,17 +1,17 @@
 public struct Move {
     public let piece: Piece
     public let destination: Square
-    public let over: [Piece]
+    public let captures: [Piece]
     
     internal let white, black, kings: Bitboard
     
-    public var from: Square { return piece.square }
-    public var isCapture: Bool { return !over.isEmpty }
+    public var origin: Square { return piece.square }
+    public var isCapture: Bool { return !captures.isEmpty }
     
     public init(from origin: Piece, to destination: Square, over: [Piece] = []) {
         self.piece = origin
         self.destination = destination
-        self.over = over
+        self.captures = over
         
         let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
         let opponentBitboard = over.reduce(Bitboard.empty) { $0.symmetricDifference(Bitboard($1.square)) }
@@ -21,7 +21,7 @@ public struct Move {
             : (opponentBitboard, playerBitboard)
         
         let promotion = piece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(destination) : .empty
-        let capturedKings = Bitboard(squares: self.over.filter { $0.kind == .king }.map { $0.square })
+        let capturedKings = Bitboard(squares: self.captures.filter { $0.kind == .king }.map { $0.square })
         let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
         
         kings = promotion
@@ -40,7 +40,7 @@ extension Move: Equatable {
 
 extension Move: TextOutputStreamable {
     public var notation: String {
-        return "\(from.humanValue)\(isCapture ? "x" : "-")\(destination.humanValue)"
+        return "\(origin.humanValue)\(isCapture ? "x" : "-")\(destination.humanValue)"
     }
     
     public func write<Target: TextOutputStream>(to target: inout Target) {

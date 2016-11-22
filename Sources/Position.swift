@@ -99,51 +99,64 @@ public struct Position {
         var steps = Square.Direction.all.map { Step(square: square, direction: $0, captures: []) }
         var maxCapture = 0
         
-        while let step = steps.popLast() {
-            let theNeighbor: Square?
-            
-            switch piece.kind {
-            case .man: theNeighbor = step.square.neighbor(to: step.direction)
-            case .king: theNeighbor = self.firstOccupiedSquare(from: step.square, to: step.direction, ignoring: square)
-            }
-            
-            guard let neighbor = theNeighbor, let opponentPiece = self[neighbor], opponentPiece.player == piece.player.opponent && !step.captures.contains(opponentPiece) else {
-                continue
-            }
-            
-            let endSquares: [Square]
-            
-            switch piece.kind {
-            case .man:
-                if let endSquare = neighbor.neighbor(to: step.direction), squareIsEmpty(endSquare) || endSquare == square {
-                    endSquares = [endSquare]
-                } else {
-                    endSquares = []
-                }
-            case .king: endSquares = self.emptySquares(from: neighbor, to: step.direction, ignoring: square)
-            }
-            
-            let newCaptures = step.captures + [opponentPiece]
-            for endSquare in endSquares {
-                let newMove = Move(from: piece, to: endSquare, over: newCaptures)
+        switch piece.kind {
+        case .man:
+            while let step = steps.popLast() {
+                guard
+                    let victim = step.square.neighbor(to: step.direction),
+                    let opponentPiece = self[victim],
+                    opponentPiece.player == piece.player.opponent && !step.captures.contains(opponentPiece),
+                    let destination = victim.neighbor(to: step.direction),
+                    squareIsEmpty(destination) || destination == square
+                    else { continue }
                 
-                if newCaptures.count > maxCapture {
-                    maxCapture = newCaptures.count
+                let captures = step.captures + [opponentPiece]
+                let newMove = Move(from: piece, to: destination, over: captures)
+                
+                if captures.count > maxCapture {
+                    maxCapture = captures.count
                     moves.removeAll()
                 }
                 
-                if newCaptures.count == maxCapture && !moves.contains(newMove) {
+                if captures.count == maxCapture && !moves.contains(newMove) {
                     moves.append(newMove)
                 }
                 
-                var directions = [step.direction.left, step.direction.right]
+                for direction in [step.direction, step.direction.left, step.direction.right] {
+                    steps.append(Step(square: destination, direction: direction, captures: captures))
+                }
+            }
+            
+        case .king:
+            while let step = steps.popLast() {
+                guard
+                    let victim = self.firstOccupiedSquare(from: step.square, to: step.direction, ignoring: square),
+                    let opponentPiece = self[victim],
+                    opponentPiece.player == piece.player.opponent && !step.captures.contains(opponentPiece)
+                    else { continue }
                 
-                if endSquares[0] == endSquare {
-                    directions.append(step.direction)
+                let destinations = self.emptySquares(from: victim, to: step.direction, ignoring: square)
+                let captures = step.captures + [opponentPiece]
+                
+                for destination in destinations {
+                    let move = Move(from: piece, to: destination, over: captures)
+                    
+                    if captures.count > maxCapture {
+                        maxCapture = captures.count
+                        moves.removeAll()
+                    }
+                    
+                    if captures.count == maxCapture && !moves.contains(move) {
+                        moves.append(move)
+                    }
+                    
+                    for direction in [step.direction.left, step.direction.right] {
+                        steps.append(Step(square: destination, direction: direction, captures: captures))
+                    }
                 }
                 
-                for direction in directions {
-                    steps.append(Step(square: endSquare, direction: direction, captures: newCaptures))
+                if let firstDestination = destinations.first {
+                    steps.append(Step(square: firstDestination, direction: step.direction, captures: captures))
                 }
             }
         }
@@ -167,10 +180,7 @@ public struct Position {
         
         return Square.Direction.all.flatMap { direction -> [Move] in
             let emptySquares = self.emptySquares(from: square, to: direction)
-            
-            return emptySquares.map { emptySquare in
-                Move(from: piece, to: emptySquare)
-            }
+            return emptySquares.map { Move(from: piece, to: $0) }
         }
     }
     
@@ -187,9 +197,9 @@ public struct Position {
         
         return squares.map { square in
             let direction = Square.Direction(player: player, pieceDirection: pieceDirection)
-            let to = Square(value: square.value + direction.rawValue)
+            let destination = Square(value: square.value + direction.rawValue)
             
-            return Move(from: Piece(player: player, kind: .man, square: square), to: to)
+            return Move(from: Piece(player: player, kind: .man, square: square), to: destination)
         }
     }
     
@@ -235,7 +245,9 @@ extension Position: TextOutputStreamable {
         let border = " " + String(repeating: "-", count: 21)
         print(border, to: &target)
         
-        for squares in [1, 11, 21, 31, 41].map({ ($0 ..< $0 + 10).map(Square.init(humanValue:)) }) {
+        let grid = [1, 11, 21, 31, 41].map { ($0 ..< $0 + 10).map(Square.init(humanValue:)) }
+        
+        for squares in grid {
             func addSquare(_ square: Square, onSide: Piece.Direction) {
                 let separator: Character
                 

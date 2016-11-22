@@ -89,29 +89,7 @@ extension Bitboard {
 
 extension Bitboard: TextOutputStreamable {
     internal func write<Target: TextOutputStream>(to target: inout Target) {
-        let border = " " + String(repeating: "-", count: 21)
-        print("\n\(border)", to: &target)
-        
-        let grid = [1, 11, 21, 31, 41].map {
-            ($0 ..< $0 + 10).map(Square.init(humanValue:))
-        }
-        
-        for squares in grid {
-            target.write("| ")
-            
-            for square in squares[0 ..< 5] {
-                target.write(self.contains(square) ? "  x " : "  - ")
-            }
-            
-            target.write("|\n| ")
-            
-            for square in squares[5 ..< 10] {
-                target.write(self.contains(square) ? "x   " : "-   ")
-            }
-            
-            target.write("|\n")
-        }
-        
-        print(border, to: &target)
+        let position = Position(white: .empty, black: self)
+        position.write(to: &target)
     }
 }
