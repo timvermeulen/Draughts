@@ -43,11 +43,15 @@ public struct Position {
     // MARK: Applying moves
     
     public mutating func play(_ move: Move) {
-        white.formSymmetricDifference(move.white)
-        black.formSymmetricDifference(move.black)
-        kings.formSymmetricDifference(move.kings)
+        self.white.formSymmetricDifference(move.white)
+        self.black.formSymmetricDifference(move.black)
+        self.kings.formSymmetricDifference(move.kings)
         
-        ply = ply.successor
+        self.empty.formSymmetricDifference(
+            move.white.symmetricDifference(move.black)
+        )
+        
+        self.ply = ply.successor
     }
     
     public func playing(_ move: Move) -> Position {
