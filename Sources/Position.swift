@@ -13,8 +13,8 @@ public struct Position {
         self.white = white
         self.black = black
         self.kings = kings
-        self.empty = white
-            .intersection(black.opposite).opposite
+        self.empty = white.opposite
+            .intersection(black.opposite)
             .intersection(Bitboard.realBoard)
         
         self.ply = ply
