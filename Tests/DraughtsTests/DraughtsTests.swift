@@ -33,6 +33,16 @@ class DraughtsTests: XCTestCase {
         
         XCTAssertEqual(moves, expected)
     }
+    
+    func testKingSlidingMoves() {
+        let fen = "W:WK33:B"
+        let position = XCTUnwrap(Position(fen: fen))
+        
+        let moves = Set(position.generateMoves().map { $0.notation })
+        let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
+        
+        XCTAssertEqual(moves, expected)
+    }
 
     func testCapture() {
         var position = Position.beginPosition
