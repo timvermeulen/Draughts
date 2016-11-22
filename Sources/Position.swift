@@ -13,7 +13,7 @@ public struct Position {
         self.white = white
         self.black = black
         self.kings = kings
-        self.empty = ~white & ~black & Bitboard.realBoard
+        self.empty = white.intersection(black.intersection(Bitboard.realBoard).opposite).opposite
         
         self.ply = ply
     }
@@ -22,17 +22,20 @@ public struct Position {
         let white = Bitboard(squares: pieces.filter { $0.player == .white }.map { $0.square })
         let black = Bitboard(squares: pieces.filter { $0.player == .black }.map { $0.square })
         let kings = Bitboard(squares: pieces.filter { $0.kind == .king }.map { $0.square })
+        
         self.init(white: white, black: black, kings: kings, ply: ply)
     }
     
     public subscript(square: Square) -> Piece? {
         let kind: Piece.Kind = kings.contains(square) ? .king : .man
         let player: Player
+        
         switch (white.contains(square), black.contains(square)) {
         case (true, _): player = .white
         case (_, true): player = .black
         default: return nil
         }
+        
         return Piece(player: player, kind: kind, square: square)
     }
     
@@ -40,9 +43,10 @@ public struct Position {
     // MARK: Applying moves
     
     public mutating func play(_ move: Move) {
-        white ^= move.white
-        black ^= move.black
-        kings ^= move.kings
+        white.formSymmetricDifference(move.white)
+        black.formSymmetricDifference(move.black)
+        kings.formSymmetricDifference(move.kings)
+        
         ply = ply.successor
     }
     
@@ -190,11 +194,14 @@ public struct Position {
     }
     
     internal func squaresThatCanSlide(to direction: Square.Direction) -> Bitboard {
-        return ~direction.edge & empty.shift(to: direction.opposite)
+        return direction.edge.opposite.intersection(empty.shift(to: direction.opposite))
     }
     
     internal func menThatCanSlide(to direction: Piece.Direction, of player: Player) -> Bitboard {
-        return pieces(of: player) & ~kings & squaresThatCanSlide(to: Square.Direction(player: player, pieceDirection: direction))
+        let pieces = self.pieces(of: player)
+        let squares = self.squaresThatCanSlide(to: Square.Direction(player: player, pieceDirection: direction))
+        
+        return pieces.intersection(squares)
     }
     
     // MARK: -

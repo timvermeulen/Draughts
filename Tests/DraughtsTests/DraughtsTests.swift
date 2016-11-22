@@ -16,11 +16,13 @@ func XCTUnwrap<T>(_ expression: @autoclosure () throws -> T?, _ message: @autocl
 
 class DraughtsTests: XCTestCase {
     override func setUp() {
+        super.setUp()
         self.continueAfterFailure = false
     }
     
     override func tearDown() {
         self.continueAfterFailure = true
+        super.tearDown()
     }
     
     func testOpeningMoves() {
@@ -36,11 +38,15 @@ class DraughtsTests: XCTestCase {
         var position = Position.beginPosition
         
         let openingMoves = position.generateMoves()
-        let firstMove = XCTUnwrap(openingMoves.first(where: { $0.notation == "32-28" }))
+        let firstMove = XCTUnwrap(
+            openingMoves.first(where: { $0.notation == "32-28" })
+        )
         position.play(firstMove)
         
         let returnMoves = position.generateMoves()
-        let secondMove = XCTUnwrap(returnMoves.first(where: { $0.notation == "19-23" }))
+        let secondMove = XCTUnwrap(
+            returnMoves.first(where: { $0.notation == "19-23" })
+        )
         position.play(secondMove)
         
         let returnReturnMoves = position.generateMoves()
@@ -55,13 +61,15 @@ class DraughtsTests: XCTestCase {
     }
     
     func testFEN() {
-        let fen = "W:W33:BK28"
+        let fen = "W:W28,K29:BK22,23"
         
         let position = XCTUnwrap(Position(fen: fen))
         let expected = Position(
             pieces: [
-                Piece(player: .white, kind: .man, square: 33),
-                Piece(player: .black, kind: .king, square: 28)
+                Piece(player: .white, kind: .man, square: 28),
+                Piece(player: .white, kind: .king, square: 29),
+                Piece(player: .black, kind: .man, square: 23),
+                Piece(player: .black, kind: .king, square: 22)
             ]
         )
         

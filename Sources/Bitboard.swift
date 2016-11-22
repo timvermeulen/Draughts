@@ -27,10 +27,6 @@ extension Bitboard {
         self.init(squares: squares)
     }
     
-    internal func contains(_ square: Square) -> Bool {
-        return self.value & Bitboard(square).value != 0
-    }
-    
     internal var squares: [Square] {
         return Square.all.filter(self.contains)
     }
@@ -78,45 +74,15 @@ extension Bitboard {
 }
 
 extension Bitboard {
-    internal static prefix func ~ (bitBoard: Bitboard) -> Bitboard {
-        return Bitboard(~bitBoard.value)
-    }
-    
-    internal static func | (left: Bitboard, right: Bitboard) -> Bitboard {
-        return Bitboard(left.value | right.value)
-    }
-    
-    internal static func ^ (left: Bitboard, right: Bitboard) -> Bitboard {
-        return Bitboard(left.value ^ right.value)
-    }
-    
-    internal static func & (left: Bitboard, right: Bitboard) -> Bitboard {
-        return Bitboard(left.value & right.value)
-    }
-    
-    internal static func |= (left: inout Bitboard, right: Bitboard) {
-        left.value |= right.value
-    }
-    
-    internal static func ^= (left: inout Bitboard, right: Bitboard) {
-        left.value ^= right.value
-    }
-    
-    internal static func &= (left: inout Bitboard, right: Bitboard) {
-        left.value &= right.value
-    }
-}
-
-extension Bitboard {
     internal static let topEdge: Bitboard = Bitboard(squares: 1 ... 5)
     internal static let bottomEdge: Bitboard = Bitboard(squares: 46 ... 50)
     internal static let leftEdge: Bitboard = Bitboard(squares: 6, 16, 26, 36, 46)
     internal static let rightEdge: Bitboard = leftEdge >> 1
     
-    internal static let topLeftEdge: Bitboard = leftEdge | topEdge
-    internal static let topRightEdge: Bitboard = topEdge | rightEdge
-    internal static let bottomRightEdge: Bitboard = rightEdge | bottomEdge
-    internal static let bottomLeftEdge: Bitboard = bottomEdge | leftEdge
+    internal static let topLeftEdge: Bitboard = leftEdge.union(topEdge)
+    internal static let topRightEdge: Bitboard = topEdge.union(rightEdge)
+    internal static let bottomRightEdge: Bitboard = rightEdge.union(bottomEdge)
+    internal static let bottomLeftEdge: Bitboard = bottomEdge.union(leftEdge)
     
     internal static let realBoard: Bitboard = Bitboard(squares: Square.all)
 }

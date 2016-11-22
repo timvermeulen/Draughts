@@ -25,17 +25,17 @@ extension Position {
             
             for man in men {
                 switch player {
-                case .white: white |= Bitboard(man)
-                case .black: black |= Bitboard(man)
+                case .white: white.formUnion(Bitboard(man))
+                case .black: black.formUnion(Bitboard(man))
                 }
             }
             
             for king in kings {
                 switch player {
-                case .white: white |= Bitboard(king)
-                case .black: black |= Bitboard(king)
+                case .white: white.formUnion(Bitboard(king))
+                case .black: black.formUnion(Bitboard(king))
                 }
-                theKings |= Bitboard(king)
+                theKings.formUnion(Bitboard(king))
             }
         }
         

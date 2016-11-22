@@ -13,8 +13,8 @@ public struct Move {
         self.destination = destination
         self.over = over
         
-        let playerBitboard = Bitboard(origin.square) ^ Bitboard(destination)
-        let opponentBitboard = over.reduce(.empty) { $0 ^ Bitboard($1.square) }
+        let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
+        let opponentBitboard = over.reduce(Bitboard.empty) { $0.symmetricDifference(Bitboard($1.square)) }
         
         (white, black) = origin.player == .white
             ? (playerBitboard, opponentBitboard)
@@ -23,7 +23,10 @@ public struct Move {
         let promotion = piece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(destination) : .empty
         let capturedKings = Bitboard(squares: self.over.filter { $0.kind == .king }.map { $0.square })
         let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
-        kings = promotion ^ capturedKings ^ movedKing
+        
+        kings = promotion
+            .symmetricDifference(capturedKings)
+            .symmetricDifference(movedKing)
     }
 }
 
