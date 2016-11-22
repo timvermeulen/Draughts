@@ -96,6 +96,9 @@ class DraughtsTests: XCTestCase {
         )
         
         XCTAssertEqual(position, expected)
+        
+        let copy = XCTUnwrap(Position(fen: position.fen))
+        XCTAssertEqual(position, copy)
     }
     
     func testCoupTurc() {
@@ -126,5 +129,15 @@ class DraughtsTests: XCTestCase {
         }
         
         print(positions.map(String.init(describing:)).joined(separator: "\n\n"))
+    }
+    
+    func testChoiceNotation() {
+        let fen = "W:WK47:B42,43,39,40"
+        let position = XCTUnwrap(Position(fen: fen))
+        let moves = position.generateMoves().map { $0.notation }
+        
+        XCTAssertEqual(moves.count, 2)
+        XCTAssert(moves.contains("47x35 (over 43)"))
+        XCTAssert(moves.contains("47x35 (over 39)"))
     }
 }

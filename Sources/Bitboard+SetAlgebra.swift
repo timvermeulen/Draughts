@@ -1,5 +1,5 @@
 extension Bitboard {
-    internal var opposite: Bitboard {
+    internal var inverse: Bitboard {
         return Bitboard(~self.value)
     }
 }

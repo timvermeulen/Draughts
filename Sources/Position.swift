@@ -6,6 +6,10 @@ public struct Position {
         return player == .white ? white : black
     }
     
+    internal func pieces(of player: Player, kind: Piece.Kind) -> Bitboard {
+        return self.pieces(of: player).intersection(kind == .king ? self.kings : self.kings.inverse)
+    }
+    
     // MARK: -
     // MARK: Initialising a Position
     
@@ -13,8 +17,8 @@ public struct Position {
         self.white = white
         self.black = black
         self.kings = kings
-        self.empty = white.opposite
-            .intersection(black.opposite)
+        self.empty = white.inverse
+            .intersection(black.inverse)
             .intersection(Bitboard.realBoard)
         
         self.ply = ply
@@ -208,7 +212,7 @@ public struct Position {
     }
     
     internal func squaresThatCanSlide(to direction: Square.Direction) -> Bitboard {
-        return direction.edge.opposite.intersection(self.empty.shift(to: direction.opposite))
+        return direction.edge.inverse.intersection(self.empty.shift(to: direction.inverse))
     }
     
     internal func menThatCanSlide(to direction: Piece.Direction, of player: Player) -> Bitboard {

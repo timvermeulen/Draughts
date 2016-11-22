@@ -97,7 +97,7 @@ extension Square {
             }
         }
         
-        public var opposite: Direction {
+        public var inverse: Direction {
             switch self {
             case .topLeft: return .bottomRight
             case .topRight: return .bottomLeft

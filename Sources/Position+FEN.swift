@@ -1,6 +1,22 @@
 import Foundation
 
 extension Position {
+    var fen: String {
+        func pieceSymbols(of player: Player, kind: Piece.Kind) -> String {
+            return self
+                .pieces(of: player, kind: kind)
+                .squares
+                .map { "\(kind == .king ? "K" : "")\($0)" }
+                .joined(separator: ",")
+        }
+        
+        func pieceSymbols(of player: Player) -> String {
+            return "\(pieceSymbols(of: player, kind: .man)),\(pieceSymbols(of: player, kind: .king))"
+        }
+        
+        return "\(self.ply.player == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
+    }
+    
     public init?(fen: String) {
         let components = fen.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: ":")
         guard components.count == 3 && !components[1].isEmpty && !components[2].isEmpty else { return nil }
