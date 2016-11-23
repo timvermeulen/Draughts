@@ -121,23 +121,34 @@ class DraughtsTests: XCTestCase {
         XCTAssertEqual(next, expected)
     }
     
-    func testGame() {
-        let positions = sequence(first: Position.beginPosition) { position in
-            let moves = position.generateMoves()
-            guard let move = moves.first else { return nil }
-            return position.playing(move)
-        }
+    func testManIntermediateSquares() {
+        let fen = "W:W48:B43,33,22,21"
+        let position = XCTUnwrap(Position(fen: fen))
         
-        print(positions.map(String.init(describing:)).joined(separator: "\n\n"))
+        let moves = position.generateMoves()
+        XCTAssertEqual(moves.count, 1)
+        
+        let move = XCTUnwrap(moves.first)
+        let expectedMove = Move(
+            from: Piece(player: .white, kind: .man, square: 48),
+            to: 26,
+            over: position.pieces(of: .black).squares.map { Piece(player: .black, kind: .man, square: $0) }
+        )
+        XCTAssertEqual(move, expectedMove)
+        
+        let intermediateSquares = move.intermediateSquares
+        let expectedSquares: [Square] = [39, 28, 17]
+        
+        XCTAssertEqual(intermediateSquares, expectedSquares)
     }
     
-    func testChoiceNotation() {
-        let fen = "W:WK47:B42,43,39,40"
-        let position = XCTUnwrap(Position(fen: fen))
-        let moves = position.generateMoves().map { $0.notation }
-        
-        XCTAssertEqual(moves.count, 2)
-        XCTAssert(moves.contains("47x35 (over 43)"))
-        XCTAssert(moves.contains("47x35 (over 39)"))
-    }
+//    func testChoiceNotation() {
+//        let fen = "W:WK47:B42,43,39,40"
+//        let position = XCTUnwrap(Position(fen: fen))
+//        let moves = position.generateMoves().map { $0.notation }
+//        
+//        XCTAssertEqual(moves.count, 2)
+//        XCTAssert(moves.contains("47x35 (over 43)"))
+//        XCTAssert(moves.contains("47x35 (over 39)"))
+//    }
 }
