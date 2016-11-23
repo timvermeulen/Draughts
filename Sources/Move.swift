@@ -1,4 +1,4 @@
-public struct Move {
+public final class Move {
     public let piece: Piece
     public let destination: Square
     public let captures: [Piece]
@@ -30,10 +30,8 @@ public struct Move {
             .symmetricDifference(capturedKings)
             .symmetricDifference(movedKing)
     }
-}
-
-extension Move {
-    var allIntermediateSquares: [[Square]] {
+    
+    lazy var allIntermediateSquares: [[Square]] = {
         guard self.piece.kind == .king else {
             return self.anyIntermediateSquares.map { [$0] }
         }
@@ -55,9 +53,9 @@ extension Move {
                 fatalError("invalid move")
             }
         }
-    }
+    }()
     
-    var anyIntermediateSquares: [Square] {
+    lazy var anyIntermediateSquares: [Square] = {
         guard self.piece.kind == .man else {
             return self.allIntermediateSquares.flatMap { $0.first }
         }
@@ -74,12 +72,12 @@ extension Move {
             direction = newDirection
             return neighbor
         }
-    }
+    }()
     
-    var relevantSquares: [Square] {
+    lazy var relevantSquares: [Square] = {
         let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
         return intermediateRelevantSquares + [self.origin, self.destination]
-    }
+    }()
 }
 
 extension Move: Equatable {
