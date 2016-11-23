@@ -65,6 +65,10 @@ extension Square: Strideable {
 
 extension Square {
     public enum Direction: Int {
+        public enum Side {
+            case front, left, back, right
+        }
+        
         case topLeft = -6
         case topRight = -5
         case bottomRight = 6
@@ -79,30 +83,12 @@ extension Square {
             }
         }
         
-        public var left: Direction {
-            switch self {
-            case .topLeft: return .bottomLeft
-            case .topRight: return .topLeft
-            case .bottomRight: return .topRight
-            case .bottomLeft: return .bottomRight
-            }
-        }
-        
-        public var right: Direction {
-            switch self {
-            case .topLeft: return .topRight
-            case .topRight: return .bottomRight
-            case .bottomRight: return .bottomLeft
-            case .bottomLeft: return .topLeft
-            }
-        }
-        
-        public var inverse: Direction {
-            switch self {
-            case .topLeft: return .bottomRight
-            case .topRight: return .bottomLeft
-            case .bottomRight: return .topLeft
-            case .bottomLeft: return .topRight
+        public func turned(to relativeDirection: Side) -> Direction {
+            switch (self, relativeDirection) {
+            case (.topLeft, .front), (.topRight, .left),  (.bottomRight, .back),  (.bottomLeft, .right): return .topLeft
+            case (.topLeft, .right), (.topRight, .front), (.bottomRight, .left),  (.bottomLeft, .back):  return .topRight
+            case (.topLeft, .back),  (.topRight, .right), (.bottomRight, .front), (.bottomLeft, .left):  return .bottomRight
+            case (.topLeft, .left),  (.topRight, .back),  (.bottomRight, .right), (.bottomLeft, .front): return .bottomLeft
             }
         }
         

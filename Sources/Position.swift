@@ -121,8 +121,8 @@ public final class Position {
                     moves.append(newMove)
                 }
                 
-                for direction in [step.direction, step.direction.left, step.direction.right] {
-                    steps.append(Step(square: destination, direction: direction, captures: captures))
+                for side: Square.Direction.Side in [.front, .left, .right] {
+                    steps.append(Step(square: destination, direction: step.direction.turned(to: side), captures: captures))
                 }
             }
             
@@ -149,8 +149,8 @@ public final class Position {
                         moves.append(move)
                     }
                     
-                    for direction in [step.direction.left, step.direction.right] {
-                        steps.append(Step(square: destination, direction: direction, captures: captures))
+                    for side: Square.Direction.Side in [.left, .right] {
+                        steps.append(Step(square: destination, direction: step.direction.turned(to: side), captures: captures))
                     }
                 }
                 
@@ -203,7 +203,7 @@ public final class Position {
     }
     
     internal func squaresThatCanSlide(to direction: Square.Direction) -> Bitboard {
-        return direction.edge.inverse.intersection(self.empty.shift(to: direction.inverse))
+        return direction.edge.inverse.intersection(self.empty.shift(to: direction.turned(to: .back)))
     }
     
     internal func menThatCanSlide(to direction: Piece.Direction, of player: Player) -> Bitboard {
