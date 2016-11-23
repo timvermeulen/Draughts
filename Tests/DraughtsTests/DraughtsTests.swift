@@ -196,9 +196,11 @@ class DraughtsTests: SafeXCTestCase {
             let position = XCTUnwrap(Position(fen: "W:WK46:B41,42,38,30"))
             let picker = MovePicker(position)
             XCTAssertNil(picker.onlyCandidate)
+            
             picker.toggle(46)
             XCTAssertNil(picker.onlyCandidate)
             XCTAssertEqual(picker.candidates.count, 2)
+            
             picker.toggle(37)
             XCTAssertNotNil(picker.onlyCandidate)
         }
@@ -219,6 +221,19 @@ class DraughtsTests: SafeXCTestCase {
             picker.toggle(16)
             XCTAssertNotNil(picker.onlyCandidate)
         }
+    }
+    
+    func testMovePickerFromTo() {
+        let position = XCTUnwrap(Position(fen: "W:W32:B7,8,9,10,18,19,28"))
+        let picker = MovePicker(position)
+        XCTAssertNil(picker.onlyCandidate)
+        
+        picker.toggle(32)
+        picker.toggle(23)
+        XCTAssertNotEqual(picker.requirements, .empty)
+        XCTAssertNil(picker.onlyCandidate)
+        
+        XCTAssertNotNil(picker.onlyCandidate(from: 32, to: 23))
     }
     
 //    func testChoiceNotation() {
