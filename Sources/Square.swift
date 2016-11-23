@@ -92,15 +92,6 @@ extension Square {
             }
         }
         
-        public var next: [Direction] {
-            switch self {
-            case .bottomRight: return [.topRight, .bottomRight, .bottomLeft]
-            case .bottomLeft: return [.bottomRight, .bottomLeft, .topLeft]
-            case .topLeft: return [.bottomLeft, .topLeft, .topRight]
-            case .topRight: return [.topLeft, .topRight, .bottomRight]
-            }
-        }
-        
         internal var edge: Bitboard {
             switch self {
             case .topLeft: return Bitboard.topLeftEdge
