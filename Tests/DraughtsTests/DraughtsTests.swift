@@ -183,6 +183,27 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertEqual(result, expectedResult)
     }
     
+    func testMovePicker() {
+        do {
+            let position = Position.beginPosition
+            let picker = MovePicker(position)
+            XCTAssertNil(picker.onlyCandidate)
+            picker.toggle(26)
+            XCTAssertNotNil(picker.onlyCandidate)
+        }
+        
+        do {
+            let position = XCTUnwrap(Position(fen: "W:WK46:B41,42,38,30"))
+            let picker = MovePicker(position)
+            XCTAssertNil(picker.onlyCandidate)
+            picker.toggle(46)
+            XCTAssertNil(picker.onlyCandidate)
+            XCTAssertEqual(picker.candidates.count, 2)
+            picker.toggle(37)
+            XCTAssertNotNil(picker.onlyCandidate)
+        }
+    }
+    
 //    func testChoiceNotation() {
 //        let fen = "W:WK47:B42,43,39,40"
 //        let position = XCTUnwrap(Position(fen: fen))
