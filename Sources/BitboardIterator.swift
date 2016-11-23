@@ -7,7 +7,7 @@ struct BitboardIterator: IteratorProtocol {
     }
     
     mutating func next() -> Square? {
-        guard let square = (index.advanced(by: 1) ... 50).first(where: bitboard.contains) else { return nil }
+        guard let square = (index ... 50).dropFirst().first(where: bitboard.contains) else { return nil }
         self.index = square
         return square
     }
