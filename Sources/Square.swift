@@ -141,6 +141,7 @@ extension Square {
     }
     
     public func direction(to square: Square) -> Direction? {
+        // TODO: improve performance
         return Direction.all.first(where: { self.squares(to: $0).contains(square) })
     }
 }
