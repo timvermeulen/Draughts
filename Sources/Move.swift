@@ -30,6 +30,29 @@ public struct Move {
     }
 }
 
+extension Move {
+    var intermediateSquares: [Square] {
+        guard self.piece.kind == .man else { fatalError() }
+
+        guard let firstCapture = self.captures.first else { return [] }
+        guard var direction = self.origin.direction(to: firstCapture.square) else { fatalError("invalid move") }
+
+        var intermediates: [Square] = []
+        
+        for (from, to) in zip(self.captures, self.captures.dropFirst()) {
+            guard
+                let neighbor = from.square.neighbor(to: direction),
+                let newDirection = neighbor.direction(to: to.square)
+                else { fatalError("invalid move") }
+            
+            intermediates.append(neighbor)
+            direction = newDirection
+        }
+        
+        return intermediates
+    }
+}
+
 extension Move: Equatable {
     public static func == (left: Move, right: Move) -> Bool {
         return left.white == right.white &&
