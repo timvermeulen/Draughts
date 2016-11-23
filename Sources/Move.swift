@@ -33,25 +33,47 @@ public struct Move {
 }
 
 extension Move {
-    var intermediateSquares: [Square] {
-        guard self.piece.kind == .man else { fatalError() }
-
+    var allIntermediateSquares: [[Square]] {
+        guard self.piece.kind == .king else {
+            return self.anyIntermediateSquares.map { [$0] }
+        }
+        
         guard let firstCapture = self.captures.first else { return [] }
         guard var direction = self.origin.direction(to: firstCapture.square) else { fatalError("invalid move") }
-
-        var intermediates: [Square] = []
         
-        for (from, to) in zip(self.captures, self.captures.dropFirst()) {
+        return zip(self.captures, self.captures.dropFirst()).map { from, to in
+            if let squares = from.square.squares(before: to.square) {
+                return squares
+            } else {
+                for square in from.square.squares(to: direction) {
+                    guard let newDirection = square.direction(to: to.square) else { continue }
+                    
+                    direction = newDirection
+                    return [square]
+                }
+                
+                fatalError("invalid move")
+            }
+        }
+    }
+    
+    var anyIntermediateSquares: [Square] {
+        guard self.piece.kind == .man else {
+            return self.allIntermediateSquares.flatMap { $0.first }
+        }
+        
+        guard let firstCapture = self.captures.first else { return [] }
+        guard var direction = self.origin.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        
+        return zip(self.captures, self.captures.dropFirst()).map { from, to in
             guard
                 let neighbor = from.square.neighbor(to: direction),
                 let newDirection = neighbor.direction(to: to.square)
                 else { fatalError("invalid move") }
             
-            intermediates.append(neighbor)
             direction = newDirection
+            return neighbor
         }
-        
-        return intermediates
     }
 }
 

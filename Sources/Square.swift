@@ -127,8 +127,20 @@ extension Square {
     }
     
     public func direction(to square: Square) -> Direction? {
-        // TODO: improve performance
+        // TODO: improve performance, based on offsets
         return Direction.all.first(where: { self.squares(to: $0).contains(square) })
+    }
+    
+    // returns nil if the two squares aren't on one line (or are equal), and [] if they are neighbors
+    public func squares(before square: Square) -> [Square]? {
+        guard let direction = self.direction(to: square) else { return nil }
+        guard let neighbor = self.neighbor(to: direction) else { fatalError("edge of board reached before destination square") }
+        guard neighbor != square else { return [] }
+
+        return Array(first: neighbor, next: { inBetween in
+            guard let next = inBetween.neighbor(to: direction) else { fatalError("edge of board reached before destination square") }
+            return next == square ? nil : next
+        })
     }
 }
 

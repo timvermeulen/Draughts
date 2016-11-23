@@ -2,6 +2,10 @@ import XCTest
 import SafeXCTestCase
 @testable import Draughts
 
+func == <T: Equatable> (left: [[T]], right: [[T]]) -> Bool {
+    return left.count == right.count && !zip(left, right).contains(where: !=)
+}
+
 class DraughtsTests: SafeXCTestCase {
     func testOpeningMoves() {
         let position = Position.beginPosition
@@ -109,10 +113,20 @@ class DraughtsTests: SafeXCTestCase {
         )
         XCTAssertEqual(move, expectedMove)
         
-        let intermediateSquares = move.intermediateSquares
+        let intermediateSquares = move.anyIntermediateSquares
         let expectedSquares: [Square] = [39, 28, 17]
         
         XCTAssertEqual(intermediateSquares, expectedSquares)
+    }
+    
+    func testKingIntermediateSquares() {
+        let position = XCTUnwrap(Position(fen: "W:WK46:B19,20,30,32,43"))
+        let move = XCTUnwrap(position.legalMoves.first)
+        XCTAssert(position.legalMoves.count == 1)
+        
+        let intermediateSquares = move.allIntermediateSquares
+        let expectedIntermediateSquares: [[Square]] = [[28, 23], [14], [25], [34, 39]]
+        XCTAssert(intermediateSquares == expectedIntermediateSquares)
     }
     
     func testSlidingPromotion() {
