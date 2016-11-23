@@ -164,7 +164,7 @@ public final class Position {
     }
     
     internal func captures(of player: Player) -> [Move] {
-        let captures = self.pieces(of: player).squares.map { self.captures(of: $0) }
+        let captures = self.pieces(of: player).map { self.captures(of: $0) }
         guard let maxCapture = captures.map({ $0.amount }).max() else { return [] }
         let maxCaptures = captures.filter { $0.amount == maxCapture }
         return maxCaptures.flatMap { $0.captures }
@@ -184,7 +184,7 @@ public final class Position {
     }
     
     internal func slidingKingMoves(of player: Player) -> [Move] {
-        return self.pieces(of: player).squares.flatMap { self.slidingKingMoves(of: $0) }
+        return self.pieces(of: player).flatMap { self.slidingKingMoves(of: $0) }
     }
     
     internal func slidingManMoves(of player: Player) -> [Move] {
@@ -192,7 +192,7 @@ public final class Position {
     }
     
     internal func slidingManMoves(of player: Player, to pieceDirection: Piece.Direction) -> [Move] {
-        let squares = self.menThatCanSlide(to: pieceDirection, of: player).squares
+        let squares = self.menThatCanSlide(to: pieceDirection, of: player)
         
         return squares.flatMap { square in
             let direction = Square.Direction(player: player, pieceDirection: pieceDirection)

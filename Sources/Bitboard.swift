@@ -14,6 +14,12 @@ extension Bitboard: Equatable {
     }
 }
 
+extension Bitboard: Sequence {
+    func makeIterator() -> BitboardIterator {
+        return BitboardIterator(self)
+    }
+}
+
 extension Bitboard {
     internal init(_ square: Square) {
         self.value = 1 << UInt64(square.value)
@@ -25,10 +31,6 @@ extension Bitboard {
     
     internal init(squares: Square...) {
         self.init(squares: squares)
-    }
-    
-    internal var squares: [Square] {
-        return Square.all.filter(self.contains)
     }
     
     internal var count: Int {
