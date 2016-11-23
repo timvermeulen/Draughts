@@ -109,7 +109,7 @@ class DraughtsTests: SafeXCTestCase {
         let expectedMove = Move(
             from: Piece(player: .white, kind: .man, square: 48),
             to: 26,
-            over: position.pieces(of: .black).squares.map { Piece(player: .black, kind: .man, square: $0) }
+            over: position.pieces(of: .black).map { Piece(player: .black, kind: .man, square: $0) }
         )
         XCTAssertEqual(move, expectedMove)
         
