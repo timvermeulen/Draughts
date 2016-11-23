@@ -31,7 +31,7 @@ public final class Move {
             .symmetricDifference(movedKing)
     }
     
-    lazy var allIntermediateSquares: [[Square]] = {
+    public lazy var allIntermediateSquares: [[Square]] = {
         guard self.piece.kind == .king else {
             return self.anyIntermediateSquares.map { [$0] }
         }
@@ -55,7 +55,7 @@ public final class Move {
         }
     }()
     
-    lazy var anyIntermediateSquares: [Square] = {
+    public lazy var anyIntermediateSquares: [Square] = {
         guard self.piece.kind == .man else {
             return self.allIntermediateSquares.flatMap { $0.first }
         }
@@ -74,7 +74,7 @@ public final class Move {
         }
     }()
     
-    lazy var relevantSquares: [Square] = {
+    public lazy var relevantSquares: [Square] = {
         let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
         return intermediateRelevantSquares + [self.origin, self.destination]
     }()
