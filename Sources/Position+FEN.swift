@@ -17,7 +17,7 @@ extension Position {
         return "\(self.ply.player == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
     }
     
-    public init?(fen: String) {
+    public convenience init?(fen: String) {
         let components = fen.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: ":")
         guard components.count == 3 && !components[1].isEmpty && !components[2].isEmpty else { return nil }
         

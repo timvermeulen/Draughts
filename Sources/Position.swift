@@ -1,6 +1,10 @@
-public struct Position {
+public final class Position {
     fileprivate let white, black, kings, empty: Bitboard
     public let ply: Ply
+    
+    lazy var legalMoves: [Move] = {
+        return self.moves(of: self.ply.player)
+    }()
     
     internal func pieces(of player: Player) -> Bitboard {
         return player == .white ? white : black
@@ -24,7 +28,7 @@ public struct Position {
         self.ply = ply
     }
     
-    public init(pieces: [Piece], ply: Ply = Ply()) {
+    public convenience init(pieces: [Piece], ply: Ply = Ply()) {
         let white = Bitboard(squares: pieces.filter { $0.player == .white }.map { $0.square })
         let black = Bitboard(squares: pieces.filter { $0.player == .black }.map { $0.square })
         let kings = Bitboard(squares: pieces.filter { $0.kind == .king }.map { $0.square })
@@ -57,10 +61,6 @@ public struct Position {
     
     // MARK: -
     // MARK: Man moves
-    
-    public func generateMoves() -> [Move] {
-        return self.moves(of: self.ply.player)
-    }
     
     internal func moves(of player: Player) -> [Move] {
         let captures = self.captures(of: player)
