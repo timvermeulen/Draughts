@@ -75,6 +75,10 @@ extension Move {
             return neighbor
         }
     }
+    
+    var relevantSquares: [Square] {
+        return [self.origin, self.destination] + self.allIntermediateSquares.joined()
+    }
 }
 
 extension Move: Equatable {
