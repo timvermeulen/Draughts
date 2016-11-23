@@ -37,18 +37,21 @@ extension Bitboard: SetAlgebra {
         self.value ^= other.value
     }
     
+    @discardableResult
     internal mutating func insert(_ square: Square) -> (inserted: Bool, memberAfterInsert: Square) {
         let inserted = !self.contains(square)
         self.value |= Bitboard(square).value
         return (inserted, square)
     }
     
+    @discardableResult
     internal mutating func remove(_ square: Square) -> Square? {
         let contained = self.contains(square)
         self.value &= ~Bitboard(square).value
         return contained ? square : nil
     }
     
+    @discardableResult
     internal mutating func update(with square: Square) -> Square? {
         return self.insert(square).inserted ? square : nil
     }
