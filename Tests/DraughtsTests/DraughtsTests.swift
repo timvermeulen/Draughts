@@ -47,8 +47,7 @@ class DraughtsTests: XCTestCase {
     }
     
     func testKingSlidingMoves() {
-        let fen = "W:WK33:B"
-        let position = XCTUnwrap(Position(fen: fen))
+        let position = XCTUnwrap(Position(fen: "W:WK33:B"))
         
         let moves = Set(position.legalMoves.map { $0.notation })
         let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
@@ -83,9 +82,7 @@ class DraughtsTests: XCTestCase {
     }
     
     func testFEN() {
-        let fen = "W:W28,K29:BK22,23"
-        
-        let position = XCTUnwrap(Position(fen: fen))
+        let position = XCTUnwrap(Position(fen: "W:W28,K29:BK22,23"))
         let expected = Position(
             pieces: [
                 Piece(player: .white, kind: .man, square: 28),
@@ -102,8 +99,7 @@ class DraughtsTests: XCTestCase {
     }
     
     func testCoupTurc() {
-        let fen = "W:WK26:B9,12,13,23,24"
-        let position = XCTUnwrap(Position(fen: fen))
+        let position = XCTUnwrap(Position(fen: "W:WK26:B9,12,13,23,24"))
         let moves = position.legalMoves
         
         let move = XCTUnwrap(moves.first)
@@ -122,8 +118,7 @@ class DraughtsTests: XCTestCase {
     }
     
     func testManIntermediateSquares() {
-        let fen = "W:W48:B43,33,22,21"
-        let position = XCTUnwrap(Position(fen: fen))
+        let position = XCTUnwrap(Position(fen: "W:W48:B43,33,22,21"))
         
         let moves = position.legalMoves
         XCTAssertEqual(moves.count, 1)
@@ -143,8 +138,7 @@ class DraughtsTests: XCTestCase {
     }
     
     func testSlidingPromotion() {
-        let fen = "W:W6:B45"
-        let pos1 = XCTUnwrap(Position(fen: fen))
+        let pos1 = XCTUnwrap(Position(fen: "W:W6:B45"))
         
         let move1 = XCTUnwrap(pos1.legalMoves.first)
         XCTAssertEqual(pos1.legalMoves.count, 1)
@@ -174,8 +168,7 @@ class DraughtsTests: XCTestCase {
     }
     
     func testCapturingPromotion() {
-        let fen = "W:W15:B10"
-        let position = XCTUnwrap(Position(fen: fen))
+        let position = XCTUnwrap(Position(fen: "W:W15:B10"))
         
         let move = XCTUnwrap(position.legalMoves.first)
         XCTAssertEqual(position.legalMoves.count, 1)
