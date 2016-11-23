@@ -69,7 +69,7 @@ extension Bitboard {
     }
     
     internal func shift(to direction: Square.Direction, count: Int = 1) -> Bitboard {
-        return self << (direction.rawValue * count)
+        return self << (direction.offset * count)
     }
 }
 

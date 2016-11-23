@@ -64,15 +64,15 @@ extension Square: Strideable {
 }
 
 extension Square {
-    public enum Direction: Int {
+    public enum Direction {
         public enum Side {
             case front, left, back, right
         }
         
-        case topLeft = -6
-        case topRight = -5
-        case bottomRight = 6
-        case bottomLeft = 5
+        case topLeft
+        case topRight
+        case bottomRight
+        case bottomLeft
         
         public init(player: Player, pieceDirection: Piece.Direction) {
             switch (player, pieceDirection) {
@@ -80,6 +80,15 @@ extension Square {
             case (.white, .right): self = .topRight
             case (.black, .left): self = .bottomLeft
             case (.black, .right): self = .bottomRight
+            }
+        }
+        
+        internal var offset: Int {
+            switch self {
+            case .topLeft: return -6
+            case .topRight: return -5
+            case .bottomRight: return 6
+            case .bottomLeft: return 5
             }
         }
         
@@ -109,7 +118,7 @@ extension Square {
 
 extension Square {
     public func neighbor(to direction: Direction) -> Square? {
-        return Square(checking: self.value + direction.rawValue)
+        return Square(checking: self.value + direction.offset)
     }
     
     public func squares(to direction: Direction) -> [Square] {
