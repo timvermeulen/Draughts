@@ -23,7 +23,7 @@ extension Position {
         
         var white = Bitboard.empty
         var black = Bitboard.empty
-        var theKings = Bitboard.empty
+        var kings = Bitboard.empty
         let player: Player = components[0] == "W" ? .white : .black
         
         for (component, player): (String, Player) in [(components[1], .white), (components[2], .black)] {
@@ -34,7 +34,7 @@ extension Position {
                 .flatMap { Int($0) }
                 .map(Square.init(humanValue:))
             
-            let kings = pieceStrings
+            let theKings = pieceStrings
                 .filter { $0.characters.first == "K" }
                 .flatMap { Int($0.substring(from: $0.index(after: $0.startIndex))) }
                 .map(Square.init(humanValue:))
@@ -46,15 +46,16 @@ extension Position {
                 }
             }
             
-            for king in kings {
+            for king in theKings {
                 switch player {
                 case .white: white.formUnion(Bitboard(king))
                 case .black: black.formUnion(Bitboard(king))
                 }
-                theKings.formUnion(Bitboard(king))
+                
+                kings.formUnion(Bitboard(king))
             }
         }
         
-        self.init(white: white, black: black, kings: theKings, ply: Ply(player: player))
+        self.init(white: white, black: black, kings: kings, ply: Ply(player: player))
     }
 }
