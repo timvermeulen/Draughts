@@ -63,7 +63,7 @@ extension Move: Equatable {
 
 extension Move: TextOutputStreamable {
     public var notation: String {
-        return "\(origin.humanValue)\(isCapture ? "x" : "-")\(destination.humanValue)"
+        return "\(origin)\(isCapture ? "x" : "-")\(destination)"
     }
     
     public func write<Target: TextOutputStream>(to target: inout Target) {
