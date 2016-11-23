@@ -5,8 +5,8 @@ public struct Move {
     
     internal let white, black, kings: Bitboard
     
-    public var origin: Square { return piece.square }
-    public var isCapture: Bool { return !captures.isEmpty }
+    public var origin: Square { return self.piece.square }
+    public var isCapture: Bool { return !self.captures.isEmpty }
     
     public init(from origin: Piece, to destination: Square, over captures: [Piece] = []) {
         self.piece = origin
