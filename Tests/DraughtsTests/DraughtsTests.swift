@@ -142,6 +142,62 @@ class DraughtsTests: XCTestCase {
         XCTAssertEqual(intermediateSquares, expectedSquares)
     }
     
+    func testSlidingPromotion() {
+        let fen = "W:W6:B45"
+        let pos1 = XCTUnwrap(Position(fen: fen))
+        
+        let move1 = XCTUnwrap(pos1.legalMoves.first)
+        XCTAssertEqual(pos1.legalMoves.count, 1)
+        
+        let pos2 = pos1.playing(move1)
+        let expected1 = Position(
+            pieces: [
+                Piece(player: .white, kind: .king, square: 1),
+                Piece(player: .black, kind: .man, square: 45)
+            ],
+            ply: Ply(player: .black)
+        )
+        XCTAssertEqual(pos2, expected1)
+        
+        let move2 = XCTUnwrap(pos2.legalMoves.first)
+        XCTAssertEqual(pos2.legalMoves.count, 1)
+        
+        let pos3 = pos2.playing(move2)
+        let expected2 = Position(
+            pieces: [
+                Piece(player: .white, kind: .king, square: 1),
+                Piece(player: .black, kind: .king, square: 50)
+            ],
+            ply: Ply(player: .white)
+        )
+        XCTAssertEqual(pos3, expected2)
+    }
+    
+    func testCapturingPromotion() {
+        let fen = "W:W15:B10"
+        let position = XCTUnwrap(Position(fen: fen))
+        
+        let move = XCTUnwrap(position.legalMoves.first)
+        XCTAssertEqual(position.legalMoves.count, 1)
+        let expectedMove = Move(
+            from: Piece(player: .white, kind: .man, square: 15),
+            to: 4,
+            over: [
+                Piece(player: .black, kind: .man, square: 10)
+            ]
+        )
+        XCTAssertEqual(move, expectedMove)
+        
+        let result = position.playing(move)
+        let expectedResult = Position(
+            pieces: [
+                Piece(player: .white, kind: .king, square: 4)
+            ],
+            ply: Ply(player: .black)
+        )
+        XCTAssertEqual(result, expectedResult)
+    }
+    
 //    func testChoiceNotation() {
 //        let fen = "W:WK47:B42,43,39,40"
 //        let position = XCTUnwrap(Position(fen: fen))
