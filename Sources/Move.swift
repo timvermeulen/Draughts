@@ -77,7 +77,8 @@ extension Move {
     }
     
     var relevantSquares: [Square] {
-        return [self.origin, self.destination] + self.allIntermediateSquares.joined()
+        let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
+        return intermediateRelevantSquares + [self.origin, self.destination]
     }
 }
 
