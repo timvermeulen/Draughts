@@ -53,4 +53,10 @@ extension MovePicker {
             self.restore()
         }
     }
+    
+    public func onlyCandidate(from start: Square, to end: Square) -> Move? {
+        let filtered = self.candidates.filter { $0.origin == start && $0.destination == end }
+        guard let move = filtered.first, filtered.count == 1 else { return nil }
+        return move
+    }
 }
