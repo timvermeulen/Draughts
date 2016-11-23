@@ -9,7 +9,7 @@ func XCTFatal(_ message: String = "", file: StaticString = #file, line: UInt = #
 }
 
 func XCTUnwrap<T>(_ expression: @autoclosure () throws -> T?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
-    XCTAssertNotNil(try expression(), message())
+    XCTAssertNotNil(try expression(), message(), file: file, line: line)
     guard let result = (try? expression()) ?? nil else { fatalError(errorMessage) }
     return result
 }
