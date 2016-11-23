@@ -202,6 +202,23 @@ class DraughtsTests: SafeXCTestCase {
             picker.toggle(37)
             XCTAssertNotNil(picker.onlyCandidate)
         }
+        
+        do {
+            let position = XCTUnwrap(Position(fen: "W:WK26:B7,9,12,13,29,32,34,37,40"))
+            XCTAssertEqual(position.legalMoves.count, 9)
+            
+            let picker = MovePicker(position)
+            XCTAssertNil(picker.onlyCandidate)
+            
+            picker.toggle(40)
+            XCTAssertEqual(picker.candidates.count, 4)
+            
+            picker.toggle(34)
+            XCTAssertEqual(picker.candidates.count, 2)
+            
+            picker.toggle(16)
+            XCTAssertNotNil(picker.onlyCandidate)
+        }
     }
     
 //    func testChoiceNotation() {
