@@ -1,6 +1,6 @@
 public struct Position {
-    fileprivate var white, black, kings, empty: Bitboard
-    public var ply: Ply
+    fileprivate let white, black, kings, empty: Bitboard
+    public let ply: Ply
     
     internal func pieces(of player: Player) -> Bitboard {
         return player == .white ? white : black
@@ -46,22 +46,13 @@ public struct Position {
     // MARK: -
     // MARK: Applying moves
     
-    public mutating func play(_ move: Move) {
-        self.white.formSymmetricDifference(move.white)
-        self.black.formSymmetricDifference(move.black)
-        self.kings.formSymmetricDifference(move.kings)
-        
-        self.empty.formSymmetricDifference(
-            move.white.symmetricDifference(move.black)
-        )
-        
-        self.ply = ply.successor
-    }
-    
     public func playing(_ move: Move) -> Position {
-        var position = self
-        position.play(move)
-        return position
+        return Position(
+            white: self.white.symmetricDifference(move.white),
+            black: self.black.symmetricDifference(move.black),
+            kings: self.kings.symmetricDifference(move.kings),
+            ply: self.ply.successor
+        )
     }
     
     // MARK: -

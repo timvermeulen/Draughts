@@ -57,29 +57,29 @@ class DraughtsTests: XCTestCase {
     }
 
     func testCapture() {
-        var position = Position.beginPosition
+        let pos1 = Position.beginPosition
         
-        let openingMoves = position.generateMoves()
+        let openingMoves = pos1.generateMoves()
         let firstMove = XCTUnwrap(
             openingMoves.first(where: { $0.notation == "32-28" })
         )
-        position.play(firstMove)
+        let pos2 = pos1.playing(firstMove)
         
-        let returnMoves = position.generateMoves()
+        let returnMoves = pos2.generateMoves()
         let secondMove = XCTUnwrap(
             returnMoves.first(where: { $0.notation == "19-23" })
         )
-        position.play(secondMove)
+        let pos3 = pos2.playing(secondMove)
         
-        let returnReturnMoves = position.generateMoves()
+        let returnReturnMoves = pos3.generateMoves()
         let capture = XCTUnwrap(returnReturnMoves.first)
         XCTAssertEqual(returnReturnMoves.count, 1)
         XCTAssertTrue(capture.isCapture)
         
-        position.play(capture)
+        let pos4 = pos3.playing(capture)
         
-        XCTAssertEqual(position.pieces(of: .white).count, 20)
-        XCTAssertEqual(position.pieces(of: .black).count, 19)
+        XCTAssertEqual(pos4.pieces(of: .white).count, 20)
+        XCTAssertEqual(pos4.pieces(of: .black).count, 19)
     }
     
     func testFEN() {
