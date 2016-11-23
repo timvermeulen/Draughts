@@ -8,13 +8,15 @@ public struct Move {
     public var origin: Square { return piece.square }
     public var isCapture: Bool { return !captures.isEmpty }
     
-    public init(from origin: Piece, to destination: Square, over: [Piece] = []) {
+    public init(from origin: Piece, to destination: Square, over captures: [Piece] = []) {
         self.piece = origin
         self.destination = destination
-        self.captures = over
+        self.captures = captures
         
         let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
-        let opponentBitboard = over.reduce(Bitboard.empty) { $0.symmetricDifference(Bitboard($1.square)) }
+        let opponentBitboard = captures
+            .map { Bitboard($0.square) }
+            .reduce(Bitboard.empty) { $0.symmetricDifference($1) }
         
         (white, black) = origin.player == .white
             ? (playerBitboard, opponentBitboard)
