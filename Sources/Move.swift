@@ -1,16 +1,16 @@
 public final class Move {
     public let piece: Piece
-    public let destination: Square
+    public let end: Square
     public let captures: [Piece]
     
     internal let white, black, kings: Bitboard
     
-    public var origin: Square { return self.piece.square }
+    public var start: Square { return self.piece.square }
     public var isCapture: Bool { return !self.captures.isEmpty }
     
     public init(from origin: Piece, to destination: Square, over captures: [Piece] = []) {
         self.piece = origin
-        self.destination = destination
+        self.end = destination
         self.captures = captures
         
         let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
@@ -37,7 +37,7 @@ public final class Move {
         }
         
         guard let firstCapture = self.captures.first else { return [] }
-        guard var direction = self.origin.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        guard var direction = self.start.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
         return zip(self.captures, self.captures.dropFirst()).map { from, to in
             if let squares = from.square.squares(before: to.square) {
@@ -61,7 +61,7 @@ public final class Move {
         }
         
         guard let firstCapture = self.captures.first else { return [] }
-        guard var direction = self.origin.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        guard var direction = self.start.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
         return zip(self.captures, self.captures.dropFirst()).map { from, to in
             guard
@@ -76,7 +76,7 @@ public final class Move {
     
     public lazy var relevantSquares: [Square] = {
         let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
-        return intermediateRelevantSquares + [self.origin, self.destination]
+        return intermediateRelevantSquares + [self.start, self.end]
     }()
 }
 
@@ -90,7 +90,7 @@ extension Move: Equatable {
 
 extension Move: TextOutputStreamable {
     public var notation: String {
-        return "\(origin)\(isCapture ? "x" : "-")\(destination)"
+        return "\(start)\(isCapture ? "x" : "-")\(end)"
     }
     
     public func write<Target: TextOutputStream>(to target: inout Target) {
