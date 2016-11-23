@@ -1,30 +1,8 @@
 import XCTest
+import SafeXCTestCase
 @testable import Draughts
 
-let errorMessage = "`continueAfterFailure` should be set to `false` inside `setUp()`, and set to `true` inside `tearDown()`"
-
-func XCTFatal(_ message: String = "", file: StaticString = #file, line: UInt = #line) -> Never {
-    XCTFail(message, file: file, line: line)
-    fatalError(errorMessage)
-}
-
-func XCTUnwrap<T>(_ expression: @autoclosure () throws -> T?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
-    XCTAssertNotNil(try expression(), message(), file: file, line: line)
-    guard let result = (try? expression()) ?? nil else { fatalError(errorMessage) }
-    return result
-}
-
-class DraughtsTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        self.continueAfterFailure = false
-    }
-    
-    override func tearDown() {
-        self.continueAfterFailure = true
-        super.tearDown()
-    }
-    
+class DraughtsTests: SafeXCTestCase {
     func testOpeningMoves() {
         let position = Position.beginPosition
         
