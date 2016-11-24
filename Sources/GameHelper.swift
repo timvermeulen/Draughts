@@ -1,15 +1,19 @@
 public final class GameHelper {
     public var game: Game
-    private var movePicker: MovePicker
+    fileprivate var movePicker: MovePicker
     
     public init(_ game: Game) {
         self.game = game
         self.movePicker = MovePicker(game.endPosition)
     }
     
+    private func reloadMovePicker() {
+        self.movePicker = MovePicker(game.endPosition)
+    }
+    
     private func play(_ move: Move) {
         self.game.play(move)
-        self.movePicker = MovePicker(game.endPosition)
+        self.reloadMovePicker()
     }
     
     public func toggle(_ square: Square) {
