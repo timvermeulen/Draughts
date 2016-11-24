@@ -41,16 +41,17 @@ extension MovePicker {
     }
     
     public func toggle(_ square: Square) {
-        guard self.requirements.remove(square) == nil else {
+        guard !self.requirements.contains(square) else {
+            self.requirements.remove(square)
             self.generateCandidates()
             return
         }
         
         self.requirements.insert(square)
-        self.candidates = self.candidates.filter { $0.relevantSquares.contains(square) }
+        let newCandidates = self.candidates.filter { $0.relevantSquares.contains(square) }
         
-        if self.candidates.isEmpty {
-            self.restore()
+        if !newCandidates.isEmpty {
+            self.candidates = newCandidates
         }
     }
     

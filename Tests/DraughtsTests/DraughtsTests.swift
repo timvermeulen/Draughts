@@ -225,6 +225,18 @@ class DraughtsTests: SafeXCTestCase {
         }
     }
     
+    func testMovePickerIrrelevantToggle() {
+        let position = XCTUnwrap(Position(fen: "W:W28:B13,14,23"))
+        let picker = MovePicker(position)
+        
+        picker.toggle(28)
+        XCTAssertNil(picker.onlyCandidate)
+        XCTAssertNotEqual(picker.requirements, .empty)
+        
+        picker.toggle(50)
+        XCTAssertNotEqual(picker.requirements, .empty)
+    }
+    
     func testMovePickerFromTo() {
         let position = XCTUnwrap(Position(fen: "W:W32:B7,8,9,10,18,19,28"))
         let picker = MovePicker(position)
