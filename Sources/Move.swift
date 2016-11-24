@@ -3,8 +3,7 @@ public final class Move {
     public let end: Square
     public let captures: [Piece]
     
-    fileprivate let position: Position
-    
+    internal let position: Position
     internal let white, black, kings: Bitboard
     
     public var start: Square { return self.piece.square }
