@@ -50,6 +50,10 @@ public final class Position {
     // MARK: -
     // MARK: Moves
     
+    public func moveIsValid(_ move: Move) -> Bool {
+        return move.position === self
+    }
+    
     internal func moves(of player: Player) -> [Move] {
         let captures = self.captures(of: player)
         return captures.isEmpty ? self.slidingMoves(of: player) : captures
