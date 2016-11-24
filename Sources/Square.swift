@@ -13,34 +13,38 @@
  .--------------------          --------------------
  */
 
+private func valueIsValid(_ value: Int) -> Bool {
+    return (0 ... 53).contains(value) && value % 11 != 10
+}
+
 public struct Square {
     internal let value: Int
     
-    var humanValue: Int { return (value / 11) * 10 + (value % 11) + 1 }
+    public var humanValue: Int { return (value / 11) * 10 + (value % 11) + 1 }
     
-    init(humanValue value: Int) {
+    public init(humanValue value: Int) {
         assert((1 ... 50).contains(value), "\(value) is not a valid square")
         self.init(value: ((value - 1) / 10) * 11 + ((value - 1) % 10))
     }
     
-    init?(checking value: Int) {
-        guard (0 ... 53).contains(value) && value % 11 != 10 else { return nil }
+    internal init?(checking value: Int) {
+        guard valueIsValid(value) else { return nil }
         self.value = value
     }
     
-    init(value: Int) {
-        guard let square = Square(checking: value) else { fatalError("\(value) is not a valid square value") }
-        self = square
+    internal init(value: Int) {
+        assert(valueIsValid(value), "\(value) is not a valid square value")
+        self.value = value
     }
     
-    func isOnPromotionRow(of player: Player) -> Bool {
+    public func isOnPromotionRow(of player: Player) -> Bool {
         switch player {
         case .white: return value < 5
         case .black: return value >= 49
         }
     }
     
-    static let all = (1 ... 50).map(Square.init(humanValue:))
+    public static let all = (1 ... 50).map(Square.init(humanValue:))
 }
 
 extension Square: Comparable {
