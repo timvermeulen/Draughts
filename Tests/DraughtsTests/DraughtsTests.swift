@@ -296,4 +296,30 @@ class DraughtsTests: SafeXCTestCase {
         print(game.notation)
         print(game.endPosition)
     }
+    
+    func testGameHelper() {
+        do {
+            let position = XCTUnwrap(Position(fen: "B:W48,49:B2,3"))
+            let helper = GameHelper(Game(position: position))
+            XCTAssertTrue(helper.game.moves.isEmpty)
+            
+            helper.toggle(9)
+            XCTAssertEqual(helper.game.moves.count, 1)
+            
+            helper.move(from: 48, to: 43)
+            XCTAssertEqual(helper.game.moves.count, 2)
+        }
+        
+        do {
+            let helper = GameHelper(Game(position: .beginPosition))
+            XCTAssertTrue(helper.game.moves.isEmpty)
+            
+            helper.toggle(35)
+            helper.toggle(30)
+            XCTAssertEqual(helper.game.moves.count, 1)
+            
+            helper.move(from: 17, to: 21)
+            XCTAssertEqual(helper.game.moves.count, 2)
+        }
+    }
 }
