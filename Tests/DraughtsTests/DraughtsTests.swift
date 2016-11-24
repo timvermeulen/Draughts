@@ -2,6 +2,36 @@ import XCTest
 import SafeXCTestCase
 @testable import Draughts
 
+let errorMessage = "`continueAfterFailure` should be set to `false` inside `setUp()`, and set to `true` inside `tearDown()`"
+
+public func XCTFatal(_ message: String = "", file: StaticString = #file, line: UInt = #line) -> Never {
+    XCTFail(message, file: file, line: line)
+    fatalError(errorMessage)
+}
+
+public func XCTUnwrap<T>(_ expression: @autoclosure () throws -> T?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
+    XCTAssertNotNil(try expression(), message(), file: file, line: line)
+    
+    do {
+        guard let result = try expression() else { fatalError(errorMessage) }
+        return result
+    } catch {
+        fatalError(errorMessage)
+    }
+}
+
+open class SafeXCTestCase: XCTestCase {
+    override open func setUp() {
+        super.setUp()
+        self.continueAfterFailure = false
+    }
+    
+    override open func tearDown() {
+        self.continueAfterFailure = true
+        super.tearDown()
+    }
+}
+
 func == <T: Equatable> (left: [[T]], right: [[T]]) -> Bool {
     return left.count == right.count && !zip(left, right).contains(where: !=)
 }
