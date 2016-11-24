@@ -238,6 +238,19 @@ public final class Position {
     }
     
     // MARK: -
+    // MARK: Notation
+    
+    internal func essentialCaptures(of move: Move) -> [Square] {
+        let similarMoves = self.legalMoves.filter { $0.start == move.start && $0.end == move.end }
+        
+        func isRelevant(_ capture: Piece) -> Bool {
+            return similarMoves.contains(where: { !$0.captures.contains(capture) })
+        }
+        
+        return move.captures.filter(isRelevant).map { $0.square }
+    }
+    
+    // MARK: -
 }
 
 extension Position: Equatable {
