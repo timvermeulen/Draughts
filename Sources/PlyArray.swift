@@ -3,9 +3,9 @@ internal struct PlyArray<Element> {
     
     internal var startPly: Ply
     
-    internal init(index: Ply) {
+    internal init(_ ply: Ply) {
         contents = []
-        startPly = index
+        startPly = ply
     }
 }
 
@@ -30,10 +30,17 @@ extension PlyArray: RandomAccessCollection {
     }
     
     internal subscript(ply: Ply) -> Element {
-        return contents[ply.number - self.startPly.number]
+        get { return self.contents[ply.number - self.startPly.number] }
+        set { self.contents[ply.number - self.startPly.number] = newValue }
     }
     
     internal mutating func reserveCapacity(n: Int) {
         contents.reserveCapacity(n)
+    }
+}
+
+extension PlyArray {
+    internal mutating func append(_ element: Element) {
+        self.contents.append(element)
     }
 }
