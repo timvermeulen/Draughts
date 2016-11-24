@@ -1,14 +1,23 @@
 struct BitboardIterator: IteratorProtocol {
     let bitboard: Bitboard
-    var index: Square = 1
+    var index = 0
     
     init(_ bitboard: Bitboard) {
         self.bitboard = bitboard
     }
     
     mutating func next() -> Square? {
-        guard let square = (index ... 50).dropFirst().first(where: bitboard.contains) else { return nil }
-        self.index = square
-        return square
+        while self.index < 64 {
+            defer { self.index += 1 }
+            
+            guard
+                let square = Square(checking: self.index),
+                self.bitboard.contains(square)
+                else { continue }
+            
+            return square
+        }
+        
+        return nil
     }
 }

@@ -280,4 +280,9 @@ class DraughtsTests: SafeXCTestCase {
             XCTAssert(moves.contains("21x26 (over 13 and 34)"))
         }
     }
+    
+    func testMoveFromOne() {
+        let position = XCTUnwrap(Position(fen: "W:WK1:B"))
+        XCTAssertNotEqual(position.legalMoves.count, 0)
+    }
 }
