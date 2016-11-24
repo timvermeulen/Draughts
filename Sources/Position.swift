@@ -2,7 +2,7 @@ public final class Position {
     internal let white, black, kings, empty: Bitboard
     public let ply: Ply
     
-    lazy var legalMoves: [Move] = {
+    public lazy var legalMoves: [Move] = {
         return self.moves(of: self.ply.player)
     }()
     
