@@ -34,8 +34,8 @@ extension PlyArray: RandomAccessCollection {
         set { self.contents[ply.number - self.startPly.number] = newValue }
     }
     
-    internal mutating func reserveCapacity(n: Int) {
-        contents.reserveCapacity(n)
+    internal mutating func reserveCapacity(capacity: Int) {
+        contents.reserveCapacity(capacity)
     }
 }
 

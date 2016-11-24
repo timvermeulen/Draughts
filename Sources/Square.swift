@@ -58,8 +58,8 @@ extension Square: Comparable {
 }
 
 extension Square: Strideable {
-    public func advanced(by n: Int) -> Square {
-        return Square(humanValue: self.humanValue + n)
+    public func advanced(by distance: Int) -> Square {
+        return Square(humanValue: self.humanValue + distance)
     }
     
     public func distance(to other: Square) -> Int {
@@ -98,10 +98,10 @@ extension Square {
         
         public func turned(to relativeDirection: Side) -> Direction {
             switch (self, relativeDirection) {
-            case (.topLeft, .front), (.topRight, .left),  (.bottomRight, .back),  (.bottomLeft, .right): return .topLeft
-            case (.topLeft, .right), (.topRight, .front), (.bottomRight, .left),  (.bottomLeft, .back):  return .topRight
-            case (.topLeft, .back),  (.topRight, .right), (.bottomRight, .front), (.bottomLeft, .left):  return .bottomRight
-            case (.topLeft, .left),  (.topRight, .back),  (.bottomRight, .right), (.bottomLeft, .front): return .bottomLeft
+            case (.topLeft, .front), (.topRight, .left), (.bottomRight, .back), (.bottomLeft, .right): return .topLeft
+            case (.topLeft, .right), (.topRight, .front), (.bottomRight, .left), (.bottomLeft, .back): return .topRight
+            case (.topLeft, .back), (.topRight, .right), (.bottomRight, .front), (.bottomLeft, .left): return .bottomRight
+            case (.topLeft, .left), (.topRight, .back), (.bottomRight, .right), (.bottomLeft, .front): return .bottomLeft
             }
         }
         

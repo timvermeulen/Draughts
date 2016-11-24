@@ -75,6 +75,19 @@ public final class Position {
         var steps = Square.Direction.all.map { Step(square: square, direction: $0, captures: []) }
         var maxCapture = 0
         
+        func handleMove(_ move: Move, direction: Square.Direction, sides: Square.Direction.Side...) {
+            if move.captures.count > maxCapture {
+                maxCapture = move.captures.count
+                moves = [move]
+            } else if move.captures.count == maxCapture && !moves.contains(move) {
+                moves.append(move)
+            }
+            
+            for side: Square.Direction.Side in sides {
+                steps.append(Step(square: move.end, direction: direction.turned(to: side), captures: move.captures))
+            }
+        }
+        
         switch piece.kind {
         case .man:
             while let step = steps.popLast() {
@@ -86,21 +99,8 @@ public final class Position {
                     self.squareIsEmpty(destination) || destination == square
                     else { continue }
                 
-                let captures = step.captures + [opponentPiece]
-                let newMove = Move(from: piece, to: destination, over: captures, position: self)
-                
-                if captures.count > maxCapture {
-                    maxCapture = captures.count
-                    moves.removeAll()
-                }
-                
-                if captures.count == maxCapture && !moves.contains(newMove) {
-                    moves.append(newMove)
-                }
-                
-                for side: Square.Direction.Side in [.front, .left, .right] {
-                    steps.append(Step(square: destination, direction: step.direction.turned(to: side), captures: captures))
-                }
+                let newMove = Move(from: piece, to: destination, over: step.captures + [opponentPiece], position: self)
+                handleMove(newMove, direction: step.direction, sides: .front, .left, .right)
             }
             
         case .king:
@@ -116,19 +116,7 @@ public final class Position {
                 
                 for destination in destinations {
                     let move = Move(from: piece, to: destination, over: captures, position: self)
-                    
-                    if captures.count > maxCapture {
-                        maxCapture = captures.count
-                        moves.removeAll()
-                    }
-                    
-                    if captures.count == maxCapture && !moves.contains(move) {
-                        moves.append(move)
-                    }
-                    
-                    for side: Square.Direction.Side in [.left, .right] {
-                        steps.append(Step(square: destination, direction: step.direction.turned(to: side), captures: captures))
-                    }
+                    handleMove(move, direction: step.direction, sides: .left, .right)
                 }
                 
                 if let firstDestination = destinations.first {
