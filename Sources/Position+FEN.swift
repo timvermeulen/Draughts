@@ -1,7 +1,7 @@
 import Foundation
 
 extension Position {
-    var fen: String {
+    public var fen: String {
         func pieceSymbols(of player: Player, kind: Piece.Kind) -> String {
             return self
                 .pieces(of: player, kind: kind)
