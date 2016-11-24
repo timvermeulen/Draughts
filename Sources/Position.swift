@@ -14,6 +14,17 @@ public final class Position {
         return self.pieces(of: player).intersection(kind == .king ? self.kings : self.kings.inverse)
     }
     
+    public subscript(square: Square) -> Piece? {
+        let kind: Piece.Kind = kings.contains(square) ? .king : .man
+        let player: Player
+        
+        if white.contains(square) { player = .white }
+        else if black.contains(square) { player = .black }
+        else { return nil }
+        
+        return Piece(player: player, kind: kind, square: square)
+    }
+    
     // MARK: -
     // MARK: Initialising a Position
     
@@ -36,17 +47,6 @@ public final class Position {
         self.init(white: white, black: black, kings: kings, ply: ply)
     }
     
-    public subscript(square: Square) -> Piece? {
-        let kind: Piece.Kind = kings.contains(square) ? .king : .man
-        let player: Player
-        
-        if white.contains(square) { player = .white }
-        else if black.contains(square) { player = .black }
-        else { return nil }
-        
-        return Piece(player: player, kind: kind, square: square)
-    }
-    
     // MARK: -
     // MARK: Applying moves
     
@@ -60,29 +60,14 @@ public final class Position {
     }
     
     // MARK: -
-    // MARK: Man moves
+    // MARK: Moves
     
     internal func moves(of player: Player) -> [Move] {
         let captures = self.captures(of: player)
         return captures.isEmpty ? self.slidingMoves(of: player) : captures
     }
     
-    internal func firstOccupiedSquare(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> Square? {
-        return square.squares(to: direction).first(where: { $0 != squareToIgnore && !self.squareIsEmpty($0) })
-    }
-    
-    internal func squareIsEmpty(_ square: Square) -> Bool {
-        return self[square] == nil
-    }
-    
-    internal func emptySquares(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> [Square] {
-        guard let neighbor = square.neighbor(to: direction), self.squareIsEmpty(neighbor) else { return [] }
-        
-        return Array(first: neighbor, next: {
-            guard let neighbor = $0.neighbor(to: direction) else { return nil }
-            return self.squareIsEmpty(neighbor) ? neighbor : nil
-        })
-    }
+    // MARK: Captures
     
     internal func captures(of square: Square) -> (captures: [Move], amount: Int) {
         guard let piece = self[square] else { return ([], 0) }
@@ -170,6 +155,9 @@ public final class Position {
         return maxCaptures.flatMap { $0.captures }
     }
     
+    // MARK: -
+    // MARK: Sliding moves
+    
     internal func slidingMoves(of player: Player) -> [Move] {
         return self.slidingManMoves(of: player) + self.slidingKingMoves(of: player)
     }
@@ -211,6 +199,26 @@ public final class Position {
         let squares = self.squaresThatCanSlide(to: Square.Direction(player: player, pieceDirection: direction))
         
         return pieces.intersection(squares)
+    }
+    
+    // MARK: -
+    // MARK: Helper functions
+    
+    internal func firstOccupiedSquare(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> Square? {
+        return square.squares(to: direction).first(where: { $0 != squareToIgnore && !self.squareIsEmpty($0) })
+    }
+    
+    internal func squareIsEmpty(_ square: Square) -> Bool {
+        return self[square] == nil
+    }
+    
+    internal func emptySquares(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> [Square] {
+        guard let neighbor = square.neighbor(to: direction), self.squareIsEmpty(neighbor) else { return [] }
+        
+        return Array(first: neighbor, next: {
+            guard let neighbor = $0.neighbor(to: direction) else { return nil }
+            return self.squareIsEmpty(neighbor) ? neighbor : nil
+        })
     }
     
     // MARK: -
