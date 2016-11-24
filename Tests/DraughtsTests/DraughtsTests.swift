@@ -250,6 +250,18 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertNotNil(picker.onlyCandidate(from: 32, to: 23))
     }
     
+    func testMovePickerOverride() {
+        let position = XCTUnwrap(Position(fen: "W:W35,36:B20,21,22,30,31"))
+        let picker = MovePicker(position)
+        
+        picker.toggle(27)
+        XCTAssertNil(picker.onlyCandidate)
+        XCTAssertNotNil(picker.onlyCandidate(from: 35, to: 15))
+        
+        picker.toggle(35)
+        XCTAssertNotNil(picker.onlyCandidate)
+    }
+    
     func testUnambiguousNotation() {
         let position = XCTUnwrap(Position(fen: "W:WK47:B42,43,39,40"))
         let moves = position.legalMoves.map { $0.unambiguousNotation }

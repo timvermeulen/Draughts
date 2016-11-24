@@ -26,11 +26,6 @@ extension MovePicker {
         return move
     }
     
-    private func restore() {
-        self.candidates = position.legalMoves
-        self.requirements = .empty
-    }
-    
     private func generateCandidates() {
         let requirements = self.requirements
         self.restore()
@@ -40,6 +35,11 @@ extension MovePicker {
         }
     }
     
+    public func restore() {
+        self.candidates = position.legalMoves
+        self.requirements = .empty
+    }
+    
     public func toggle(_ square: Square) {
         guard !self.requirements.contains(square) else {
             self.requirements.remove(square)
@@ -47,17 +47,31 @@ extension MovePicker {
             return
         }
         
-        self.requirements.insert(square)
         let newCandidates = self.candidates.filter { $0.relevantSquares.contains(square) }
         
-        if !newCandidates.isEmpty {
+        if newCandidates.isEmpty {
+            let otherCandidates = self.position.legalMoves.filter { $0.start == square }
+            
+            if !otherCandidates.isEmpty {
+                self.candidates = otherCandidates
+                self.requirements = Bitboard(square)
+            }
+        } else {
+            self.requirements.insert(square)
             self.candidates = newCandidates
         }
     }
     
     public func onlyCandidate(from start: Square, to end: Square) -> Move? {
-        let filtered = self.candidates.filter { $0.start == start && $0.end == end }
-        guard let move = filtered.first, filtered.count == 1 else { return nil }
-        return move
+        func includeMove(_ move: Move) -> Bool {
+            return move.start == start && move.end == end
+        }
+        
+        func onlyMove(of moves: [Move]) -> Move? {
+            guard let move = moves.first, moves.count == 1 else { return nil }
+            return move
+        }
+        
+        return onlyMove(of: self.candidates.filter(includeMove)) ?? onlyMove(of: self.position.legalMoves.filter(includeMove))
     }
 }
