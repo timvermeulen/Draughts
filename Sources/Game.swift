@@ -31,6 +31,7 @@ public struct Game {
         if ply == self.endPly {
             self.moves.append(move)
             self.positions.append(move.played)
+            variations.append([])
         } else {
             if !self.variations[ply].contains(where: { $0.move == move }) {
                 self.variations[ply].append((move, Game(position: move.played)))
