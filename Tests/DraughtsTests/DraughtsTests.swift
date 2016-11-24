@@ -286,17 +286,6 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertNotEqual(position.legalMoves.count, 0)
     }
     
-    func testGame() {
-        var game = Game(position: .beginPosition)
-        
-        for _ in 0 ..< 10 {
-            game.play(XCTUnwrap(game.endPosition.legalMoves.first))
-        }
-        
-        print(game.notation)
-        print(game.endPosition)
-    }
-    
     func testGameHelper() {
         do {
             let position = XCTUnwrap(Position(fen: "B:W48,49:B2,3"))
