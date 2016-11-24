@@ -129,6 +129,6 @@ extension Move: TextOutputStreamable {
     
     public func write<Target: TextOutputStream>(to target: inout Target) {
         let position = Position(white: white, black: black, kings: kings)
-        print(position, self.notation, separator: "\n", to: &target)
+        target.write("\(position)\n\(self.notation)")
     }
 }
