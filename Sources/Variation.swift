@@ -1,21 +1,22 @@
-struct Variation {
-    let startPosition: Position
-    var moves: [(move: Move, position: Position, subvariations: [Variation])]
+public struct Variation {
+    public let startPosition: Position
+    internal var moves: [Move]
+    internal var positions: [Position]
     
-    var endPosition: Position { return self.moves.last?.position ?? self.startPosition }
-    var startPly: Ply { return self.startPosition.ply }
-    var endPly: Ply { return self.endPosition.ply }
+    public var endPosition: Position { return self.positions.last ?? self.startPosition }
+    public var startPly: Ply { return self.startPosition.ply }
+    public var endPly: Ply { return self.endPosition.ply }
     
-    init(position: Position) {
+    public init(position: Position) {
         self.startPosition = position
         self.moves = []
+        self.positions = []
     }
     
-    func play(_ move: Move) {
-        self.play(move, at: self.endPly)
-    }
-    
-    func play(_ move: Move, at ply: Ply) {
+    public mutating func play(_ move: Move) {
+        assert(self.endPosition.moveIsValid(move))
         
+        self.moves.append(move)
+        self.positions.append(move.played)
     }
 }
