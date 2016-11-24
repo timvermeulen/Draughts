@@ -6,6 +6,12 @@ public struct Piece {
     public let player: Player
     public var kind: Kind
     public var square: Square
+    
+    public init(player: Player, kind: Kind, square: Square) {
+        self.player = player
+        self.kind = kind
+        self.square = square
+    }
 }
 
 extension Piece {
