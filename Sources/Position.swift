@@ -51,6 +51,8 @@ public final class Position {
     // MARK: Applying moves
     
     public func playing(_ move: Move) -> Position {
+        assert(self.legalMoves.contains(move))
+        
         return Position(
             white: self.white.symmetricDifference(move.white),
             black: self.black.symmetricDifference(move.black),
