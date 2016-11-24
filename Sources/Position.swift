@@ -1,5 +1,5 @@
 public final class Position {
-    fileprivate let white, black, kings, empty: Bitboard
+    internal let white, black, kings, empty: Bitboard
     public let ply: Ply
     
     lazy var legalMoves: [Move] = {
@@ -48,20 +48,6 @@ public final class Position {
     }
     
     // MARK: -
-    // MARK: Applying moves
-    
-    public func playing(_ move: Move) -> Position {
-        assert(self.legalMoves.contains(move))
-        
-        return Position(
-            white: self.white.symmetricDifference(move.white),
-            black: self.black.symmetricDifference(move.black),
-            kings: self.kings.symmetricDifference(move.kings),
-            ply: self.ply.successor
-        )
-    }
-    
-    // MARK: -
     // MARK: Moves
     
     internal func moves(of player: Player) -> [Move] {
@@ -97,7 +83,7 @@ public final class Position {
                     else { continue }
                 
                 let captures = step.captures + [opponentPiece]
-                let newMove = Move(from: piece, to: destination, over: captures)
+                let newMove = Move(from: piece, to: destination, over: captures, position: self)
                 
                 if captures.count > maxCapture {
                     maxCapture = captures.count
@@ -125,7 +111,7 @@ public final class Position {
                 let captures = step.captures + [opponentPiece]
                 
                 for destination in destinations {
-                    let move = Move(from: piece, to: destination, over: captures)
+                    let move = Move(from: piece, to: destination, over: captures, position: self)
                     
                     if captures.count > maxCapture {
                         maxCapture = captures.count
@@ -169,7 +155,7 @@ public final class Position {
         
         return Square.Direction.all.flatMap { direction -> [Move] in
             let emptySquares = self.emptySquares(from: square, to: direction)
-            return emptySquares.map { Move(from: piece, to: $0) }
+            return emptySquares.map { Move(from: piece, to: $0, position: self) }
         }
     }
     
@@ -188,7 +174,7 @@ public final class Position {
             let direction = Square.Direction(player: player, pieceDirection: pieceDirection)
             guard let destination = square.neighbor(to: direction) else { return nil }
             
-            return Move(from: Piece(player: player, kind: .man, square: square), to: destination)
+            return Move(from: Piece(player: player, kind: .man, square: square), to: destination, position: self)
         }
     }
     
@@ -235,30 +221,6 @@ public final class Position {
             white: Bitboard(squares: 31 ... 50),
             black: Bitboard(squares: 1 ... 20)
         )
-    }
-    
-    // MARK: -
-    // MARK: Notation
-    
-    internal func essentialCaptures(of move: Move) -> [Square] {
-        let similarMoves = self.legalMoves.filter { $0.start == move.start && $0.end == move.end }
-        
-        func isRelevant(_ capture: Piece) -> Bool {
-            return similarMoves.contains(where: { !$0.captures.contains(capture) })
-        }
-        
-        return move.captures.filter(isRelevant).map { $0.square }
-    }
-    
-    public func notation(of move: Move) -> String {
-        let essentialCaptures = self.essentialCaptures(of: move).sorted()
-        guard let lastCapture = essentialCaptures.last else { return String(describing: move) }
-        
-        let essentialDescription = essentialCaptures.count > 1
-            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture))"
-            : String(describing: lastCapture)
-
-        return "\(move.notation) (over \(essentialDescription))"
     }
     
     // MARK: -

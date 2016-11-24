@@ -3,15 +3,19 @@ public final class Move {
     public let end: Square
     public let captures: [Piece]
     
+    fileprivate let position: Position
+    
     internal let white, black, kings: Bitboard
     
     public var start: Square { return self.piece.square }
     public var isCapture: Bool { return !self.captures.isEmpty }
     
-    public init(from origin: Piece, to destination: Square, over captures: [Piece] = []) {
+    public init(from origin: Piece, to destination: Square, over captures: [Piece] = [], position: Position) {
         self.piece = origin
         self.end = destination
         self.captures = captures
+        
+        self.position = position
         
         let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
         let opponentBitboard = captures
@@ -30,6 +34,15 @@ public final class Move {
             .symmetricDifference(capturedKings)
             .symmetricDifference(movedKing)
     }
+    
+    public lazy var played: Position = {
+        return Position(
+            white: self.white.symmetricDifference(self.position.white),
+            black: self.black.symmetricDifference(self.position.black),
+            kings: self.kings.symmetricDifference(self.position.kings),
+            ply: self.position.ply.successor
+        )
+    }()
     
     public lazy var allIntermediateSquares: [[Square]] = {
         guard self.piece.kind == .king else {
@@ -77,6 +90,27 @@ public final class Move {
     public lazy var relevantSquares: [Square] = {
         let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
         return intermediateRelevantSquares + [self.start, self.end]
+    }()
+    
+    public lazy var essentialCaptures: [Square] = {
+        let similarMoves = self.position.legalMoves.filter { $0.start == self.start && $0.end == self.end }
+        
+        func isRelevant(_ capture: Piece) -> Bool {
+            return similarMoves.contains(where: { !$0.captures.contains(capture) })
+        }
+        
+        return self.captures.filter(isRelevant).map { $0.square }
+    }()
+    
+    public lazy var unambiguousNotation: String = {
+        let essentialCaptures = self.essentialCaptures.sorted()
+        guard let lastCapture = essentialCaptures.last else { return self.notation }
+        
+        let essentialDescription = essentialCaptures.count > 1
+            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture))"
+            : String(describing: lastCapture)
+        
+        return "\(self.notation) (over \(essentialDescription))"
     }()
 }
 
