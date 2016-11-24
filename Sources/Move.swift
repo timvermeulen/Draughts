@@ -107,7 +107,7 @@ public final class Move {
         guard let lastCapture = essentialCaptures.last else { return self.notation }
         
         let essentialDescription = essentialCaptures.count > 1
-            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture))"
+            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture)"
             : String(describing: lastCapture)
         
         return "\(self.notation) (over \(essentialDescription))"

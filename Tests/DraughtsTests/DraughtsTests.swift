@@ -263,11 +263,21 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testUnambiguousNotation() {
-        let position = XCTUnwrap(Position(fen: "W:WK47:B42,43,39,40"))
-        let moves = position.legalMoves.map { $0.unambiguousNotation }
+        do {
+            let position = XCTUnwrap(Position(fen: "W:WK47:B42,43,39,40"))
+            let moves = position.legalMoves.map { $0.unambiguousNotation }
+            
+            XCTAssertEqual(moves.count, 2)
+            XCTAssert(moves.contains("47x35 (over 43)"))
+            XCTAssert(moves.contains("47x35 (over 39)"))
+        }
         
-        XCTAssertEqual(moves.count, 2)
-        XCTAssert(moves.contains("47x35 (over 43)"))
-        XCTAssert(moves.contains("47x35 (over 39)"))
+        do {
+            let position = XCTUnwrap(Position(fen: "W:WK21:B9,12,13,29,31,34"))
+            let moves = position.legalMoves.map { $0.unambiguousNotation }
+            
+            XCTAssertEqual(moves.count, 4)
+            XCTAssert(moves.contains("21x26 (over 13 and 34)"))
+        }
     }
 }
