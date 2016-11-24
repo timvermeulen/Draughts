@@ -250,6 +250,17 @@ public final class Position {
         return move.captures.filter(isRelevant).map { $0.square }
     }
     
+    public func notation(of move: Move) -> String {
+        let essentialCaptures = self.essentialCaptures(of: move).sorted()
+        guard let lastCapture = essentialCaptures.last else { return String(describing: move) }
+        
+        let essentialDescription = essentialCaptures.count > 1
+            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture))"
+            : String(describing: lastCapture)
+
+        return "\(move.notation) (over \(essentialDescription))"
+    }
+    
     // MARK: -
 }
 

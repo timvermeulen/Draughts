@@ -236,13 +236,13 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertNotNil(picker.onlyCandidate(from: 32, to: 23))
     }
     
-//    func testChoiceNotation() {
-//        let fen = "W:WK47:B42,43,39,40"
-//        let position = XCTUnwrap(Position(fen: fen))
-//        let moves = position.generateMoves().map { $0.notation }
-//        
-//        XCTAssertEqual(moves.count, 2)
-//        XCTAssert(moves.contains("47x35 (over 43)"))
-//        XCTAssert(moves.contains("47x35 (over 39)"))
-//    }
+    func testChoiceNotation() {
+        let fen = "W:WK47:B42,43,39,40"
+        let position = XCTUnwrap(Position(fen: fen))
+        let moves = position.legalMoves.map { position.notation(of: $0) }
+        
+        XCTAssertEqual(moves.count, 2)
+        XCTAssert(moves.contains("47x35 (over 43)"))
+        XCTAssert(moves.contains("47x35 (over 39)"))
+    }
 }
