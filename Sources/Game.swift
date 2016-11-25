@@ -1,9 +1,9 @@
 public struct Game {
     public let startPosition: Position
     
-    internal var moves: PlyArray<Move>
-    internal var positions: PlyArray<Position>
-    internal var variations: PlyArray<[(move: Move, variation: Game)]>
+    public var moves: PlyArray<Move>
+    public var positions: PlyArray<Position>
+    public var variations: PlyArray<[(move: Move, variation: Game)]>
     
     // causes a segfault:
     // public var endPosition: Position { return self.positions.last ?? self.startPosition }
