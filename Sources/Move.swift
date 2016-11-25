@@ -2,8 +2,8 @@ public final class Move {
     public let piece: Piece
     public let end: Square
     public let captures: [Piece]
+    public let startPosition: Position
     
-    internal let position: Position
     internal let white, black, kings: Bitboard
     
     public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
@@ -18,7 +18,7 @@ public final class Move {
         self.end = destination
         self.captures = captures
         
-        self.position = position
+        self.startPosition = position
         
         let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
         let opponentBitboard = captures
@@ -38,12 +38,12 @@ public final class Move {
             .symmetricDifference(movedKing)
     }
     
-    public lazy var played: Position = {
+    public lazy var endPosition: Position = {
         return Position(
-            white: self.white.symmetricDifference(self.position.white),
-            black: self.black.symmetricDifference(self.position.black),
-            kings: self.kings.symmetricDifference(self.position.kings),
-            ply: self.position.ply.successor
+            white: self.white.symmetricDifference(self.startPosition.white),
+            black: self.black.symmetricDifference(self.startPosition.black),
+            kings: self.kings.symmetricDifference(self.startPosition.kings),
+            ply: self.startPosition.ply.successor
         )
     }()
     
@@ -96,7 +96,7 @@ public final class Move {
     }()
     
     public lazy var essentialCaptures: [Square] = {
-        let similarMoves = self.position.legalMoves.filter { $0.start == self.start && $0.end == self.end }
+        let similarMoves = self.startPosition.legalMoves.filter { $0.start == self.start && $0.end == self.end }
         
         func isRelevant(_ capture: Piece) -> Bool {
             return similarMoves.contains(where: { !$0.captures.contains(capture) })

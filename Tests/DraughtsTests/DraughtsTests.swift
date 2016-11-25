@@ -51,7 +51,7 @@ class DraughtsTests: SafeXCTestCase {
         let openingMoves = pos1.legalMoves
         let move = XCTUnwrap(openingMoves.first)
         
-        let pos2 = move.played
+        let pos2 = move.endPosition
         let returnMoves = Set(pos2.legalMoves.map { $0.notation })
         let expected: Set = ["16-21", "17-21", "17-22", "18-22", "18-23", "19-23", "19-24", "20-24", "20-25"]
         
@@ -74,20 +74,20 @@ class DraughtsTests: SafeXCTestCase {
         let firstMove = XCTUnwrap(
             openingMoves.first(where: { $0.notation == "32-28" })
         )
-        let pos2 = firstMove.played
+        let pos2 = firstMove.endPosition
         
         let returnMoves = pos2.legalMoves
         let secondMove = XCTUnwrap(
             returnMoves.first(where: { $0.notation == "19-23" })
         )
-        let pos3 = secondMove.played
+        let pos3 = secondMove.endPosition
         
         let returnReturnMoves = pos3.legalMoves
         let capture = XCTUnwrap(returnReturnMoves.first)
         XCTAssertEqual(returnReturnMoves.count, 1)
         XCTAssertTrue(capture.isCapture)
         
-        let pos4 = capture.played
+        let pos4 = capture.endPosition
         
         XCTAssertEqual(pos4.pieces(of: .white).count, 20)
         XCTAssertEqual(pos4.pieces(of: .black).count, 19)
@@ -117,7 +117,7 @@ class DraughtsTests: SafeXCTestCase {
         let move = XCTUnwrap(moves.first)
         XCTAssertEqual(moves.count, 1)
         
-        let next = move.played
+        let next = move.endPosition
         let expected = Position(
             pieces: [
                 Piece(player: .white, kind: .king, square: 18),
@@ -166,7 +166,7 @@ class DraughtsTests: SafeXCTestCase {
         let move1 = XCTUnwrap(pos1.legalMoves.first)
         XCTAssertEqual(pos1.legalMoves.count, 1)
         
-        let pos2 = move1.played
+        let pos2 = move1.endPosition
         let expected1 = Position(
             pieces: [
                 Piece(player: .white, kind: .king, square: 1),
@@ -179,7 +179,7 @@ class DraughtsTests: SafeXCTestCase {
         let move2 = XCTUnwrap(pos2.legalMoves.first)
         XCTAssertEqual(pos2.legalMoves.count, 1)
         
-        let pos3 = move2.played
+        let pos3 = move2.endPosition
         let expected2 = Position(
             pieces: [
                 Piece(player: .white, kind: .king, square: 1),
@@ -205,7 +205,7 @@ class DraughtsTests: SafeXCTestCase {
         )
         XCTAssertEqual(move, expectedMove)
         
-        let result = move.played
+        let result = move.endPosition
         let expectedResult = Position(
             pieces: [
                 Piece(player: .white, kind: .king, square: 4)

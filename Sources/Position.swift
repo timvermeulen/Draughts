@@ -55,7 +55,7 @@ public final class Position {
     // MARK: Moves
     
     public func moveIsValid(_ move: Move) -> Bool {
-        return move.position === self
+        return move.startPosition === self
     }
     
     internal func moves(of player: Player) -> [Move] {
