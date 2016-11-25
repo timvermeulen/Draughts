@@ -10,7 +10,7 @@ extension Bitboard: SetAlgebra {
     }
     
     internal func contains(_ square: Square) -> Bool {
-        return self.value & Bitboard(square).value != 0
+        return self.value & Bitboard(square: square).value != 0
     }
     
     internal func union(_ other: Bitboard) -> Bitboard {
@@ -40,14 +40,14 @@ extension Bitboard: SetAlgebra {
     @discardableResult
     internal mutating func insert(_ square: Square) -> (inserted: Bool, memberAfterInsert: Square) {
         let inserted = !self.contains(square)
-        self.value |= Bitboard(square).value
+        self.value |= Bitboard(square: square).value
         return (inserted, square)
     }
     
     @discardableResult
     internal mutating func remove(_ square: Square) -> Square? {
         let contained = self.contains(square)
-        self.value &= ~Bitboard(square).value
+        self.value &= ~Bitboard(square: square).value
         return contained ? square : nil
     }
     

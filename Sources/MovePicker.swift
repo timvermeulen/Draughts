@@ -54,7 +54,7 @@ extension MovePicker {
             
             if !otherCandidates.isEmpty {
                 self.candidates = otherCandidates
-                self.requirements = Bitboard(square)
+                self.requirements = Bitboard(square: square)
             }
         } else {
             self.requirements.insert(square)

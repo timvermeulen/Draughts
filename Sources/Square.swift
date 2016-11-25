@@ -156,7 +156,7 @@ extension Square: ExpressibleByIntegerLiteral {
 
 extension Square: CustomStringConvertible {
     public var visual: String {
-        return String(describing: Bitboard(self))
+        return String(describing: Bitboard(square: self))
     }
     
     public var description: String {

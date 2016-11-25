@@ -20,16 +20,16 @@ public final class Move {
         
         self.startPosition = position
         
-        let playerBitboard = Bitboard(origin.square).symmetricDifference(Bitboard(destination))
+        let playerBitboard = Bitboard(square: origin.square).symmetricDifference(Bitboard(square: destination))
         let opponentBitboard = captures
-            .map { Bitboard($0.square) }
+            .map { Bitboard(square: $0.square) }
             .reduce(Bitboard.empty) { $0.symmetricDifference($1) }
         
         (white, black) = origin.player == .white
             ? (playerBitboard, opponentBitboard)
             : (opponentBitboard, playerBitboard)
         
-        let promotion = piece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(destination) : .empty
+        let promotion = piece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(square: destination) : .empty
         let capturedKings = Bitboard(squares: self.captures.filter { $0.kind == .king }.map { $0.square })
         let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
         
