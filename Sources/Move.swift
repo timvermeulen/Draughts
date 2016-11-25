@@ -6,6 +6,10 @@ public final class Move {
     internal let position: Position
     internal let white, black, kings: Bitboard
     
+    public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
+        return (self.white.value, self.black.value, self.kings.value)
+    }
+    
     public var start: Square { return self.piece.square }
     public var isCapture: Bool { return !self.captures.isEmpty }
     

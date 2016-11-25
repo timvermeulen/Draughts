@@ -2,12 +2,16 @@ public final class Position {
     internal let white, black, kings, empty: Bitboard
     public let ply: Ply
     
+    public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
+        return (self.white.value, self.black.value, self.kings.value)
+    }
+    
     public lazy var legalMoves: [Move] = {
         return self.moves(of: self.ply.player)
     }()
     
     internal func pieces(of player: Player) -> Bitboard {
-        return player == .white ? white : black
+        return player == .white ? self.white : self.black
     }
     
     internal func pieces(of player: Player, kind: Piece.Kind) -> Bitboard {
@@ -15,11 +19,11 @@ public final class Position {
     }
     
     public subscript(square: Square) -> Piece? {
-        let kind: Piece.Kind = kings.contains(square) ? .king : .man
+        let kind: Piece.Kind = self.kings.contains(square) ? .king : .man
         let player: Player
         
-        if white.contains(square) { player = .white }
-        else if black.contains(square) { player = .black }
+        if self.white.contains(square) { player = .white }
+        else if self.black.contains(square) { player = .black }
         else { return nil }
         
         return Piece(player: player, kind: kind, square: square)
