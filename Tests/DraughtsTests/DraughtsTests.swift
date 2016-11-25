@@ -38,7 +38,7 @@ func == <T: Equatable> (left: [[T]], right: [[T]]) -> Bool {
 
 class DraughtsTests: SafeXCTestCase {
     func testOpeningMoves() {
-        let position = Position.beginPosition
+        let position = Position.start
         
         let moves = Set(position.legalMoves.map { $0.notation })
         let expected: Set = ["31-26", "31-27", "32-27", "32-28", "33-28", "33-29", "34-29", "34-30", "35-30"]
@@ -47,7 +47,7 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testReturnMoves() {
-        let pos1 = Position.beginPosition
+        let pos1 = Position.start
         let openingMoves = pos1.legalMoves
         let move = XCTUnwrap(openingMoves.first)
         
@@ -68,7 +68,7 @@ class DraughtsTests: SafeXCTestCase {
     }
 
     func testCapture() {
-        let pos1 = Position.beginPosition
+        let pos1 = Position.start
         
         let openingMoves = pos1.legalMoves
         let firstMove = XCTUnwrap(
@@ -217,7 +217,7 @@ class DraughtsTests: SafeXCTestCase {
     
     func testMovePicker() {
         do {
-            let position = Position.beginPosition
+            let position = Position.start
             let picker = MovePicker(position)
             XCTAssertNil(picker.onlyCandidate)
             picker.toggle(26)
@@ -330,7 +330,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let helper = GameHelper(Game(position: .beginPosition))
+            let helper = GameHelper(Game(position: .start))
             XCTAssertTrue(helper.game.moves.isEmpty)
             
             helper.toggle(35)

@@ -208,7 +208,7 @@ public final class Position {
         return Position(white: .empty, black: .empty, kings: .empty)
     }
     
-    public static var beginPosition: Position {
+    public static var start: Position {
         return Position(
             white: Bitboard(squares: 31 ... 50),
             black: Bitboard(squares: 1 ... 20)

@@ -12,7 +12,7 @@ public struct Game {
     public var startPly: Ply { return self.startPosition.ply }
     public var endPly: Ply { return self.endPosition.ply }
 
-    public init(position: Position) {
+    public init(position: Position = .start) {
         self.startPosition = position
         self.moves = PlyArray(position.ply)
         self.positions = PlyArray(position.ply)
