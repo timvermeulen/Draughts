@@ -1,5 +1,5 @@
 public struct PlyArray<Element> {
-    fileprivate var contents: [Element]
+    fileprivate var contents: ArraySlice<Element>
     
     public var startPly: Ply
     
@@ -22,7 +22,10 @@ extension PlyArray: RandomAccessCollection {
     }
     
     public func index(_ ply: Ply, offsetBy offset: Int) -> Ply {
-        return Ply(player: offset % 2 == 0 ? ply.player : ply.player.opponent, number: ply.number + offset)
+        return Ply(
+            player: offset % 2 == 0 ? ply.player : ply.player.opponent,
+            number: ply.number + offset
+        )
     }
     
     public func distance(from start: Ply, to end: Ply) -> Int {

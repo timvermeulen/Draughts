@@ -1,4 +1,5 @@
 import XCTest
+import Parser
 @testable import Draughts
 
 let errorMessage = "`continueAfterFailure` should be set to `false` inside `setUp()`, and set to `true` inside `tearDown()`"
@@ -338,6 +339,82 @@ class DraughtsTests: SafeXCTestCase {
             
             helper.move(from: 17, to: 21)
             XCTAssertEqual(helper.game.moves.count, 2)
+        }
+    }
+    
+    func testSquareParser() {
+        let (square, remainder) = XCTUnwrap(Parsers.square.run("35-30"))
+        XCTAssertEqual(square, 35)
+        XCTAssertEqual(remainder, "-30")
+        
+        XCTAssertNil(Parsers.square.run("72"))
+        XCTAssertNil(Parsers.square.run("abc"))
+    }
+    
+    func testMoveParser() {
+        do {
+            let (squares, remainder) = XCTUnwrap(Parsers.move.run("35-30"))
+            
+            XCTAssertEqual(squares, [35, 30])
+            XCTAssertEqual(remainder, "")
+        }
+        
+        do {
+            let (squares, remainder) = XCTUnwrap(Parsers.move.run("32x23x14 abcd"))
+            
+            XCTAssertEqual(squares, [32, 23, 14])
+            XCTAssertEqual(remainder, " abcd")
+        }
+    }
+    
+    func testPlyIndicatorParser() {
+        XCTAssertEqual(XCTUnwrap(Parsers.plyIndicator.run("1. abc")).remainder, " abc")
+        XCTAssertEqual(XCTUnwrap(Parsers.plyIndicator.run("2. ... abc")).remainder, " abc")
+        XCTAssertNil(Parsers.plyIndicator.run("35-30"))
+        XCTAssertNil(Parsers.plyIndicator.run("28x19"))
+    }
+    
+    func testVariationParser() {
+        let game = XCTUnwrap(Game(pdn: "1. 32-28"))
+        let parser = Parsers.variation.flatMap { $0(game) }
+        let newGame = XCTUnwrap(parser.run("(1. 32-27 19-24 (1. ... 19-23) 2. 31-26; 1. 33-29 20-24)")).result
+        
+        XCTAssertEqual(newGame.pdn, "1. 32-28 (1. 32-27 19-24 (1. ... 19-23) 2. 31-26; 1. 33-29 20-24)")
+    }
+    
+    func testMovesAndVariationsParser() {
+        let notation = "1. 32-28 (1. 33-29)"
+        let parsed = XCTUnwrap(Parsers.movesAndVariations.run(notation))
+        let game = XCTUnwrap(parsed.result(Game()))
+        print(game.pdn)
+    }
+    
+    func testPDN() {
+        do {
+            let gameHelper = GameHelper(Game(position: XCTUnwrap(Position(fen: "B:W37:B14"))))
+            
+            gameHelper.move(from: 14, to: 19)
+            gameHelper.move(from: 37, to: 31)
+            
+            XCTAssertEqual(gameHelper.game.pdn, "1. ... 14-19 2. 37-31")
+        }
+        
+        do {
+            let game = XCTUnwrap(Game(pdn: "1. 32-28 19-23 2. 28x19 14x23"))
+            
+            XCTAssertEqual(game.moves.count, 4)
+            XCTAssertEqual(game.endPosition.pieces(of: .white).count, 19)
+            XCTAssertEqual(game.endPosition.pieces(of: .black).count, 19)
+        }
+        
+        do {
+            let raphael = XCTUnwrap(Position(fen: "W:W27,28,32,37,38,33,34,48,49:B24,23,19,13,12,17,21,16,26"))
+            let result = XCTUnwrap(Position(fen: "B:W17:B7"))
+            
+            let notation = "1. 34-29 23x34 2. 28-23 19x39 3. 37-31 26x28 4. 49-44 21x43 5. 44x11 16x7 6. 48x17"
+            let game = XCTUnwrap(Game(pdn: notation, position: raphael))
+            
+            XCTAssertEqual(game.endPosition, result)
         }
     }
 }

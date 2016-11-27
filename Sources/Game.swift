@@ -39,13 +39,3 @@ public struct Game {
         }
     }
 }
-
-extension Game {
-    public var notation: String {
-        let moveNotations: [String] = zip(self.moves.indices, self.moves).map { ply, move in
-            "\(ply.player == .white ? "\(ply.number / 2 + 1). " : "")\(move.unambiguousNotation)"
-        }
-        
-        return moveNotations.joined(separator: " ")
-    }
-}
