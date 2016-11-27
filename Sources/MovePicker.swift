@@ -40,11 +40,12 @@ extension MovePicker {
         self.requirements = .empty
     }
     
-    public func toggle(_ square: Square) {
+    @discardableResult
+    public func toggle(_ square: Square) -> Move? {
         guard !self.requirements.contains(square) else {
             self.requirements.remove(square)
             self.generateCandidates()
-            return
+            return nil
         }
         
         let newCandidates = self.candidates.filter { $0.relevantSquares.contains(square) }
@@ -60,6 +61,8 @@ extension MovePicker {
             self.requirements.insert(square)
             self.candidates = newCandidates
         }
+        
+        return self.onlyCandidate
     }
     
     public func onlyCandidate(from start: Square, to end: Square) -> Move? {

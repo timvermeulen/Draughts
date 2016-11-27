@@ -1,6 +1,37 @@
+import Foundation
+
 extension Game {
     public init?(pdn: String, position: Position = .start) {
-        fatalError()
+        let separators = CharacterSet(charactersIn: "-x")
+        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.replacingOccurrences(of: $1, with: " \($1) ") }
+        let helper = GameHelper(Game(position: position))
+        
+        for component in enhanced.components(separatedBy: .whitespacesAndNewlines) {
+            switch component {
+            case "": break
+            case "(": helper.backward()
+            case ")": if !helper.popVariation() || !helper.forward() { return nil }
+            case ";": if !helper.popVariation() { return nil }
+            default:
+                guard !component.hasSuffix(".") else { continue }
+                
+                let squares = component
+                    .components(separatedBy: separators)
+                    .flatMap { Int($0) }
+                    .filter((1 ... 50).contains)
+                    .map { Square(humanValue: $0) }
+                
+                guard let start = squares.first, let end = squares.last else { return nil }
+                
+                for square in squares.dropFirst().dropLast() {
+                    helper.toggle(square)
+                }
+                
+                guard helper.move(from: start, to: end) else { return nil }
+            }
+        }
+        
+        self = helper.game
     }
     
     public var pdn: String {

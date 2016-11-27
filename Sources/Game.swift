@@ -21,20 +21,31 @@ public struct Game {
         self.positions.append(self.startPosition)
     }
     
+    public init(move: Move) {
+        self.init(position: move.startPosition)
+        self.play(move)
+    }
+    
     public mutating func play(_ move: Move) {
         self.play(move, at: self.endPly)
     }
     
-    public mutating func play(_ move: Move, at ply: Ply) {
-        assert(self.positions[ply].moveIsValid(move))
+    /// returns: the index of the variation if one was created (or one already existed), nil otherwise
+    @discardableResult
+    public mutating func play(_ move: Move, at ply: Ply) -> Int? {
+        assert(self.positions[ply].moveIsValid(move), "invalid move")
         
         if ply == self.endPly {
             self.moves.append(move)
             self.positions.append(move.endPosition)
             variations.append([])
+            return nil
         } else {
-            if !self.variations[ply].contains(where: { $0.move == move }) {
-                self.variations[ply].append((move, Game(position: move.endPosition)))
+            if let index = self.variations[ply].index(where: { $0.move == move }) {
+                return index
+            } else {
+                self.variations[ply].append((move, Game(move: move)))
+                return self.variations[ply].count - 1
             }
         }
     }
