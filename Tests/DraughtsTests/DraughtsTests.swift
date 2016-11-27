@@ -1,5 +1,4 @@
 import XCTest
-import SafeXCTestCase
 @testable import Draughts
 
 let errorMessage = "`continueAfterFailure` should be set to `false` inside `setUp()`, and set to `true` inside `tearDown()`"
