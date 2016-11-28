@@ -15,7 +15,7 @@ extension Bitboard: Equatable {
 }
 
 extension Bitboard: Sequence {
-    func makeIterator() -> BitboardIterator {
+    internal func makeIterator() -> BitboardIterator {
         return BitboardIterator(self)
     }
 }
