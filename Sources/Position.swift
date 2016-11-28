@@ -164,7 +164,7 @@ public final class Position {
     }
     
     internal func slidingManMoves(of player: Player, to pieceDirection: Piece.Direction) -> [Move] {
-        let squares = self.menThatCanSlide(to: pieceDirection, of: player)
+        let squares = self.menThatCanSlide(to: pieceDirection, of: player).intersection(self.kings.inverse)
         
         return squares.flatMap { square in
             let direction = Square.Direction(player: player, pieceDirection: pieceDirection)

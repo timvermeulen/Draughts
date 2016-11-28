@@ -59,12 +59,20 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testKingSlidingMoves() {
-        let position = XCTUnwrap(Position(fen: "W:WK33:B"))
+        do {
+            let position = XCTUnwrap(Position(fen: "W:WK33:B"))
+            
+            let moves = Set(position.legalMoves.map { $0.notation })
+            let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
+            
+            XCTAssertEqual(moves, expected)
+        }
         
-        let moves = Set(position.legalMoves.map { $0.notation })
-        let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
-        
-        XCTAssertEqual(moves, expected)
+        do {
+            let fen = "W:W24,35,K29:BK41"
+            let position = XCTUnwrap(Position(fen: fen))
+            print(position.legalMoves)
+        }
     }
 
     func testCapture() {
@@ -388,6 +396,14 @@ class DraughtsTests: SafeXCTestCase {
             let pdn = "1. 32-28 (1. 32-27 19-23 (1. ... 18-23); 1. 31-26 16-21 2. 36-31)"
             let game = XCTUnwrap(Game(pdn: pdn))
             XCTAssertEqual(game.pdn, pdn)
+        }
+        
+        do {
+            let fen = "W:W24,44,K5:B26,27,36,"
+            let pdn = "1. 44-40 26-31 2. 40-35 27-32 3. 05x26 36-41 4. 26-42 (4. 26-12 41-47 5. 12-29) 41-47 5. 42-29 47-41 6. 29-23 41x30 7. 35x24"
+            
+            let position = XCTUnwrap(Position(fen: fen))
+            XCTAssertNotNil(Game(pdn: pdn, position: position))
         }
     }
 }

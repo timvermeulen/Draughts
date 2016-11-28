@@ -10,7 +10,7 @@ extension Position {
         }
         
         func pieceSymbols(of player: Player) -> String {
-            return "\(pieceSymbols(of: player, kind: .man)),\(pieceSymbols(of: player, kind: .king))"
+            return [pieceSymbols(of: player, kind: .man), pieceSymbols(of: player, kind: .king)].joined(separator: ",")
         }
         
         return "\(self.ply.player == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
