@@ -51,6 +51,15 @@ public final class Position {
         self.init(white: white, black: black, kings: kings, ply: ply)
     }
     
+    public convenience init(white: [Square], black: [Square], kings: [Square], ply: Ply = Ply()) {
+        self.init(
+            white: Bitboard(squares: white),
+            black: Bitboard(squares: black),
+            kings: Bitboard(squares: kings),
+            ply: ply
+        )
+    }
+    
     // MARK: -
     // MARK: Moves
     
