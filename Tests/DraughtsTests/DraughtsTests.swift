@@ -102,20 +102,30 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testFEN() {
-        let position = XCTUnwrap(Position(fen: "W:W28,K29:BK22,23"))
-        let expected = Position(
-            pieces: [
-                Piece(player: .white, kind: .man, square: 28),
-                Piece(player: .white, kind: .king, square: 29),
-                Piece(player: .black, kind: .man, square: 23),
-                Piece(player: .black, kind: .king, square: 22)
-            ]
-        )
+        do {
+            let position = XCTUnwrap(Position(fen: "W:W28,K29:BK22,23"))
+            let expected = Position(
+                pieces: [
+                    Piece(player: .white, kind: .man, square: 28),
+                    Piece(player: .white, kind: .king, square: 29),
+                    Piece(player: .black, kind: .man, square: 23),
+                    Piece(player: .black, kind: .king, square: 22)
+                ]
+            )
+            
+            XCTAssertEqual(position, expected)
+            
+            let copy = XCTUnwrap(Position(fen: position.fen))
+            XCTAssertEqual(position, copy)
+        }
         
-        XCTAssertEqual(position, expected)
-        
-        let copy = XCTUnwrap(Position(fen: position.fen))
-        XCTAssertEqual(position, copy)
+        do {
+            let fen1 = "W:W20,24,30,33,40,43,47,:B7,10,12,22,27,29,36,"
+            let fen2 = "W:W20,24,30,33,40,43,47:B7,10,12,22,27,29,36"
+            
+            let position = XCTUnwrap(Position(fen: fen1))
+            XCTAssertEqual(fen2, position.fen)
+        }
     }
     
     func testCoupTurc() {
@@ -401,6 +411,14 @@ class DraughtsTests: SafeXCTestCase {
         do {
             let fen = "W:W24,44,K5:B26,27,36,"
             let pdn = "1. 44-40 26-31 2. 40-35 27-32 3. 05x26 36-41 4. 26-42 (4. 26-12 41-47 5. 12-29) 41-47 5. 42-29 47-41 6. 29-23 41x30 7. 35x24"
+            
+            let position = XCTUnwrap(Position(fen: fen))
+            XCTAssertNotNil(Game(pdn: pdn, position: position))
+        }
+        
+        do {
+            let fen = "W:W20,24,30,33,40,43,47,:B7,10,12,22,27,29,36,"
+            let pdn = "1. 20-15 29x49 2. 15x04 49x35 3. 47-41 36x47 4. 04-15 47x20 5. 15x38x16x02 35x24 6. 02x30 22-28 7. 30-25 28-32 8. 25-03 12-18 9. 03-09 18-23 10. 09-20"
             
             let position = XCTUnwrap(Position(fen: fen))
             XCTAssertNotNil(Game(pdn: pdn, position: position))

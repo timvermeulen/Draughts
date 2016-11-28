@@ -23,11 +23,9 @@ extension Game {
                 
                 guard let start = squares.first, let end = squares.last else { return nil }
                 
-                for square in squares.dropFirst().dropLast() {
-                    helper.toggle(square)
-                }
-                
-                guard helper.move(from: start, to: end) else { return nil }
+                guard
+                    squares.dropFirst().dropLast().contains(where: helper.toggle) || helper.move(from: start, to: end)
+                    else { return nil }
             }
         }
         
