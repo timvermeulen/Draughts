@@ -147,6 +147,11 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertEqual(next, expected)
     }
     
+    func testMillCapture() {
+        let position = XCTUnwrap(Position(fen: "W:WK2:B7,13,32,34"))
+        XCTAssertTrue(position.legalMoves.contains(where: { $0.start == 2 && $0.end == 2 }))
+    }
+    
     func testManIntermediateSquares() {
         let position = XCTUnwrap(Position(fen: "W:W48:B43,33,22,21"))
         
