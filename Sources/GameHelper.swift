@@ -46,7 +46,7 @@ extension GameHelper {
         self.movePicker = MovePicker(self.currentGame.positions[self.ply])
     }
     
-    fileprivate func play(_ move: Move) {
+    public func play(_ move: Move) {
         if let index = self.currentGame.play(move, at: self.ply) {
             self.indices.append((self.ply, index))
         }
@@ -111,7 +111,7 @@ extension GameHelper {
     /// returns: `true` is a move was played, `false` otherwise
     @discardableResult
     public func move(from start: Square, to end: Square) -> Bool {
-        guard let move = movePicker.onlyCandidate(from: start, to: end) else { return false }
+        guard let move = self.movePicker.onlyCandidate(from: start, to: end) else { return false }
         
         self.play(move)
         return true
