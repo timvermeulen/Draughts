@@ -1,6 +1,6 @@
 public final class GameHelper {
     public var game: Game
-    public fileprivate(set) var ply: Ply {
+    fileprivate var ply: Ply {
         didSet { self.reloadMovePicker() }
     }
     fileprivate var indices: [(ply: Ply, index: Int)]
@@ -40,6 +40,10 @@ extension GameHelper {
         set {
             self.game.setVariation(newValue, indices: self.indices.makeIterator())
         }
+    }
+    
+    public var position: Position {
+        return self.currentGame.positions[self.ply]
     }
     
     fileprivate func reloadMovePicker() {

@@ -262,7 +262,7 @@ class DraughtsTests: SafeXCTestCase {
         
         do {
             let position = XCTUnwrap(Position(fen: "W:WK26:B7,9,12,13,29,32,34,37,40"))
-            XCTAssertEqual(position.legalMoves.count, 9)
+            XCTAssertEqual(position.legalMoves.count, 10)
             
             let picker = MovePicker(position)
             XCTAssertNil(picker.onlyCandidate)
@@ -377,6 +377,25 @@ class DraughtsTests: SafeXCTestCase {
             
             XCTAssertEqual(helper.game.pdn, "1. 32-28 (1. 32-27 19-23 (1. ... 18-23))")
         }
+    }
+    
+    func testGameHelperPosition() {
+        let position = XCTUnwrap(Position(fen: "W:W47:B5"))
+        let helper = GameHelper(Game(position: position))
+        
+        XCTAssertTrue(helper.toggle(41))
+        XCTAssertTrue(helper.toggle(10))
+        
+        XCTAssertEqual(helper.position, XCTUnwrap(Position(fen: "W:W41:B10")))
+        
+        XCTAssertTrue(helper.backward())
+        XCTAssertEqual(helper.position, XCTUnwrap(Position(fen: "B:W41:B5")))
+        
+        XCTAssertTrue(helper.backward())
+        XCTAssertEqual(helper.position, position)
+        
+        XCTAssertTrue(helper.toggle(42))
+        XCTAssertEqual(helper.position, XCTUnwrap(Position(fen: "B:W42:B5")))
     }
     
     func testPDN() {
