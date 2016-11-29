@@ -16,7 +16,7 @@ extension Position {
         }
         
         print(pieceSymbols(of: .white))
-        return "\(self.ply.player == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
+        return "\(self.playerToMove == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
     }
     
     public convenience init?(fen: String) {
@@ -58,6 +58,6 @@ extension Position {
             }
         }
         
-        self.init(white: white, black: black, kings: kings, ply: Ply(player: player))
+        self.init(white: white, black: black, kings: kings, playerToMove: player)
     }
 }

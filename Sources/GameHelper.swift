@@ -51,7 +51,7 @@ extension GameHelper {
             self.indices.append((self.ply, index))
         }
         
-        self.forward()
+        guard self.forward() else { fatalError("this shouldn't happen") }
     }
 }
 

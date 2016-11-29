@@ -1,13 +1,13 @@
 public final class Position {
     internal let white, black, kings, empty: Bitboard
-    public let ply: Ply
+    public let playerToMove: Player
     
     public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
         return (self.white.value, self.black.value, self.kings.value)
     }
     
     public lazy var legalMoves: [Move] = {
-        return self.moves(of: self.ply.player)
+        return self.moves(of: self.playerToMove)
     }()
     
     internal func pieces(of player: Player) -> Bitboard {
@@ -32,7 +32,7 @@ public final class Position {
     // MARK: -
     // MARK: Initialising a Position
     
-    internal init(white: Bitboard, black: Bitboard, kings: Bitboard = .empty, ply: Ply = Ply()) {
+    internal init(white: Bitboard, black: Bitboard, kings: Bitboard = .empty, playerToMove: Player = .white) {
         self.white = white
         self.black = black
         self.kings = kings
@@ -40,32 +40,32 @@ public final class Position {
             .intersection(black.inverse)
             .intersection(Bitboard.realBoard)
         
-        self.ply = ply
+        self.playerToMove = playerToMove
     }
     
-    public convenience init(pieces: [Piece], ply: Ply = Ply()) {
+    public convenience init(pieces: [Piece], playerToMove: Player = .white) {
         let white = Bitboard(squares: pieces.filter { $0.player == .white }.map { $0.square })
         let black = Bitboard(squares: pieces.filter { $0.player == .black }.map { $0.square })
         let kings = Bitboard(squares: pieces.filter { $0.kind == .king }.map { $0.square })
         
-        self.init(white: white, black: black, kings: kings, ply: ply)
+        self.init(white: white, black: black, kings: kings, playerToMove: playerToMove)
     }
     
-    public convenience init(white: [Square], black: [Square], kings: [Square], ply: Ply = Ply()) {
+    public convenience init(white: [Square], black: [Square], kings: [Square], playerToMove: Player = .white) {
         self.init(
             white: Bitboard(squares: white),
             black: Bitboard(squares: black),
             kings: Bitboard(squares: kings),
-            ply: ply
+            playerToMove: playerToMove
         )
     }
     
-    public convenience init(bitboards: (white: UInt64, black: UInt64, kings: UInt64), ply: Ply = Ply()) {
+    public convenience init(bitboards: (white: UInt64, black: UInt64, kings: UInt64), playerToMove: Player = .white) {
         self.init(
             white: Bitboard(bitboards.white),
             black: Bitboard(bitboards.black),
             kings: Bitboard(bitboards.kings),
-            ply: ply
+            playerToMove: playerToMove
         )
     }
     
@@ -245,7 +245,7 @@ extension Position: Equatable {
         return left.white == right.white &&
             left.black == right.black &&
             left.kings == right.kings &&
-            left.ply.player == right.ply.player
+            left.playerToMove == right.playerToMove
     }
 }
 

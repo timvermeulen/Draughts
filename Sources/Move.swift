@@ -43,7 +43,7 @@ public final class Move {
             white: self.white.symmetricDifference(self.startPosition.white),
             black: self.black.symmetricDifference(self.startPosition.black),
             kings: self.kings.symmetricDifference(self.startPosition.kings),
-            ply: self.startPosition.ply.successor
+            playerToMove: self.startPosition.playerToMove.opponent
         )
     }()
     

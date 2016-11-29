@@ -1,5 +1,6 @@
 public struct Game {
     public let startPosition: Position
+    public let startNumber: Int
     
     public var moves: PlyArray<Move>
     public var positions: PlyArray<Position>
@@ -9,20 +10,24 @@ public struct Game {
     // public var endPosition: Position { return self.positions.last ?? self.startPosition }
 
     public var endPosition: Position { return self.positions[self.positions.index(before: self.positions.endIndex)] }
-    public var startPly: Ply { return self.startPosition.ply }
-    public var endPly: Ply { return self.endPosition.ply }
+    public var startPly: Ply { return Ply(player: self.startPosition.playerToMove, number: self.startNumber) }
+    public var endPly: Ply { return Ply(player: self.endPosition.playerToMove, number: self.startNumber + self.moves.count) }
 
-    public init(position: Position = .start) {
+    public init(position: Position = .start, startNumber: Int = 0) {
+        let ply = Ply(player: position.playerToMove, number: startNumber)
+        
         self.startPosition = position
-        self.moves = PlyArray(position.ply)
-        self.positions = PlyArray(position.ply)
-        self.variations = PlyArray(position.ply)
+        self.startNumber = startNumber
+        
+        self.moves = PlyArray(ply)
+        self.positions = PlyArray(ply)
+        self.variations = PlyArray(ply)
         
         self.positions.append(self.startPosition)
     }
     
-    public init(move: Move) {
-        self.init(position: move.startPosition)
+    public init(move: Move, startNumber: Int = 0) {
+        self.init(position: move.startPosition, startNumber: startNumber)
         self.play(move)
     }
     
@@ -44,7 +49,7 @@ public struct Game {
             if let index = self.variations[ply].index(where: { $0.move == move }) {
                 return index
             } else {
-                self.variations[ply].append((move, Game(move: move)))
+                self.variations[ply].append((move, Game(move: move, startNumber: ply.number)))
                 return self.variations[ply].count - 1
             }
         }
