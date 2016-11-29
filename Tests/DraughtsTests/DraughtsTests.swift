@@ -59,20 +59,12 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testKingSlidingMoves() {
-        do {
-            let position = XCTUnwrap(Position(fen: "W:WK33:B"))
-            
-            let moves = Set(position.legalMoves.map { $0.notation })
-            let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
-            
-            XCTAssertEqual(moves, expected)
-        }
+        let position = XCTUnwrap(Position(fen: "W:WK33:B"))
         
-        do {
-            let fen = "W:W24,35,K29:BK41"
-            let position = XCTUnwrap(Position(fen: fen))
-            print(position.legalMoves)
-        }
+        let moves = Set(position.legalMoves.map { $0.notation })
+        let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
+        
+        XCTAssertEqual(moves, expected)
     }
 
     func testCapture() {
