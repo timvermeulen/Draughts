@@ -122,3 +122,10 @@ extension GameHelper {
         return true
     }
 }
+
+extension GameHelper: TextOutputStreamable {
+    public func write<Target: TextOutputStream>(to target: inout Target) {
+        print("game:\n\(self.game.pdn)", to: &target)
+        self.movePicker.write(to: &target)
+    }
+}

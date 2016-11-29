@@ -1,12 +1,12 @@
-struct BitboardIterator: IteratorProtocol {
-    let bitboard: Bitboard
-    var index = 0
+internal struct BitboardIterator: IteratorProtocol {
+    internal let bitboard: Bitboard
+    internal var index = 0
     
-    init(_ bitboard: Bitboard) {
+    internal init(_ bitboard: Bitboard) {
         self.bitboard = bitboard
     }
     
-    mutating func next() -> Square? {
+    internal mutating func next() -> Square? {
         while self.index < 64 {
             defer { self.index += 1 }
             

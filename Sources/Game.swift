@@ -55,3 +55,13 @@ public struct Game {
         }
     }
 }
+
+extension Game: TextOutputStreamable {
+    public func write<Target: TextOutputStream>(to target: inout Target) {
+        print(
+            self.startPosition, self.pdn, self.endPosition,
+            separator: "\n", terminator: "",
+            to: &target
+        )
+    }
+}

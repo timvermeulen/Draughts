@@ -78,3 +78,15 @@ extension MovePicker {
         return onlyMove(of: self.candidates.filter(includeMove)) ?? onlyMove(of: self.position.legalMoves.filter(includeMove))
     }
 }
+
+extension MovePicker: TextOutputStreamable {
+    public func write<Target: TextOutputStream>(to target: inout Target) {
+        print(
+            "position:", self.position,
+            "required squares:", self.requirements,
+            "candidate moves:", self.candidates.map { $0.unambiguousNotation }.joined(separator: ", "),
+            separator: "\n", terminator: "",
+            to: &target
+        )
+    }
+}

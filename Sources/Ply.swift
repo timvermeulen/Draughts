@@ -18,6 +18,15 @@ extension Ply {
     }
 }
 
+extension Ply {
+    public var indicator: String {
+        switch self.player {
+        case .white: return "\((self.number + 1) / 2 + 1)."
+        case .black: return "\(self.number / 2 + 1). ..."
+        }
+    }
+}
+
 extension Ply: Comparable {
     public static func < (left: Ply, right: Ply) -> Bool {
         return left.number < right.number

@@ -55,12 +55,12 @@ public final class Move {
         guard let firstCapture = self.captures.first else { return [] }
         guard var direction = self.start.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(self.captures, self.captures.dropFirst()).map { from, to in
-            if let squares = from.square.squares(before: to.square) {
+        return zip(self.captures, self.captures.dropFirst()).map { start, end in
+            if let squares = start.square.squares(before: end.square) {
                 return squares
             } else {
-                for square in from.square.squares(to: direction) {
-                    guard let newDirection = square.direction(to: to.square) else { continue }
+                for square in start.square.squares(to: direction) {
+                    guard let newDirection = square.direction(to: end.square) else { continue }
                     
                     direction = newDirection
                     return [square]
@@ -79,10 +79,10 @@ public final class Move {
         guard let firstCapture = self.captures.first else { return [] }
         guard var direction = self.start.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(self.captures, self.captures.dropFirst()).map { from, to in
+        return zip(self.captures, self.captures.dropFirst()).map { start, end in
             guard
-                let neighbor = from.square.neighbor(to: direction),
-                let newDirection = neighbor.direction(to: to.square)
+                let neighbor = start.square.neighbor(to: direction),
+                let newDirection = neighbor.direction(to: end.square)
                 else { fatalError("invalid move") }
             
             direction = newDirection
@@ -125,13 +125,12 @@ extension Move: Equatable {
     }
 }
 
-extension Move: TextOutputStreamable {
+extension Move: CustomStringConvertible {
     public var notation: String {
-        return "\(start)\(isCapture ? "x" : "-")\(end)"
+        return "\(self.start)\(self.isCapture ? "x" : "-")\(self.end)"
     }
     
-    public func write<Target: TextOutputStream>(to target: inout Target) {
-        let position = Position(white: white, black: black, kings: kings)
-        target.write("\(position)\n\(self.notation)")
+    public var description: String {
+        return self.unambiguousNotation
     }
 }
