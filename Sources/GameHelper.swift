@@ -29,13 +29,9 @@ extension Game {
 extension GameHelper {
     fileprivate var currentGame: Game {
         get {
-            var game = self.game
-            
-            for (ply, index) in self.indices {
-                game = game.variations[ply][index].variation
+            return self.indices.reduce(self.game) { (game, pair) in
+                game.variations[pair.ply][pair.index].variation
             }
-            
-            return game
         }
         set {
             self.game.setVariation(newValue, indices: self.indices.makeIterator())
