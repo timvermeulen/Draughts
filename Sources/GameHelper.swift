@@ -46,12 +46,17 @@ extension GameHelper {
         self.movePicker = MovePicker(self.currentGame.positions[self.ply])
     }
     
-    public func play(_ move: Move) {
+    /// returns: `true` if a variation could be popped, `false` otherwise
+    @discardableResult
+    public func play(_ move: Move) -> Bool {
+        guard self.currentGame.positions[self.ply].moveIsValid(move) else { return false }
+        
         if let index = self.currentGame.play(move, at: self.ply) {
             self.indices.append((self.ply, index))
         }
         
         guard self.forward() else { fatalError("this shouldn't happen") }
+        return true
     }
 }
 
