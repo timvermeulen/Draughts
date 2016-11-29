@@ -15,7 +15,6 @@ extension Position {
             return [pieceSymbols(of: player, kind: .man), pieceSymbols(of: player, kind: .king)].flatMap { $0 }.joined(separator: ",")
         }
         
-        print(pieceSymbols(of: .white))
         return "\(self.playerToMove == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
     }
     
