@@ -1,5 +1,5 @@
 public final class GameHelper {
-    public var game: Game
+    public fileprivate(set) var game: Game
     fileprivate var ply: Ply {
         didSet { self.reloadMovePicker() }
     }
