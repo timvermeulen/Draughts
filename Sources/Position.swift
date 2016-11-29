@@ -60,6 +60,15 @@ public final class Position {
         )
     }
     
+    public convenience init(bitboards: (white: UInt64, black: UInt64, kings: UInt64), ply: Ply = Ply()) {
+        self.init(
+            white: Bitboard(bitboards.white),
+            black: Bitboard(bitboards.black),
+            kings: Bitboard(bitboards.kings),
+            ply: ply
+        )
+    }
+    
     // MARK: -
     // MARK: Moves
     
