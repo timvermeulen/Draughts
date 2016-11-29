@@ -399,38 +399,38 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testPDN() {
-//        do {
-//            let gameHelper = GameHelper(Game(position: XCTUnwrap(Position(fen: "B:W37:B14"))))
-//            
-//            XCTAssertTrue(gameHelper.move(from: 14, to: 19))
-//            XCTAssertTrue(gameHelper.move(from: 37, to: 31))
-//            
-//            XCTAssertEqual(gameHelper.game.pdn, "1. ... 14-19 2. 37-31")
-//        }
-//        
-//        do {
-//            let game = XCTUnwrap(Game(pdn: "1. 32-28 19-23 2. 28x19 14x23"))
-//            
-//            XCTAssertEqual(game.moves.count, 4)
-//            XCTAssertEqual(game.endPosition.pieces(of: .white).count, 19)
-//            XCTAssertEqual(game.endPosition.pieces(of: .black).count, 19)
-//        }
-//        
-//        do {
-//            let raphael = XCTUnwrap(Position(fen: "W:W27,28,32,37,38,33,34,48,49:B24,23,19,13,12,17,21,16,26"))
-//            let result = XCTUnwrap(Position(fen: "B:W17:B7"))
-//            
-//            let notation = "1. 34-29 23x34 2. 28-23 19x39 3. 37-31 26x28 4. 49-44 21x43 5. 44x11 16x7 6. 48x17"
-//            let game = XCTUnwrap(Game(pdn: notation, position: raphael))
-//            
-//            XCTAssertEqual(game.endPosition, result)
-//        }
-//        
-//        do {
-//            let pdn = "1. 32-28 (1. 32-27 19-23 (1. ... 18-23); 1. 31-26 16-21 2. 36-31)"
-//            let game = XCTUnwrap(Game(pdn: pdn))
-//            XCTAssertEqual(game.pdn, pdn)
-//        }
+        do {
+            let gameHelper = GameHelper(Game(position: XCTUnwrap(Position(fen: "B:W37:B14"))))
+            
+            XCTAssertTrue(gameHelper.move(from: 14, to: 19))
+            XCTAssertTrue(gameHelper.move(from: 37, to: 31))
+            
+            XCTAssertEqual(gameHelper.game.pdn, "1. ... 14-19 2. 37-31")
+        }
+        
+        do {
+            let game = XCTUnwrap(Game(pdn: "1. 32-28 19-23 2. 28x19 14x23"))
+            
+            XCTAssertEqual(game.moves.count, 4)
+            XCTAssertEqual(game.endPosition.pieces(of: .white).count, 19)
+            XCTAssertEqual(game.endPosition.pieces(of: .black).count, 19)
+        }
+        
+        do {
+            let raphael = XCTUnwrap(Position(fen: "W:W27,28,32,37,38,33,34,48,49:B24,23,19,13,12,17,21,16,26"))
+            let result = XCTUnwrap(Position(fen: "B:W17:B7"))
+            
+            let notation = "1. 34-29 23x34 2. 28-23 19x39 3. 37-31 26x28 4. 49-44 21x43 5. 44x11 16x7 6. 48x17"
+            let game = XCTUnwrap(Game(pdn: notation, position: raphael))
+            
+            XCTAssertEqual(game.endPosition, result)
+        }
+        
+        do {
+            let pdn = "1. 32-28 (1. 32-27 19-23 (1. ... 18-23); 1. 31-26 16-21 2. 36-31)"
+            let game = XCTUnwrap(Game(pdn: pdn))
+            XCTAssertEqual(game.pdn, pdn)
+        }
         
         do {
             let fen = "W:W24,44,K5:B26,27,36,"
@@ -440,12 +440,12 @@ class DraughtsTests: SafeXCTestCase {
             XCTAssertNotNil(Game(pdn: pdn, position: position))
         }
         
-//        do {
-//            let fen = "W:W20,24,30,33,40,43,47,:B7,10,12,22,27,29,36,"
-//            let pdn = "1. 20-15 29x49 2. 15x04 49x35 3. 47-41 36x47 4. 04-15 47x20 5. 15x38x16x02 35x24 6. 02x30 22-28 7. 30-25 28-32 8. 25-03 12-18 9. 03-09 18-23 10. 09-20"
-//            
-//            let position = XCTUnwrap(Position(fen: fen))
-//            XCTAssertNotNil(Game(pdn: pdn, position: position))
-//        }
+        do {
+            let fen = "W:W20,24,30,33,40,43,47,:B7,10,12,22,27,29,36,"
+            let pdn = "1. 20-15 29x49 2. 15x04 49x35 3. 47-41 36x47 4. 04-15 47x20 5. 15x38x16x02 35x24 6. 02x30 22-28 7. 30-25 28-32 8. 25-03 12-18 9. 03-09 18-23 10. 09-20"
+            
+            let position = XCTUnwrap(Position(fen: fen))
+            XCTAssertNotNil(Game(pdn: pdn, position: position))
+        }
     }
 }
