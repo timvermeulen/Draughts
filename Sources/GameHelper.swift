@@ -84,16 +84,15 @@ extension GameHelper {
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func backward() -> Bool {
-        if self.ply > self.variation.startPly {
-            self.ply = self.ply.predecessor
-            return true
-        } else if !self.indices.isEmpty {
+        guard self.ply > self.variation.startPly else { return false }
+        
+        self.ply = self.ply.predecessor
+        
+        if !self.indices.isEmpty && self.ply == self.variation.startPly {
             self.indices.removeLast()
-            self.ply = self.ply.predecessor
-            return true
-        } else {
-            return false
         }
+        
+        return true
     }
 }
 
