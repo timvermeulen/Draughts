@@ -27,7 +27,7 @@ extension Game {
 }
 
 extension GameHelper {
-    fileprivate var currentGame: Game {
+    fileprivate var variation: Game {
         get {
             return self.indices.reduce(self.game) { (game, pair) in
                 game.variations[pair.ply][pair.index].variation
@@ -39,19 +39,19 @@ extension GameHelper {
     }
     
     public var position: Position {
-        return self.currentGame.positions[self.ply]
+        return self.variation.positions[self.ply]
     }
     
     fileprivate func reloadMovePicker() {
-        self.movePicker = MovePicker(self.currentGame.positions[self.ply])
+        self.movePicker = MovePicker(self.variation.positions[self.ply])
     }
     
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     public func play(_ move: Move) -> Bool {
-        guard self.currentGame.positions[self.ply].moveIsValid(move) else { return false }
+        guard self.variation.positions[self.ply].moveIsValid(move) else { return false }
         
-        if let index = self.currentGame.play(move, at: self.ply) {
+        if let index = self.variation.play(move, at: self.ply) {
             self.indices.append((self.ply, index))
         }
         
@@ -75,7 +75,7 @@ extension GameHelper {
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func forward() -> Bool {
-        guard self.ply < self.currentGame.endPly else { return false }
+        guard self.ply < self.variation.endPly else { return false }
         
         self.ply = self.ply.successor
         return true
@@ -84,7 +84,7 @@ extension GameHelper {
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func backward() -> Bool {
-        if self.ply > self.currentGame.startPly {
+        if self.ply > self.variation.startPly {
             self.ply = self.ply.predecessor
             return true
         } else if !self.indices.isEmpty {
