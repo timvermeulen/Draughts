@@ -1,5 +1,5 @@
 public struct PlyArray<Element> {
-    fileprivate var contents: ArraySlice<Element>
+    fileprivate var contents: [Element]
     
     public var startPly: Ply
     
@@ -10,6 +10,9 @@ public struct PlyArray<Element> {
 }
 
 extension PlyArray: RandomAccessCollection {
+    // this should be the default, but leaving it out makes the compiler unhappy
+    public typealias Indices = DefaultRandomAccessIndices<PlyArray>
+    
     public var startIndex: Ply { return self.startPly }
     public var endIndex: Ply { return self.index(self.startPly, offsetBy: self.contents.count) }
     
