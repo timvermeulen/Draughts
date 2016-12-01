@@ -60,6 +60,10 @@ extension Game {
     /// Points to a specific (sub)variation of the game.
     public struct Index {
         internal var indices: ArraySlice<(ply: Ply, index: Int)>
+        
+        init(_ indices: ArraySlice<(ply: Ply, index: Int)> = []) {
+            self.indices = indices
+        }
     }
     
     public subscript(index: Index) -> Game {
@@ -69,11 +73,9 @@ extension Game {
             }
         }
         set {
-            var indices = index.indices
-            
-            if let (ply, index) = indices.popFirst() {
-                let newIndex = Index(indices: indices)
-                self.variations[ply][index].variation[newIndex] = newValue
+            if let (ply, variationIndex) = index.indices.first {
+                let newIndex = Index(index.indices.dropFirst())
+                self.variations[ply][variationIndex].variation[newIndex] = newValue
             } else {
                 self = newValue
             }

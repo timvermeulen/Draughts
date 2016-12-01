@@ -9,7 +9,7 @@ public final class GameHelper {
     public init(_ game: Game) {
         self.game = game
         self.ply = game.endPly
-        self.index = Game.Index(indices: [])
+        self.index = Game.Index()
         self.movePicker = MovePicker(game.endPosition)
     }
 }
