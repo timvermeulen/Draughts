@@ -3,39 +3,21 @@ public final class GameHelper {
     fileprivate var ply: Ply {
         didSet { self.reloadMovePicker() }
     }
-    fileprivate var indices: [(ply: Ply, index: Int)]
+    fileprivate var index: Game.Index
     fileprivate var movePicker: MovePicker
     
     public init(_ game: Game) {
         self.game = game
         self.ply = game.endPly
-        self.indices = []
+        self.index = Game.Index(indices: [])
         self.movePicker = MovePicker(game.endPosition)
-    }
-}
-
-extension Game {
-    fileprivate mutating func setVariation<I: IteratorProtocol>(_ variation: Game, indices: I) where I.Element == (ply: Ply, index: Int) {
-        var indices = indices
-        
-        if let (ply, index) = indices.next() {
-            self.variations[ply][index].variation.setVariation(variation, indices: indices)
-        } else {
-            self = variation
-        }
     }
 }
 
 extension GameHelper {
     fileprivate var variation: Game {
-        get {
-            return self.indices.reduce(self.game) { (game, pair) in
-                game.variations[pair.ply][pair.index].variation
-            }
-        }
-        set {
-            self.game.setVariation(newValue, indices: self.indices.makeIterator())
-        }
+        get { return self.game[self.index] }
+        set { self.game[self.index] = newValue }
     }
     
     public var position: Position {
@@ -52,7 +34,7 @@ extension GameHelper {
         guard self.variation.positions[self.ply].moveIsValid(move) else { return false }
         
         if let index = self.variation.play(move, at: self.ply) {
-            self.indices.append((self.ply, index))
+            self.index.indices.append((self.ply, index))
         }
         
         guard self.forward() else { fatalError("this shouldn't happen") }
@@ -64,7 +46,7 @@ extension GameHelper {
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     internal func popVariation() -> Bool {
-        guard let (ply, _) = self.indices.popLast() else { return false }
+        guard let (ply, _) = self.index.indices.popLast() else { return false }
         
         self.ply = ply
         return true
@@ -88,8 +70,8 @@ extension GameHelper {
         
         self.ply = self.ply.predecessor
         
-        if !self.indices.isEmpty && self.ply == self.variation.startPly {
-            self.indices.removeLast()
+        if !self.index.indices.isEmpty && self.ply == self.variation.startPly {
+            self.index.indices.removeLast()
         }
         
         return true

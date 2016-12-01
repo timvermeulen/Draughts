@@ -56,6 +56,31 @@ public struct Game {
     }
 }
 
+extension Game {
+    /// Points to a specific (sub)variation of the game.
+    public struct Index {
+        internal var indices: ArraySlice<(ply: Ply, index: Int)>
+    }
+    
+    public subscript(index: Index) -> Game {
+        get {
+            return index.indices.reduce(self) { game, pair in
+                game.variations[pair.ply][pair.index].variation
+            }
+        }
+        set {
+            var indices = index.indices
+            
+            if let (ply, index) = indices.popFirst() {
+                let newIndex = Index(indices: indices)
+                self.variations[ply][index].variation[newIndex] = newValue
+            } else {
+                self = newValue
+            }
+        }
+    }
+}
+
 extension Game: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         print(
