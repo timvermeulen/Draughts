@@ -18,12 +18,7 @@ public final class MovePicker {
 
 extension MovePicker {
     public var onlyCandidate: Move? {
-        guard
-            let move = self.candidates.first,
-            self.candidates.count == 1
-            else { return nil }
-        
-        return move
+        return Optional(self.candidates.first, where: { _ in self.candidates.count == 1 })
     }
     
     private func generateCandidates() {
@@ -71,8 +66,7 @@ extension MovePicker {
         }
         
         func onlyMove(of moves: [Move]) -> Move? {
-            guard let move = moves.first, moves.count == 1 else { return nil }
-            return move
+            return Optional(moves.first, where: { _ in moves.count == 1 })
         }
         
         return onlyMove(of: self.candidates.filter(includeMove)) ?? onlyMove(of: self.position.legalMoves.filter(includeMove))

@@ -8,7 +8,7 @@ extension Position {
                 .map { "\(kind == .king ? "K" : "")\($0)" }
                 .joined(separator: ",")
             
-            return result.isEmpty ? nil : result
+            return Optional(result, where: { !$0.isEmpty })
         }
         
         func pieceSymbols(of player: Player) -> String {
@@ -25,6 +25,7 @@ extension Position {
         var white = Bitboard.empty
         var black = Bitboard.empty
         var kings = Bitboard.empty
+        
         let player: Player = components[0] == "W" ? .white : .black
         
         for (component, player): (String, Player) in [(components[1], .white), (components[2], .black)] {

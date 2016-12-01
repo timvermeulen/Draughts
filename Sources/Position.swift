@@ -218,8 +218,7 @@ public final class Position {
         guard let neighbor = square.neighbor(to: direction), self.squareIsEmpty(neighbor) || neighbor == squareToIgnore else { return [] }
         
         return Array(first: neighbor, next: {
-            guard let neighbor = $0.neighbor(to: direction) else { return nil }
-            return self.squareIsEmpty(neighbor) || neighbor == squareToIgnore ? neighbor : nil
+            return Optional($0.neighbor(to: direction), where: { self.squareIsEmpty($0) || $0 == squareToIgnore })
         })
     }
     

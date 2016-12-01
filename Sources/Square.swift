@@ -143,7 +143,7 @@ extension Square {
 
         return Array(first: neighbor, next: { inBetween in
             guard let next = inBetween.neighbor(to: direction) else { fatalError("edge of board reached before destination square") }
-            return next == square ? nil : next
+            return Optional(next, where: { $0 != square })
         })
     }
 }
