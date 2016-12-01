@@ -1,40 +1,6 @@
 import XCTest
 @testable import Draughts
 
-let errorMessage = "`continueAfterFailure` should be set to `false` inside `setUp()`, and set to `true` inside `tearDown()`"
-
-public func XCTFatal(_ message: String = "", file: StaticString = #file, line: UInt = #line) -> Never {
-    XCTFail(message, file: file, line: line)
-    fatalError(errorMessage)
-}
-
-public func XCTUnwrap<T>(_ expression: @autoclosure () throws -> T?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
-    XCTAssertNotNil(try expression(), message(), file: file, line: line)
-    
-    do {
-        guard let result = try expression() else { fatalError(errorMessage) }
-        return result
-    } catch {
-        fatalError(errorMessage)
-    }
-}
-
-open class SafeXCTestCase: XCTestCase {
-    override open func setUp() {
-        super.setUp()
-        self.continueAfterFailure = false
-    }
-    
-    override open func tearDown() {
-        self.continueAfterFailure = true
-        super.tearDown()
-    }
-}
-
-func == <T: Equatable> (left: [[T]], right: [[T]]) -> Bool {
-    return left.count == right.count && !zip(left, right).contains(where: !=)
-}
-
 class DraughtsTests: SafeXCTestCase {
     func testOpeningMoves() {
         let position = Position.start
@@ -48,7 +14,7 @@ class DraughtsTests: SafeXCTestCase {
     func testReturnMoves() {
         let pos1 = Position.start
         let openingMoves = pos1.legalMoves
-        let move = XCTUnwrap(openingMoves.first)
+        let move = SafeXCTAssertNotNil(openingMoves.first)
         
         let pos2 = move.endPosition
         let returnMoves = Set(pos2.legalMoves.map { $0.notation })
@@ -58,7 +24,7 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testKingSlidingMoves() {
-        let position = XCTUnwrap(Position(fen: "W:WK33:B"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:WK33:B"))
         
         let moves = Set(position.legalMoves.map { $0.notation })
         let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
@@ -70,19 +36,19 @@ class DraughtsTests: SafeXCTestCase {
         let pos1 = Position.start
         
         let openingMoves = pos1.legalMoves
-        let firstMove = XCTUnwrap(
+        let firstMove = SafeXCTAssertNotNil(
             openingMoves.first(where: { $0.notation == "32-28" })
         )
         let pos2 = firstMove.endPosition
         
         let returnMoves = pos2.legalMoves
-        let secondMove = XCTUnwrap(
+        let secondMove = SafeXCTAssertNotNil(
             returnMoves.first(where: { $0.notation == "19-23" })
         )
         let pos3 = secondMove.endPosition
         
         let returnReturnMoves = pos3.legalMoves
-        let capture = XCTUnwrap(returnReturnMoves.first)
+        let capture = SafeXCTAssertNotNil(returnReturnMoves.first)
         XCTAssertEqual(returnReturnMoves.count, 1)
         XCTAssertTrue(capture.isCapture)
         
@@ -94,7 +60,7 @@ class DraughtsTests: SafeXCTestCase {
     
     func testFEN() {
         do {
-            let position = XCTUnwrap(Position(fen: "W:W28,K29:BK22,23"))
+            let position = SafeXCTAssertNotNil(Position(fen: "W:W28,K29:BK22,23"))
             let expected = Position(
                 pieces: [
                     Piece(player: .white, kind: .man, square: 28),
@@ -106,7 +72,7 @@ class DraughtsTests: SafeXCTestCase {
             
             XCTAssertEqual(position, expected)
             
-            let copy = XCTUnwrap(Position(fen: position.fen))
+            let copy = SafeXCTAssertNotNil(Position(fen: position.fen))
             XCTAssertEqual(position, copy)
         }
         
@@ -114,16 +80,16 @@ class DraughtsTests: SafeXCTestCase {
             let fen1 = "W:W20,24,30,33,40,43,47,:B7,10,12,22,27,29,36,"
             let fen2 = "W:W20,24,30,33,40,43,47:B7,10,12,22,27,29,36"
             
-            let position = XCTUnwrap(Position(fen: fen1))
+            let position = SafeXCTAssertNotNil(Position(fen: fen1))
             XCTAssertEqual(fen2, position.fen)
         }
     }
     
     func testCoupTurc() {
-        let position = XCTUnwrap(Position(fen: "W:WK26:B9,12,13,23,24"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:WK26:B9,12,13,23,24"))
         let moves = position.legalMoves
         
-        let move = XCTUnwrap(moves.first)
+        let move = SafeXCTAssertNotNil(moves.first)
         XCTAssertEqual(moves.count, 1)
         
         let next = move.endPosition
@@ -139,17 +105,17 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testMillCapture() {
-        let position = XCTUnwrap(Position(fen: "W:WK2:B7,13,32,34"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:WK2:B7,13,32,34"))
         XCTAssertTrue(position.legalMoves.contains(where: { $0.startSquare == 2 && $0.endSquare == 2 }))
     }
     
     func testManIntermediateSquares() {
-        let position = XCTUnwrap(Position(fen: "W:W48:B43,33,22,21"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W48:B43,33,22,21"))
         
         let moves = position.legalMoves
         XCTAssertEqual(moves.count, 1)
         
-        let move = XCTUnwrap(moves.first)
+        let move = SafeXCTAssertNotNil(moves.first)
         let expectedMove = Move(
             from: Piece(player: .white, kind: .man, square: 48),
             to: 26,
@@ -165,8 +131,8 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testKingIntermediateSquares() {
-        let position = XCTUnwrap(Position(fen: "W:WK46:B19,20,30,32,43"))
-        let move = XCTUnwrap(position.legalMoves.first)
+        let position = SafeXCTAssertNotNil(Position(fen: "W:WK46:B19,20,30,32,43"))
+        let move = SafeXCTAssertNotNil(position.legalMoves.first)
         XCTAssert(position.legalMoves.count == 1)
         
         let intermediateSquares = move.allIntermediateSquares
@@ -175,9 +141,9 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testSlidingPromotion() {
-        let pos1 = XCTUnwrap(Position(fen: "W:W6:B45"))
+        let pos1 = SafeXCTAssertNotNil(Position(fen: "W:W6:B45"))
         
-        let move1 = XCTUnwrap(pos1.legalMoves.first)
+        let move1 = SafeXCTAssertNotNil(pos1.legalMoves.first)
         XCTAssertEqual(pos1.legalMoves.count, 1)
         
         let pos2 = move1.endPosition
@@ -190,7 +156,7 @@ class DraughtsTests: SafeXCTestCase {
         )
         XCTAssertEqual(pos2, expected1)
         
-        let move2 = XCTUnwrap(pos2.legalMoves.first)
+        let move2 = SafeXCTAssertNotNil(pos2.legalMoves.first)
         XCTAssertEqual(pos2.legalMoves.count, 1)
         
         let pos3 = move2.endPosition
@@ -205,9 +171,9 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testCapturingPromotion() {
-        let position = XCTUnwrap(Position(fen: "W:W15:B10"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W15:B10"))
         
-        let move = XCTUnwrap(position.legalMoves.first)
+        let move = SafeXCTAssertNotNil(position.legalMoves.first)
         XCTAssertEqual(position.legalMoves.count, 1)
         let expectedMove = Move(
             from: Piece(player: .white, kind: .man, square: 15),
@@ -239,7 +205,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let position = XCTUnwrap(Position(fen: "W:WK46:B41,42,38,30"))
+            let position = SafeXCTAssertNotNil(Position(fen: "W:WK46:B41,42,38,30"))
             let picker = MovePicker(position)
             XCTAssertNil(picker.onlyCandidate)
             
@@ -252,7 +218,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let position = XCTUnwrap(Position(fen: "W:WK26:B7,9,12,13,29,32,34,37,40"))
+            let position = SafeXCTAssertNotNil(Position(fen: "W:WK26:B7,9,12,13,29,32,34,37,40"))
             XCTAssertEqual(position.legalMoves.count, 10)
             
             let picker = MovePicker(position)
@@ -270,7 +236,7 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testMovePickerIrrelevantToggle() {
-        let position = XCTUnwrap(Position(fen: "W:W28:B13,14,23"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W28:B13,14,23"))
         let picker = MovePicker(position)
         
         picker.toggle(28)
@@ -282,7 +248,7 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testMovePickerFromTo() {
-        let position = XCTUnwrap(Position(fen: "W:W32:B7,8,9,10,18,19,28"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W32:B7,8,9,10,18,19,28"))
         let picker = MovePicker(position)
         XCTAssertNil(picker.onlyCandidate)
         
@@ -295,7 +261,7 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testMovePickerOverride() {
-        let position = XCTUnwrap(Position(fen: "W:W35,36:B20,21,22,30,31"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W35,36:B20,21,22,30,31"))
         let picker = MovePicker(position)
         
         picker.toggle(27)
@@ -308,7 +274,7 @@ class DraughtsTests: SafeXCTestCase {
     
     func testUnambiguousNotation() {
         do {
-            let position = XCTUnwrap(Position(fen: "W:WK47:B42,43,39,40"))
+            let position = SafeXCTAssertNotNil(Position(fen: "W:WK47:B42,43,39,40"))
             let moves = position.legalMoves.map { $0.unambiguousNotation }
             
             XCTAssertEqual(moves.count, 2)
@@ -317,7 +283,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let position = XCTUnwrap(Position(fen: "W:WK21:B9,12,13,29,31,34"))
+            let position = SafeXCTAssertNotNil(Position(fen: "W:WK21:B9,12,13,29,31,34"))
             let moves = position.legalMoves.map { $0.unambiguousNotation }
             
             XCTAssertEqual(moves.count, 4)
@@ -326,13 +292,13 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testMoveFromOne() {
-        let position = XCTUnwrap(Position(fen: "W:WK1:B"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:WK1:B"))
         XCTAssertNotEqual(position.legalMoves.count, 0)
     }
     
     func testGameHelper() {
         do {
-            let position = XCTUnwrap(Position(fen: "B:W48,49:B2,3"))
+            let position = SafeXCTAssertNotNil(Position(fen: "B:W48,49:B2,3"))
             let helper = GameHelper(Game(position: position))
             XCTAssertTrue(helper.game.moves.isEmpty)
             
@@ -371,27 +337,27 @@ class DraughtsTests: SafeXCTestCase {
     }
     
     func testGameHelperPosition() {
-        let position = XCTUnwrap(Position(fen: "W:W47:B5"))
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W47:B5"))
         let helper = GameHelper(Game(position: position))
         
         XCTAssertTrue(helper.toggle(41))
         XCTAssertTrue(helper.toggle(10))
         
-        XCTAssertEqual(helper.position, XCTUnwrap(Position(fen: "W:W41:B10")))
+        XCTAssertEqual(helper.position, SafeXCTAssertNotNil(Position(fen: "W:W41:B10")))
         
         XCTAssertTrue(helper.backward())
-        XCTAssertEqual(helper.position, XCTUnwrap(Position(fen: "B:W41:B5")))
+        XCTAssertEqual(helper.position, SafeXCTAssertNotNil(Position(fen: "B:W41:B5")))
         
         XCTAssertTrue(helper.backward())
         XCTAssertEqual(helper.position, position)
         
         XCTAssertTrue(helper.toggle(42))
-        XCTAssertEqual(helper.position, XCTUnwrap(Position(fen: "B:W42:B5")))
+        XCTAssertEqual(helper.position, SafeXCTAssertNotNil(Position(fen: "B:W42:B5")))
     }
     
     func testPDN() {
         do {
-            let gameHelper = GameHelper(Game(position: XCTUnwrap(Position(fen: "B:W37:B14"))))
+            let gameHelper = GameHelper(Game(position: SafeXCTAssertNotNil(Position(fen: "B:W37:B14"))))
             
             XCTAssertTrue(gameHelper.move(from: 14, to: 19))
             XCTAssertTrue(gameHelper.move(from: 37, to: 31))
@@ -400,7 +366,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let game = XCTUnwrap(Game(pdn: "1. 32-28 19-23 2. 28x19 14x23"))
+            let game = SafeXCTAssertNotNil(Game(pdn: "1. 32-28 19-23 2. 28x19 14x23"))
             
             XCTAssertEqual(game.moves.count, 4)
             XCTAssertEqual(game.endPosition.pieces(of: .white).count, 19)
@@ -408,18 +374,18 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let raphael = XCTUnwrap(Position(fen: "W:W27,28,32,37,38,33,34,48,49:B24,23,19,13,12,17,21,16,26"))
-            let result = XCTUnwrap(Position(fen: "B:W17:B7"))
+            let raphael = SafeXCTAssertNotNil(Position(fen: "W:W27,28,32,37,38,33,34,48,49:B24,23,19,13,12,17,21,16,26"))
+            let result = SafeXCTAssertNotNil(Position(fen: "B:W17:B7"))
             
             let notation = "1. 34-29 23x34 2. 28-23 19x39 3. 37-31 26x28 4. 49-44 21x43 5. 44x11 16x7 6. 48x17"
-            let game = XCTUnwrap(Game(pdn: notation, position: raphael))
+            let game = SafeXCTAssertNotNil(Game(pdn: notation, position: raphael))
             
             XCTAssertEqual(game.endPosition, result)
         }
         
         do {
             let pdn = "1. 32-28 (1. 32-27 19-23 (1. ... 18-23); 1. 31-26 16-21 2. 36-31)"
-            let game = XCTUnwrap(Game(pdn: pdn))
+            let game = SafeXCTAssertNotNil(Game(pdn: pdn))
             XCTAssertEqual(game.pdn, pdn)
         }
         
@@ -427,7 +393,7 @@ class DraughtsTests: SafeXCTestCase {
             let fen = "W:W24,44,K5:B26,27,36,"
             let pdn = "1. 44-40 26-31 2. 40-35 27-32 3. 05x26 36-41 4. 26-42 (4. 26-12 41-47 5. 12-29) 41-47 5. 42-29 47-41 6. 29-23 41x30 7. 35x24"
             
-            let position = XCTUnwrap(Position(fen: fen))
+            let position = SafeXCTAssertNotNil(Position(fen: fen))
             XCTAssertNotNil(Game(pdn: pdn, position: position))
         }
         
@@ -435,7 +401,7 @@ class DraughtsTests: SafeXCTestCase {
             let fen = "W:W20,24,30,33,40,43,47,:B7,10,12,22,27,29,36,"
             let pdn = "1. 20-15 29x49 2. 15x04 49x35 3. 47-41 36x47 4. 04-15 47x20 5. 15x38x16x02 35x24 6. 02x30 22-28 7. 30-25 28-32 8. 25-03 12-18 9. 03-09 18-23 10. 09-20"
             
-            let position = XCTUnwrap(Position(fen: fen))
+            let position = SafeXCTAssertNotNil(Position(fen: fen))
             XCTAssertNotNil(Game(pdn: pdn, position: position))
         }
     }
