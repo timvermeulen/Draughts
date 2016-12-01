@@ -1,17 +1,28 @@
 public struct PlyArray<Element> {
-    fileprivate var contents: [Element]
+    fileprivate var contents: ArraySlice<Element>
     
     public var startPly: Ply
     
-    internal init(_ ply: Ply) {
-        contents = []
-        startPly = ply
+    internal init(ply: Ply, contents: ArraySlice<Element> = []) {
+        self.startPly = ply
+        self.contents = contents
+    }
+}
+
+extension PlyArray {
+    fileprivate func sliceIndex(of ply: Ply) -> Int {
+        return ply.number - self.startPly.number + self.contents.startIndex
+    }
+    
+    fileprivate func sliceRange(of range: Range<Ply>) -> Range<Int> {
+        return self.sliceIndex(of: range.lowerBound) ..< self.sliceIndex(of: range.upperBound)
     }
 }
 
 extension PlyArray: RandomAccessCollection {
     // this should be the default, but leaving it out makes the compiler unhappy
     public typealias Indices = DefaultRandomAccessIndices<PlyArray>
+    public typealias SubSequence = PlyArray
     
     public var startIndex: Ply { return self.startPly }
     public var endIndex: Ply { return self.index(self.startPly, offsetBy: self.contents.count) }
@@ -36,18 +47,18 @@ extension PlyArray: RandomAccessCollection {
     }
     
     public subscript(ply: Ply) -> Element {
-        get { return self.contents[ply.number - self.startPly.number] }
-        set { self.contents[ply.number - self.startPly.number] = newValue }
+        get { return self.contents[self.sliceIndex(of: ply)] }
+        set { self.contents[self.sliceIndex(of: ply)] = newValue }
+    }
+    
+    public subscript(range: Range<Ply>) -> PlyArray {
+        get { return PlyArray(ply: range.lowerBound, contents: self.contents[self.sliceRange(of: range)]) }
+        set { fatalError() }
     }
     
     public mutating func reserveCapacity(capacity: Int) {
         contents.reserveCapacity(capacity)
     }
-}
-
-func yay() {
-    let position = Position.start
-    print(position)
 }
 
 extension PlyArray {

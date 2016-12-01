@@ -19,9 +19,9 @@ public struct Game {
         self.startPosition = position
         self.startNumber = startNumber
         
-        self.moves = PlyArray(ply)
-        self.positions = PlyArray(ply)
-        self.variations = PlyArray(ply)
+        self.moves = PlyArray(ply: ply)
+        self.positions = PlyArray(ply: ply)
+        self.variations = PlyArray(ply: ply)
         
         self.positions.append(self.startPosition)
     }

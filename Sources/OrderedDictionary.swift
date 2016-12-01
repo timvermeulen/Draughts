@@ -1,10 +1,10 @@
 public struct OrderedDictionary<Key: Equatable, Value> {
     public typealias Element = (key: Key, value: Value)
     
-    fileprivate var contents: [Element]
+    fileprivate var contents: ArraySlice<Element>
     
-    internal init() {
-        self.contents = []
+    internal init(contents: ArraySlice<Element> = []) {
+        self.contents = contents
     }
     
     public subscript(key: Key) -> Value? {
@@ -26,14 +26,20 @@ public struct OrderedDictionary<Key: Equatable, Value> {
 }
 
 extension OrderedDictionary: RandomAccessCollection {
-    public var startIndex: Int { return 0 }
-    public var endIndex: Int { return self.contents.count }
+    public typealias SubSequence = OrderedDictionary
+    
+    public var startIndex: Int { return self.contents.startIndex }
+    public var endIndex: Int { return self.contents.endIndex }
     
     public func index(before index: Int) -> Int { return index - 1 }
     public func index(after index: Int) -> Int { return index + 1 }
     
     public subscript(index: Int) -> Element {
         return self.contents[index]
+    }
+    
+    public subscript(range: Range<Int>) -> OrderedDictionary {
+        return OrderedDictionary(contents: self.contents[range])
     }
     
     public func index(_ index: Int, offsetBy offset: Int) -> Int {
@@ -51,7 +57,8 @@ extension OrderedDictionary: RandomAccessCollection {
 
 extension OrderedDictionary: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (Key, Value)...) {
-        self.init()
+        // TODO: figure out why `self.init()` isn't allowed
+        self.init(contents: [])
         
         for (key, value) in elements {
             self[key] = value
