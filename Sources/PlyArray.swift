@@ -45,6 +45,11 @@ extension PlyArray: RandomAccessCollection {
     }
 }
 
+func yay() {
+    let position = Position.start
+    print(position)
+}
+
 extension PlyArray {
     internal mutating func append(_ element: Element) {
         self.contents.append(element)

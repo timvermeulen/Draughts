@@ -51,7 +51,7 @@ extension MovePicker {
         let newCandidates = self.candidates.filter { $0.relevantSquares.contains(square) }
         
         if newCandidates.isEmpty {
-            let otherCandidates = self.position.legalMoves.filter { $0.start == square }
+            let otherCandidates = self.position.legalMoves.filter { $0.startSquare == square }
             
             if !otherCandidates.isEmpty {
                 self.candidates = otherCandidates
@@ -67,7 +67,7 @@ extension MovePicker {
     
     public func onlyCandidate(from start: Square, to end: Square) -> Move? {
         func includeMove(_ move: Move) -> Bool {
-            return move.start == start && move.end == end
+            return move.startSquare == start && move.endSquare == end
         }
         
         func onlyMove(of moves: [Move]) -> Move? {

@@ -106,7 +106,7 @@ public final class Position {
             }
             
             for side: Square.Direction.Side in sides {
-                steps.append(Step(square: move.end, direction: direction.turned(to: side), captures: move.captures))
+                steps.append(Step(square: move.endSquare, direction: direction.turned(to: side), captures: move.captures))
             }
         }
         
