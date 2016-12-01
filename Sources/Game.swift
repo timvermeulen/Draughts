@@ -62,12 +62,17 @@ public struct Game {
 extension Game {
     /// Points to a specific (sub)variation of the game.
     public struct Index {
-        public typealias Element = (ply: Ply, move: Move)
+        public typealias Deviation = (ply: Ply, move: Move)
         
-        internal var deviations: ArraySlice<Element>
+        internal var deviations: ArraySlice<Deviation>
         
         init(_ deviations: ArraySlice<(ply: Ply, move: Move)> = []) {
             self.deviations = deviations
+        }
+        
+        internal var parent: (parent: Index, element: Deviation)? {
+            guard let element = self.deviations.last else { return nil }
+            return (Index(self.deviations.dropLast()), element)
         }
     }
     
@@ -86,6 +91,40 @@ extension Game {
                 self = newValue
             }
         }
+    }
+    
+    /// Deletes the move before the given ply, and all following moves, from the game.
+    /// returns: `true` if the game's main variation ends up containing no moves, `false` otherwise
+    @discardableResult
+    public mutating func delete(from ply: Ply) -> Bool {
+        guard ply > self.startPly else { return true }
+
+        self.moves.remove(from: ply.predecessor)
+        self.positions.remove(from: ply)
+        self.variations.remove(from: ply)
+        
+        if let (_, newTail) = self.variations[ply.predecessor].popFirst() {
+            self.moves.append(contentsOf: newTail.moves)
+            self.positions.append(contentsOf: newTail.positions.dropFirst())
+            self.variations.append(contentsOf: newTail.variations.dropFirst())
+            
+            return false
+        } else {
+            self.variations.removeLast()
+            return ply.predecessor == self.startPly
+        }
+    }
+    
+    public mutating func delete(at index: Index, from ply: Ply) {
+        if self[index].delete(from: ply), let (parentIndex, (ply, move)) = index.parent {
+            self[parentIndex].variations[ply].removeValue(forKey: move)
+        }
+    }
+}
+
+extension Game: Equatable {
+    public static func == (left: Game, right: Game) -> Bool {
+        return left.positions == right.positions && left.variations == right.variations
     }
 }
 

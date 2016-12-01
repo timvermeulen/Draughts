@@ -65,4 +65,26 @@ extension PlyArray {
     internal mutating func append(_ element: Element) {
         self.contents.append(element)
     }
+    
+    internal mutating func append(contentsOf other: PlyArray) {
+        assert(self.endIndex == other.startIndex, "ply arrays to be concatenated don't match")
+        self.contents.append(contentsOf: other.contents)
+    }
+}
+
+// TODO: Conditional Conformance
+public func == <T: Equatable> (left: PlyArray<T>, right: PlyArray<T>) -> Bool {
+    return left.contents == right.contents
+}
+
+public func != <T: Equatable> (left: PlyArray<T>, right: PlyArray<T>) -> Bool {
+    return !(left == right)
+}
+
+public func == <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {
+    return left.contents.count == right.contents.count && !zip(left.contents, right.contents).contains(where: !=)
+}
+
+public func != <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {
+    return !(left == right)
 }

@@ -1,9 +1,9 @@
 public final class GameHelper {
     public fileprivate(set) var game: Game
-    fileprivate var ply: Ply {
+    internal var ply: Ply {
         didSet { self.reloadMovePicker() }
     }
-    fileprivate var index: Game.Index
+    internal var index: Game.Index
     fileprivate var movePicker: MovePicker
     
     public init(_ game: Game) {
@@ -75,6 +75,46 @@ extension GameHelper {
         }
         
         return true
+    }
+    
+    private func reloadIndex() {
+        let formerIndex = self.index
+        self.index.deviations.removeAll(keepingCapacity: true)
+        
+        var game = self.game
+        
+        for (ply, move) in formerIndex.deviations {
+            guard let variations = game.variations[checking: ply] else {
+                self.ply = game.endPly
+                break
+            }
+            
+            guard let variation = variations[move] else {
+                self.ply = ply
+                break
+            }
+            
+            game = variation
+            
+            self.index.deviations.append((ply, move))
+        }
+        
+        if !game.positions.indices.contains(self.ply) {
+            self.ply = game.endPly
+        }
+    }
+    
+    public func delete(at index: Game.Index, from ply: Ply) {
+        self.game.delete(at: index, from: ply)
+        self.reloadIndex()
+    }
+    
+    public func delete() {
+        let index = self.index
+        let ply = self.ply
+        
+        self.backward()
+        self.game.delete(at: index, from: ply)
     }
 }
 
