@@ -46,13 +46,12 @@ extension Bitboard: SetAlgebra {
     
     @discardableResult
     internal mutating func remove(_ square: Square) -> Square? {
-        let contained = self.contains(square)
-        self.value &= ~Bitboard(square: square).value
-        return contained ? square : nil
+        defer { self.value &= ~Bitboard(square: square).value }
+        return Optional(square, where: self.contains)
     }
     
     @discardableResult
     internal mutating func update(with square: Square) -> Square? {
-        return self.insert(square).inserted ? square : nil
+        return Optional(square, where: { self.insert($0).inserted })
     }
 }
