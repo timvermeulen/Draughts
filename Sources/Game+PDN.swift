@@ -5,7 +5,7 @@ extension Game {
     public init?(pdn: String, position: Position = .start) {
         let separators = CharacterSet(charactersIn: "-x")
         let enhanced = ["(", ")", ";"].reduce(pdn) { $0.replacingOccurrences(of: $1, with: " \($1) ") }
-        let helper = GameHelper(Game(position: position))
+        let helper = GameHelper(position: position)
         
         for component in enhanced.components(separatedBy: .whitespacesAndNewlines) {
             switch component {

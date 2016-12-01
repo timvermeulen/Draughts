@@ -6,11 +6,15 @@ public final class GameHelper {
     internal var index: Game.Index
     fileprivate var movePicker: MovePicker
     
-    public init(_ game: Game) {
+    public init(game: Game) {
         self.game = game
         self.ply = game.endPly
         self.index = Game.Index()
         self.movePicker = MovePicker(game.endPosition)
+    }
+    
+    public convenience init(position: Position) {
+        self.init(game: Game(position: position))
     }
 }
 
@@ -34,7 +38,7 @@ extension GameHelper {
         guard self.variation.positions[self.ply].moveIsValid(move) else { return false }
         
         if self.variation.play(move, at: self.ply).inVariation {
-            self.index.deviations.append((self.ply, move))
+            self.index.deviations.append(Game.Deviation(ply: self.ply, move: move))
         }
         
         guard self.forward() else { fatalError("this shouldn't happen") }
@@ -46,9 +50,9 @@ extension GameHelper {
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     internal func popVariation() -> Bool {
-        guard let (ply, _) = self.index.deviations.popLast() else { return false }
+        guard let deviation = self.index.deviations.popLast() else { return false }
         
-        self.ply = ply
+        self.ply = deviation.ply
         return true
     }
 }
@@ -83,20 +87,20 @@ extension GameHelper {
         
         var game = self.game
         
-        for (ply, move) in formerIndex.deviations {
-            guard let variations = game.variations[checking: ply] else {
+        for deviation in formerIndex.deviations {
+            guard let variations = game.variations[checking: deviation.ply] else {
                 self.ply = game.endPly
                 break
             }
             
-            guard let variation = variations[move] else {
-                self.ply = ply
+            guard let variation = variations[deviation.move] else {
+                self.ply = deviation.ply
                 break
             }
             
             game = variation
             
-            self.index.deviations.append((ply, move))
+            self.index.deviations.append(deviation)
         }
         
         if !game.positions.indices.contains(self.ply) {
@@ -128,6 +132,7 @@ extension GameHelper {
         return true
     }
     
+    /// Stops processing the given squares when a move is played.
     /// returns: `true` if a move was played, `false` otherwise
     @discardableResult
     public func toggle<S: Sequence>(_ squares: S) -> Bool where S.Iterator.Element == Square {

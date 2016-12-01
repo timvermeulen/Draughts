@@ -31,6 +31,15 @@ public struct Game {
         self.play(move)
     }
     
+    internal init(position: Position, startNumber: Int, moves: PlyArray<Move>, positions: PlyArray<Position>, variations: PlyArray<OrderedDictionary<Move, Game>>) {
+        self.startPosition = position
+        self.startNumber = startNumber
+        
+        self.moves = moves
+        self.positions = positions
+        self.variations = variations
+    }
+    
     public mutating func play(_ move: Move) {
         self.play(move, at: self.endPly)
     }
@@ -60,19 +69,37 @@ public struct Game {
 }
 
 extension Game {
+    internal struct Deviation {
+        let ply: Ply
+        let move: Move
+    }
+    
+    internal subscript(deviation: Deviation) -> Game? {
+        get {
+            return self.variations[checking: deviation.ply]?[deviation.move]
+        }
+        set {
+            guard self.variations.indices.contains(deviation.ply) else { return }
+            self.variations[deviation.ply][deviation.move] = newValue
+        }
+    }
+    
     /// Points to a specific (sub)variation of the game.
     public struct Index {
-        public typealias Deviation = (ply: Ply, move: Move)
-        
         internal var deviations: ArraySlice<Deviation>
         
-        init(_ deviations: ArraySlice<(ply: Ply, move: Move)> = []) {
+        internal init(_ deviations: ArraySlice<Deviation> = []) {
             self.deviations = deviations
         }
         
-        internal var parent: (parent: Index, element: Deviation)? {
-            guard let element = self.deviations.last else { return nil }
-            return (Index(self.deviations.dropLast()), element)
+        internal var child: (child: Index, deviation: Deviation)? {
+            guard let deviation = self.deviations.first else { return nil }
+            return (Index(self.deviations.dropFirst()), deviation)
+        }
+        
+        internal var parent: (parent: Index, deviation: Deviation)? {
+            guard let deviation = self.deviations.last else { return nil }
+            return (Index(self.deviations.dropLast()), deviation)
         }
     }
     
@@ -84,13 +111,27 @@ extension Game {
             }
         }
         set {
-            if let (ply, move) = index.deviations.first {
+            if let deviation = index.deviations.first {
                 let newIndex = Index(index.deviations.dropFirst())
-                self.variations[ply][move]?[newIndex] = newValue
+                self.variations[deviation.ply][deviation.move]?[newIndex] = newValue
             } else {
                 self = newValue
             }
         }
+    }
+    
+    public func game(from ply: Ply) -> Game {
+        return Game(
+            position: self.positions[ply],
+            startNumber: ply.number,
+            moves: self.moves.suffix(from: ply),
+            positions: self.positions.suffix(from: ply),
+            variations: self.variations.suffix(from: ply)
+        )
+    }
+    
+    public func game(at index: Index, from ply: Ply) -> Game {
+        return self[index].game(from: ply)
     }
     
     /// Deletes the move before the given ply, and all following moves, from the game.
@@ -116,8 +157,8 @@ extension Game {
     }
     
     public mutating func delete(at index: Index, from ply: Ply) {
-        if self[index].delete(from: ply), let (parentIndex, (ply, move)) = index.parent {
-            self[parentIndex].variations[ply].removeValue(forKey: move)
+        if self[index].delete(from: ply), let (parentIndex, deviation) = index.parent {
+            self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
         }
     }
 }

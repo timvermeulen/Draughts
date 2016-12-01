@@ -85,6 +85,13 @@ class DraughtsTests: SafeXCTestCase {
         }
     }
     
+    func testCorrectedFEN() {
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W6,1,K2:B45,50,K49"))
+        let expected = SafeXCTAssertNotNil(Position(fen: "W:W6,K1,K2:B45,K50,K49"))
+        
+        XCTAssertEqual(position, expected)
+    }
+    
     func testCoupTurc() {
         let position = SafeXCTAssertNotNil(Position(fen: "W:WK26:B9,12,13,23,24"))
         let moves = position.legalMoves
@@ -299,7 +306,7 @@ class DraughtsTests: SafeXCTestCase {
     func testGameHelper() {
         do {
             let position = SafeXCTAssertNotNil(Position(fen: "B:W48,49:B2,3"))
-            let helper = GameHelper(Game(position: position))
+            let helper = GameHelper(position: position)
             XCTAssertTrue(helper.game.moves.isEmpty)
             
             helper.toggle(9)
@@ -310,7 +317,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let helper = GameHelper(Game())
+            let helper = GameHelper(position: .start)
             XCTAssertTrue(helper.game.moves.isEmpty)
             
             XCTAssertFalse(helper.toggle(30))
@@ -320,7 +327,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let helper = GameHelper(Game())
+            let helper = GameHelper(position: .start)
             
             XCTAssertTrue(helper.move(from: 32, to: 28))
             XCTAssertFalse(helper.forward())
@@ -338,7 +345,7 @@ class DraughtsTests: SafeXCTestCase {
     
     func testGameHelperPosition() {
         let position = SafeXCTAssertNotNil(Position(fen: "W:W47:B5"))
-        let helper = GameHelper(Game(position: position))
+        let helper = GameHelper(position: position)
         
         XCTAssertTrue(helper.toggle(41))
         XCTAssertTrue(helper.toggle(10))
@@ -357,7 +364,7 @@ class DraughtsTests: SafeXCTestCase {
     
     func testPDN() {
         do {
-            let gameHelper = GameHelper(Game(position: SafeXCTAssertNotNil(Position(fen: "B:W37:B14"))))
+            let gameHelper = GameHelper(position: SafeXCTAssertNotNil(Position(fen: "B:W37:B14")))
             
             XCTAssertTrue(gameHelper.move(from: 14, to: 19))
             XCTAssertTrue(gameHelper.move(from: 37, to: 31))
@@ -409,7 +416,7 @@ class DraughtsTests: SafeXCTestCase {
     func testGameDelete() {
         do {
             var game = SafeXCTAssertNotNil(Game(pdn: "1. 32-28 (1. 32-27 16-21) 19-23"))
-            game.delete(from: game.startPly)
+            game.delete(from: game.startPly.successor)
             
             let expected = SafeXCTAssertNotNil(Game(pdn: "1. 32-27 16-21"))
             XCTAssertEqual(game, expected)
@@ -417,7 +424,7 @@ class DraughtsTests: SafeXCTestCase {
         
         do {
             var game = SafeXCTAssertNotNil(Game(pdn: "1. 32-28 (1. 32-27 16-21) 19-24 2. 37-32 14-19 (2. ... 13-19)"))
-            game.delete(from: Ply(player: .black, number: 3))
+            game.delete(from: Ply(player: .white, number: 4))
             
             let expected = SafeXCTAssertNotNil(Game(pdn: "1. 32-28 (1. 32-27 16-21) 19-24 2. 37-32 13-19"))
             XCTAssertEqual(game, expected)
@@ -427,7 +434,7 @@ class DraughtsTests: SafeXCTestCase {
     func testGameHelperDelete() {
         do {
             let game = SafeXCTAssertNotNil(Game(pdn: "1. 32-28 (1. 32-27 16-21) 19-24 2. 37-32 14-19 (2. ... 24-30 35x24)"))
-            let helper = GameHelper(game)
+            let helper = GameHelper(game: game)
             
             helper.delete()
             XCTAssertTrue(helper.forward())
@@ -439,7 +446,7 @@ class DraughtsTests: SafeXCTestCase {
         }
         
         do {
-            let helper = GameHelper(Game())
+            let helper = GameHelper(position: .start)
             
             XCTAssertTrue(helper.move(from: 32, to: 28))
             XCTAssertTrue(helper.backward())

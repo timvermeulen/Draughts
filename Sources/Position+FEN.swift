@@ -58,6 +58,9 @@ extension Position {
             }
         }
         
+        kings.formUnion(white.intersection(.topEdge))
+        kings.formUnion(black.intersection(.bottomEdge))
+        
         self.init(white: white, black: black, kings: kings, playerToMove: player)
     }
 }
