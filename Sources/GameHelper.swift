@@ -33,8 +33,8 @@ extension GameHelper {
     public func play(_ move: Move) -> Bool {
         guard self.variation.positions[self.ply].moveIsValid(move) else { return false }
         
-        if let index = self.variation.play(move, at: self.ply) {
-            self.index.indices.append((self.ply, index))
+        if self.variation.play(move, at: self.ply).inVariation {
+            self.index.deviations.append((self.ply, move))
         }
         
         guard self.forward() else { fatalError("this shouldn't happen") }
@@ -46,7 +46,7 @@ extension GameHelper {
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     internal func popVariation() -> Bool {
-        guard let (ply, _) = self.index.indices.popLast() else { return false }
+        guard let (ply, _) = self.index.deviations.popLast() else { return false }
         
         self.ply = ply
         return true
@@ -70,8 +70,8 @@ extension GameHelper {
         
         self.ply = self.ply.predecessor
         
-        if !self.index.indices.isEmpty && self.ply == self.variation.startPly {
-            self.index.indices.removeLast()
+        if !self.index.deviations.isEmpty && self.ply == self.variation.startPly {
+            self.index.deviations.removeLast()
         }
         
         return true

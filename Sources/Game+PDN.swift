@@ -33,10 +33,10 @@ extension Game {
     }
     
     public var pdn: String {
-        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map { ply, pair in
-            let withoutVariations = "\(ply.player == .white ? "\(ply.indicator) " : "")\(pair.0.unambiguousNotation)"
-            let variations = pair.1
-            return variations.isEmpty ? withoutVariations : "\(withoutVariations) (\(variations.map { $0.variation.pdn }.joined(separator: "; ")))"
+        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map { (ply: Ply, pair: (move: Move, variations: OrderedDictionary<Move, Game>)) in
+            let withoutVariations = "\(ply.player == .white ? "\(ply.indicator) " : "")\(pair.move.unambiguousNotation)"
+            let variations = pair.variations
+            return variations.isEmpty ? withoutVariations : "\(withoutVariations) (\(variations.map { $0.value.pdn }.joined(separator: "; ")))"
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")

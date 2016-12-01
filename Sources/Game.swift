@@ -4,7 +4,7 @@ public struct Game {
     
     public var moves: PlyArray<Move>
     public var positions: PlyArray<Position>
-    public var variations: PlyArray<[(move: Move, variation: Game)]>
+    public var variations: PlyArray<OrderedDictionary<Move, Game>>
     
     // causes a segfault:
     // public var endPosition: Position { return self.positions.last ?? self.startPosition }
@@ -35,22 +35,25 @@ public struct Game {
         self.play(move, at: self.endPly)
     }
     
-    /// returns: the index of the variation if one was created (or one already existed), nil otherwise
+    /// returns:
+    /// - game: the variation if one was created (or one already existed), `self` otherwise
+    /// - inVariation: `true` is a variation was created, `false` otherwise
     @discardableResult
-    public mutating func play(_ move: Move, at ply: Ply) -> Int? {
+    public mutating func play(_ move: Move, at ply: Ply) -> (game: Game, inVariation: Bool) {
         assert(self.positions[ply].moveIsValid(move), "invalid move")
         
         if ply == self.endPly {
             self.moves.append(move)
             self.positions.append(move.endPosition)
-            variations.append([])
-            return nil
+            variations.append([:])
+            return (self, false)
         } else {
-            if let index = self.variations[ply].index(where: { $0.move == move }) {
-                return index
+            if let variation = self.variations[ply][move] {
+                return (variation, true)
             } else {
-                self.variations[ply].append((move, Game(move: move, startNumber: ply.number)))
-                return self.variations[ply].count - 1
+                let variation = Game(move: move, startNumber: ply.number)
+                self.variations[ply][move] = variation
+                return (variation, true)
             }
         }
     }
@@ -59,23 +62,26 @@ public struct Game {
 extension Game {
     /// Points to a specific (sub)variation of the game.
     public struct Index {
-        internal var indices: ArraySlice<(ply: Ply, index: Int)>
+        public typealias Element = (ply: Ply, move: Move)
         
-        init(_ indices: ArraySlice<(ply: Ply, index: Int)> = []) {
-            self.indices = indices
+        internal var deviations: ArraySlice<Element>
+        
+        init(_ deviations: ArraySlice<(ply: Ply, move: Move)> = []) {
+            self.deviations = deviations
         }
     }
     
     public subscript(index: Index) -> Game {
         get {
-            return index.indices.reduce(self) { game, pair in
-                game.variations[pair.ply][pair.index].variation
+            return index.deviations.reduce(self) { game, pair in
+                guard let variation = game.variations[pair.ply][pair.move] else { fatalError("index is invalid") }
+                return variation
             }
         }
         set {
-            if let (ply, variationIndex) = index.indices.first {
-                let newIndex = Index(index.indices.dropFirst())
-                self.variations[ply][variationIndex].variation[newIndex] = newValue
+            if let (ply, move) = index.deviations.first {
+                let newIndex = Index(index.deviations.dropFirst())
+                self.variations[ply][move]?[newIndex] = newValue
             } else {
                 self = newValue
             }
