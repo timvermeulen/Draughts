@@ -1,6 +1,7 @@
 import Foundation
 
 extension Game {
+    // TODO: make this a throwing initializer
     public init?(pdn: String, position: Position = .start) {
         let separators = CharacterSet(charactersIn: "-x")
         let enhanced = ["(", ")", ";"].reduce(pdn) { $0.replacingOccurrences(of: $1, with: " \($1) ") }
