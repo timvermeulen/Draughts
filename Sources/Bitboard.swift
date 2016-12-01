@@ -57,17 +57,13 @@ extension Bitboard {
 
 extension Bitboard {
     internal static func << (bitboard: Bitboard, int: Int) -> Bitboard {
-        return Bitboard(int >= 0
-            ? bitboard.value << UInt64(int)
-            : bitboard.value >> UInt64(-int)
-        )
+        guard int >= 0 else { return bitboard >> (-int) }
+        return Bitboard(bitboard.value << numericCast(int))
     }
     
     internal static func >> (bitboard: Bitboard, int: Int) -> Bitboard {
-        return Bitboard(int >= 0
-            ? bitboard.value >> UInt64(int)
-            : bitboard.value << UInt64(-int)
-        )
+        guard int >= 0 else { return bitboard << (-int) }
+        return Bitboard(bitboard.value >> numericCast(int))
     }
     
     internal func shift(to direction: Square.Direction, count: Int = 1) -> Bitboard {
@@ -79,7 +75,7 @@ extension Bitboard {
     internal static let topEdge: Bitboard = Bitboard(squares: 1 ... 5)
     internal static let bottomEdge: Bitboard = Bitboard(squares: 46 ... 50)
     internal static let leftEdge: Bitboard = Bitboard(squares: 6, 16, 26, 36, 46)
-    internal static let rightEdge: Bitboard = leftEdge >> 1
+    internal static let rightEdge: Bitboard = Bitboard(squares: 5, 15, 25, 35, 45)
     
     internal static let topLeftEdge: Bitboard = leftEdge.union(topEdge)
     internal static let topRightEdge: Bitboard = topEdge.union(rightEdge)

@@ -92,6 +92,18 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertEqual(position, expected)
     }
     
+    func testRepeatedMove() {
+        let position = SafeXCTAssertNotNil(Position(fen: "B:W6:B1"))
+        let helper = GameHelper(position: position)
+        
+        helper.move(from: 1, to: 7)
+        helper.backward()
+        helper.move(from: 1, to: 7)
+        
+        let expected = SafeXCTAssertNotNil(Game(pdn: "1-7", position: position))
+        XCTAssertEqual(helper.game, expected)
+    }
+    
     func testCoupTurc() {
         let position = SafeXCTAssertNotNil(Position(fen: "W:WK26:B9,12,13,23,24"))
         let moves = position.legalMoves
@@ -256,6 +268,7 @@ class DraughtsTests: SafeXCTestCase {
     
     func testMovePickerFromTo() {
         let position = SafeXCTAssertNotNil(Position(fen: "W:W32:B7,8,9,10,18,19,28"))
+        print(position)
         let picker = MovePicker(position)
         XCTAssertNil(picker.onlyCandidate)
         
@@ -277,6 +290,15 @@ class DraughtsTests: SafeXCTestCase {
         
         picker.toggle(35)
         XCTAssertNotNil(picker.onlyCandidate)
+    }
+    
+    func testMovePickerDifficult() {
+        let position = SafeXCTAssertNotNil(Position(fen: "W:WK46:B9,12,13,22,23,32"))
+        let helper = GameHelper(position: position)
+        
+        XCTAssertFalse(helper.move(from: 46, to: 28))
+        XCTAssertFalse(helper.toggle(9))
+        XCTAssertTrue(helper.move(from: 46, to: 28))
     }
     
     func testUnambiguousNotation() {
