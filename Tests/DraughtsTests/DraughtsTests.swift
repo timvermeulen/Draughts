@@ -104,6 +104,20 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertEqual(helper.game, expected)
     }
     
+    func testRepeatedMove2() {
+        let begin = Position(fen: "W:W41,42,43,44,45:B6,7,8,9,10")!
+        let match = Game(pdn: "1. 41-37 10-14", position: begin)!
+        
+        let helper = GameHelper(game: match)
+        helper.move(from: 37, to: 32)
+        helper.backward()
+        helper.move(from: 37, to: 31)
+        helper.backward()
+        helper.move(from: 37, to: 32)
+        
+        print(helper.game)
+    }
+    
     func testCoupTurc() {
         let position = SafeXCTAssertNotNil(Position(fen: "W:WK26:B9,12,13,23,24"))
         let moves = position.legalMoves

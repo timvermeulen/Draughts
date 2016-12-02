@@ -56,14 +56,14 @@ public struct Game {
             self.positions.append(move.endPosition)
             variations.append([:])
             return (self, false)
+        } else if self.moves[ply] == move {
+            return (self, false)
+        } else if let variation = self.variations[ply][move] {
+            return (variation, true)
         } else {
-            if let variation = self.variations[ply][move] {
-                return (variation, true)
-            } else {
-                let variation = Game(move: move, startNumber: ply.number)
-                self.variations[ply][move] = variation
-                return (variation, true)
-            }
+            let variation = Game(move: move, startNumber: ply.number)
+            self.variations[ply][move] = variation
+            return (variation, true)
         }
     }
 }
