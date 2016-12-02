@@ -1,6 +1,8 @@
 public final class GameHelper {
+    public typealias Index = Game.PositionIndex
+    
     public fileprivate(set) var game: Game
-    public fileprivate(set) var index: Game.PositionIndex
+    public fileprivate(set) var index: Index
     fileprivate var movePicker: MovePicker
     
     public init(game: Game) {
@@ -79,13 +81,20 @@ extension GameHelper {
         return true
     }
     
-    public func delete(from index: Game.PositionIndex) {
+    public func delete(from index: Index) {
         let parentIndex = self.game.parentIndex(of: index)
         self.game.delete(from: index)
         
         if index.isChild(of: self.index) {
             self.index = parentIndex ?? self.game.startIndex
         }
+        
+        self.reloadMovePicker()
+    }
+    
+    public func move(to index: Index) {
+        self.index = index
+        self.reloadMovePicker()
     }
 }
 
