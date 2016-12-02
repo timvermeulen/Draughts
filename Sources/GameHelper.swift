@@ -71,53 +71,21 @@ extension GameHelper {
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func backward() -> Bool {
-        guard self.index.ply > self.variation.startPly else { return self.popVariation() }
+        guard let parentIndex = self.game.parentIndex(of: self.index) else { return false }
         
-        self.index.ply.formPredecessor()
+        self.index = parentIndex
         self.reloadMovePicker()
         
         return true
     }
     
-    private func reloadIndex() {
-        let formerIndex = self.index.variationIndex
-        self.index.variationIndex.deviations.removeAll(keepingCapacity: true)
-        
-        var game = self.game
-        
-        for deviation in formerIndex.deviations {
-            guard let variations = game.variations[checking: deviation.ply] else {
-                self.index.ply = game.endPly
-                break
-            }
-            
-            guard let variation = variations[deviation.move] else {
-                self.index.ply = deviation.ply
-                break
-            }
-            
-            game = variation
-            
-            self.index.variationIndex.deviations.append(deviation)
-        }
-        
-        if !game.positions.indices.contains(self.index.ply) {
-            self.index.ply = game.endPly
-        }
-        
-        self.reloadMovePicker()
-    }
-    
     public func delete(from index: Game.PositionIndex) {
+        let parentIndex = self.game.parentIndex(of: index)
         self.game.delete(from: index)
-        self.reloadIndex()
-    }
-    
-    public func delete() {
-        let index = self.index
         
-        self.backward()
-        self.game.delete(from: index)
+        if index.isChild(of: self.index) {
+            self.index = parentIndex ?? self.game.startIndex
+        }
     }
 }
 

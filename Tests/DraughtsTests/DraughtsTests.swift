@@ -458,7 +458,7 @@ class DraughtsTests: SafeXCTestCase {
             let game = SafeXCTAssertNotNil(Game(pdn: "1. 32-28 (1. 32-27 16-21) 19-24 2. 37-32 14-19 (2. ... 24-30 35x24)"))
             let helper = GameHelper(game: game)
             
-            helper.delete()
+            helper.delete(from: helper.index)
             XCTAssertTrue(helper.forward())
             XCTAssertTrue(helper.forward())
             XCTAssertTrue(helper.move(from: 20, to: 29))
@@ -473,7 +473,7 @@ class DraughtsTests: SafeXCTestCase {
             XCTAssertTrue(helper.move(from: 32, to: 28))
             XCTAssertTrue(helper.backward())
             XCTAssertTrue(helper.move(from: 33, to: 28))
-            helper.delete()
+            helper.delete(from: helper.index)
             
             let expected = SafeXCTAssertNotNil(Game(pdn: "1. 32-28"))
             XCTAssertEqual(helper.game, expected)
@@ -502,7 +502,7 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertFalse(helper.forward())
         
         XCTAssertTrue(helper.move(from: 38, to: 32))
-        helper.delete()
+        helper.delete(from: helper.index)
         XCTAssertEqual(helper.game.pdn, "1. 32-28 18-23 (1. ... 17-21)")
     }
 }

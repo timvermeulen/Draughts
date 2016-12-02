@@ -66,9 +66,13 @@ public struct Game {
 }
 
 extension Game {
-    internal struct Deviation {
+    internal struct Deviation: Equatable {
         internal let ply: Ply
         internal let move: Move
+
+        internal static func == (left: Deviation, right: Deviation) -> Bool {
+            return left.ply == right.ply && left.move == right.move
+        }
     }
     
     internal subscript(deviation: Deviation) -> Game? {
@@ -120,7 +124,29 @@ extension Game {
     public struct PositionIndex {
         internal var variationIndex: VariationIndex
         internal var ply: Ply
+        
+        internal func isChild(of other: PositionIndex) -> Bool {
+            guard self.ply >= other.ply && self.variationIndex.deviations.count >= other.variationIndex.deviations.count else { return false }
+            return !zip(self.variationIndex.deviations, other.variationIndex.deviations).contains(where: !=)
+        }
     }
+    
+    internal func parentIndex(of index: PositionIndex) -> PositionIndex? {
+        let variation = self[index.variationIndex]
+        
+        guard index.ply == variation.startPly else {
+            return PositionIndex(variationIndex: index.variationIndex, ply: index.ply.predecessor)
+        }
+        
+        guard let variationIndex = index.variationIndex.parent?.parent else { return nil }
+        
+        return PositionIndex(
+            variationIndex: variationIndex,
+            ply: index.ply.predecessor
+        )
+    }
+    
+    internal var startIndex: PositionIndex { return PositionIndex(variationIndex: Game.VariationIndex(), ply: self.startPly) }
     
     public func game(from ply: Ply) -> Game {
         return Game(
