@@ -60,7 +60,7 @@ extension Game {
             ? withoutBlackPlyIndicator
             : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
         
-        if let onlyFinalVariations = variationsNotation(of: self.variations.last!, at: self.endPly) {
+        if let onlyFinalVariations = variationsNotation(of: self.endVariations, at: self.endPly) {
             return "\(withoutFinalVariations) \(onlyFinalVariations)"
         } else {
             return withoutFinalVariations

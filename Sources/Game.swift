@@ -3,15 +3,18 @@ public struct Game {
     
     public var isLocked = false
     
-    public var moves: PlyArray<Move>
-    public var positions: PlyArray<Position>
-    public var variations: PlyArray<OrderedDictionary<Move, Game>>
+    public fileprivate(set) var moves: PlyArray<Move>
+    public fileprivate(set) var positions: PlyArray<Position>
+    public fileprivate(set) var variations: PlyArray<OrderedDictionary<Move, Game>>
     
     public var startPosition: Position { return self.positions.first! }
     public var endPosition: Position { return self.positions.last! }
 
     public var startPly: Ply { return Ply(player: self.startPosition.playerToMove, number: self.startNumber) }
     public var endPly: Ply { return Ply(player: self.endPosition.playerToMove, number: self.startNumber + self.moves.count) }
+    
+    internal var startVariations: OrderedDictionary<Move, Game> { return self.variations.first! }
+    internal var endVariations: OrderedDictionary<Move, Game> { return self.variations.last! }
 
     public init(position: Position = .start, startNumber: Int = 0) {
         let ply = Ply(player: position.playerToMove, number: startNumber)
