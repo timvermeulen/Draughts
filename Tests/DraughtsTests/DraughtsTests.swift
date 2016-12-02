@@ -491,7 +491,18 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertTrue(helper.move(from: 38, to: 32))
         XCTAssertEqual(helper.game.pdn, "1. 32-28 18-23 (2. 38-32)")
         
+        XCTAssertTrue(helper.backward())
+        XCTAssertTrue(helper.backward())
+        
+        XCTAssertTrue(helper.move(from: 17, to: 21))
+        XCTAssertEqual(helper.game.pdn, "1. 32-28 18-23 (1. ... 17-21) (2. 38-32)")
+        
+        XCTAssertTrue(helper.backward())
+        XCTAssertTrue(helper.forward())
+        XCTAssertFalse(helper.forward())
+        
+        XCTAssertTrue(helper.move(from: 38, to: 32))
         helper.delete()
-        XCTAssertEqual(helper.game.pdn, "1. 32-28 18-23")
+        XCTAssertEqual(helper.game.pdn, "1. 32-28 18-23 (1. ... 17-21)")
     }
 }
