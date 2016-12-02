@@ -1,6 +1,8 @@
 public struct Game {
     public let startNumber: Int
     
+    public var isLocked = false
+    
     public var moves: PlyArray<Move>
     public var positions: PlyArray<Position>
     public var variations: PlyArray<OrderedDictionary<Move, Game>>
@@ -45,10 +47,10 @@ public struct Game {
     public mutating func play(_ move: Move, at ply: Ply) -> (game: Game, inVariation: Bool) {
         assert(self.positions[ply].moveIsValid(move), "invalid move")
         
-        if ply == self.endPly {
+        if !self.isLocked && ply == self.endPly {
             self.play(move)
             return (self, false)
-        } else if self.moves[ply] == move {
+        } else if !self.isLocked && self.moves[ply] == move {
             return (self, false)
         } else if let variation = self.variations[ply][move] {
             return (variation, true)

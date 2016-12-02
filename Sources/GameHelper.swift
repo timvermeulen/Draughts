@@ -146,6 +146,16 @@ extension GameHelper {
     }
 }
 
+extension GameHelper {
+    public func lock() {
+        self.game.isLocked = true
+    }
+    
+    public func unlock() {
+        self.game.isLocked = false
+    }
+}
+
 extension GameHelper: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         print("game:\n\(self.game.pdn)", to: &target)

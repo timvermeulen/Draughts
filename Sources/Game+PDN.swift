@@ -33,22 +33,38 @@ extension Game {
     }
     
     internal func pdn(includingInitialBlackIndicator: Bool) -> String {
-        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map { (ply: Ply, pair: (move: Move, variations: OrderedDictionary<Move, Game>)) in
-            let withoutIndicator = pair.move.unambiguousNotation
-            let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
+        func variationsNotation(of variations: OrderedDictionary<Move, Game>, at ply: Ply) -> String? {
+            guard !variations.isEmpty else { return nil }
             
-            let onlyVariations: [String] = pair.variations.map { move, variation in
+            let notations: [String] = variations.map { move, variation in
                 let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
                 return variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.pdn(includingInitialBlackIndicator: false))"
             }
             
-            return pair.variations.isEmpty ? withoutVariations : "\(withoutVariations) (\(onlyVariations.joined(separator: "; ")))"
+            return "(\(notations.joined(separator: "; ")))"
+        }
+        
+        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map { (ply: Ply, pair: (move: Move, variations: OrderedDictionary<Move, Game>)) in
+            let withoutIndicator = pair.move.unambiguousNotation
+            let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
+            
+            if let onlyVariations = variationsNotation(of: pair.variations, at: ply) {
+                return "\(withoutVariations) \(onlyVariations)"
+            } else {
+                return withoutVariations
+            }
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")
-        return self.startPly.player == .white || !includingInitialBlackIndicator
+        let withoutFinalVariations = self.startPly.player == .white || !includingInitialBlackIndicator
             ? withoutBlackPlyIndicator
             : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
+        
+        if let onlyFinalVariations = variationsNotation(of: self.variations.last!, at: self.endPly) {
+            return "\(withoutFinalVariations) \(onlyFinalVariations)"
+        } else {
+            return withoutFinalVariations
+        }
     }
     
     public var pdn: String {
