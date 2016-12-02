@@ -32,14 +32,26 @@ extension Game {
         self = helper.game
     }
     
-    public var pdn: String {
+    internal func pdn(includingInitialBlackIndicator: Bool) -> String {
         let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map { (ply: Ply, pair: (move: Move, variations: OrderedDictionary<Move, Game>)) in
-            let withoutVariations = "\(ply.player == .white ? "\(ply.indicator) " : "")\(pair.move.unambiguousNotation)"
-            let variations = pair.variations
-            return variations.isEmpty ? withoutVariations : "\(withoutVariations) (\(variations.map { $0.value.pdn }.joined(separator: "; ")))"
+            let withoutIndicator = pair.move.unambiguousNotation
+            let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
+            
+            let onlyVariations: [String] = pair.variations.map { move, variation in
+                let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
+                return variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.pdn(includingInitialBlackIndicator: false))"
+            }
+            
+            return pair.variations.isEmpty ? withoutVariations : "\(withoutVariations) (\(onlyVariations.joined(separator: "; ")))"
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")
-        return self.startPly.player == .white ? withoutBlackPlyIndicator : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
+        return self.startPly.player == .white || !includingInitialBlackIndicator
+            ? withoutBlackPlyIndicator
+            : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
+    }
+    
+    public var pdn: String {
+        return self.pdn(includingInitialBlackIndicator: true)
     }
 }

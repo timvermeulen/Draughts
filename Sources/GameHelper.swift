@@ -50,9 +50,11 @@ extension GameHelper {
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     internal func popVariation() -> Bool {
-        guard let deviation = self.index.deviations.popLast() else { return false }
+        guard let (parent, deviation) = self.index.parent else { return false }
         
+        self.index = parent
         self.ply = deviation.ply
+        
         return true
     }
 }
@@ -70,14 +72,9 @@ extension GameHelper {
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func backward() -> Bool {
-        guard self.ply > self.variation.startPly else { return false }
+        guard self.ply > self.variation.startPly else { return self.popVariation() }
         
         self.ply = self.ply.predecessor
-        
-        if !self.index.deviations.isEmpty && self.ply == self.variation.startPly {
-            self.index.deviations.removeLast()
-        }
-        
         return true
     }
     

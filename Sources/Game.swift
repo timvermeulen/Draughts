@@ -1,38 +1,30 @@
 public struct Game {
-    public let startPosition: Position
     public let startNumber: Int
     
     public var moves: PlyArray<Move>
     public var positions: PlyArray<Position>
     public var variations: PlyArray<OrderedDictionary<Move, Game>>
     
-    // causes a segfault:
-    // public var endPosition: Position { return self.positions.last ?? self.startPosition }
+    public var startPosition: Position { return self.positions.first! }
+    public var endPosition: Position { return self.positions.last! }
 
-    public var endPosition: Position { return self.positions[self.positions.index(before: self.positions.endIndex)] }
     public var startPly: Ply { return Ply(player: self.startPosition.playerToMove, number: self.startNumber) }
     public var endPly: Ply { return Ply(player: self.endPosition.playerToMove, number: self.startNumber + self.moves.count) }
 
     public init(position: Position = .start, startNumber: Int = 0) {
         let ply = Ply(player: position.playerToMove, number: startNumber)
         
-        self.startPosition = position
         self.startNumber = startNumber
         
         self.moves = PlyArray(ply: ply)
         self.positions = PlyArray(ply: ply)
         self.variations = PlyArray(ply: ply)
         
-        self.positions.append(self.startPosition)
+        self.positions.append(position)
+        self.variations.append([:])
     }
     
-    public init(move: Move, startNumber: Int = 0) {
-        self.init(position: move.startPosition, startNumber: startNumber)
-        self.play(move)
-    }
-    
-    internal init(position: Position, startNumber: Int, moves: PlyArray<Move>, positions: PlyArray<Position>, variations: PlyArray<OrderedDictionary<Move, Game>>) {
-        self.startPosition = position
+    internal init(startNumber: Int, moves: PlyArray<Move>, positions: PlyArray<Position>, variations: PlyArray<OrderedDictionary<Move, Game>>) {
         self.startNumber = startNumber
         
         self.moves = moves
@@ -41,7 +33,9 @@ public struct Game {
     }
     
     public mutating func play(_ move: Move) {
-        self.play(move, at: self.endPly)
+        self.moves.append(move)
+        self.positions.append(move.endPosition)
+        self.variations.append([:])
     }
     
     /// returns:
@@ -52,16 +46,14 @@ public struct Game {
         assert(self.positions[ply].moveIsValid(move), "invalid move")
         
         if ply == self.endPly {
-            self.moves.append(move)
-            self.positions.append(move.endPosition)
-            variations.append([:])
+            self.play(move)
             return (self, false)
         } else if self.moves[ply] == move {
             return (self, false)
         } else if let variation = self.variations[ply][move] {
             return (variation, true)
         } else {
-            let variation = Game(move: move, startNumber: ply.number)
+            let variation = Game(position: move.endPosition, startNumber: ply.number + 1)
             self.variations[ply][move] = variation
             return (variation, true)
         }
@@ -70,8 +62,8 @@ public struct Game {
 
 extension Game {
     internal struct Deviation {
-        let ply: Ply
-        let move: Move
+        internal let ply: Ply
+        internal let move: Move
     }
     
     internal subscript(deviation: Deviation) -> Game? {
@@ -111,9 +103,8 @@ extension Game {
             }
         }
         set {
-            if let deviation = index.deviations.first {
-                let newIndex = Index(index.deviations.dropFirst())
-                self.variations[deviation.ply][deviation.move]?[newIndex] = newValue
+            if let (childIndex, deviation) = index.child {
+                self.variations[deviation.ply][deviation.move]?[childIndex] = newValue
             } else {
                 self = newValue
             }
@@ -122,7 +113,6 @@ extension Game {
     
     public func game(from ply: Ply) -> Game {
         return Game(
-            position: self.positions[ply],
             startNumber: ply.number,
             moves: self.moves.suffix(from: ply),
             positions: self.positions.suffix(from: ply),
@@ -144,16 +134,14 @@ extension Game {
         self.positions.remove(from: ply)
         self.variations.remove(from: ply)
         
-        if let (_, newTail) = self.variations[ply.predecessor].popFirst() {
+        if let (move, newTail) = self.variations[ply.predecessor].popFirst() {
+            self.moves.append(move)
             self.moves.append(contentsOf: newTail.moves)
-            self.positions.append(contentsOf: newTail.positions.dropFirst())
-            self.variations.append(contentsOf: newTail.variations.dropFirst())
-            
-            return false
-        } else {
-            self.variations.removeLast()
-            return ply.predecessor == self.startPly
+            self.positions.append(contentsOf: newTail.positions)
+            self.variations.append(contentsOf: newTail.variations)
         }
+        
+        return false
     }
     
     public mutating func delete(at index: Index, from ply: Ply) {
