@@ -47,4 +47,12 @@ extension Ply: Strideable {
     public var successor: Ply {
         return Ply(player: self.player.opponent, number: self.number + 1)
     }
+    
+    public mutating func formPredecessor() {
+        self = self.predecessor
+    }
+    
+    public mutating func formSuccessor() {
+        self = self.successor
+    }
 }

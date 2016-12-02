@@ -1,15 +1,11 @@
 public final class GameHelper {
     public fileprivate(set) var game: Game
-    internal var ply: Ply {
-        didSet { self.reloadMovePicker() }
-    }
-    internal var index: Game.Index
+    public fileprivate(set) var index: Game.PositionIndex
     fileprivate var movePicker: MovePicker
     
     public init(game: Game) {
         self.game = game
-        self.ply = game.endPly
-        self.index = Game.Index()
+        self.index = Game.PositionIndex(variationIndex: Game.VariationIndex(), ply: game.endPly)
         self.movePicker = MovePicker(game.endPosition)
     }
     
@@ -20,25 +16,25 @@ public final class GameHelper {
 
 extension GameHelper {
     fileprivate var variation: Game {
-        get { return self.game[self.index] }
-        set { self.game[self.index] = newValue }
+        get { return self.game[self.index.variationIndex] }
+        set { self.game[self.index.variationIndex] = newValue }
     }
     
     public var position: Position {
-        return self.variation.positions[self.ply]
+        return self.variation.positions[self.index.ply]
     }
     
     fileprivate func reloadMovePicker() {
-        self.movePicker = MovePicker(self.variation.positions[self.ply])
+        self.movePicker = MovePicker(self.variation.positions[self.index.ply])
     }
     
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     public func play(_ move: Move) -> Bool {
-        guard self.variation.positions[self.ply].moveIsValid(move) else { return false }
+        guard self.position.moveIsValid(move) else { return false }
         
-        if self.variation.play(move, at: self.ply).inVariation {
-            self.index.deviations.append(Game.Deviation(ply: self.ply, move: move))
+        if self.variation.play(move, at: self.index.ply).inVariation {
+            self.index.variationIndex.deviations.append(Game.Deviation(ply: self.index.ply, move: move))
         }
         
         guard self.forward() else { fatalError("this shouldn't happen") }
@@ -50,10 +46,11 @@ extension GameHelper {
     /// returns: `true` if a variation could be popped, `false` otherwise
     @discardableResult
     internal func popVariation() -> Bool {
-        guard let (parent, deviation) = self.index.parent else { return false }
+        guard let (parent, deviation) = self.index.variationIndex.parent else { return false }
         
-        self.index = parent
-        self.ply = deviation.ply
+        self.index.variationIndex = parent
+        self.index.ply = deviation.ply
+        self.reloadMovePicker()
         
         return true
     }
@@ -63,59 +60,64 @@ extension GameHelper {
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func forward() -> Bool {
-        guard self.ply < self.variation.endPly else { return false }
+        guard self.index.ply < self.variation.endPly else { return false }
         
-        self.ply = self.ply.successor
+        self.index.ply.formSuccessor()
+        self.reloadMovePicker()
+        
         return true
     }
     
     /// returns: `true` if success, `false` otherwise
     @discardableResult
     public func backward() -> Bool {
-        guard self.ply > self.variation.startPly else { return self.popVariation() }
+        guard self.index.ply > self.variation.startPly else { return self.popVariation() }
         
-        self.ply = self.ply.predecessor
+        self.index.ply.formPredecessor()
+        self.reloadMovePicker()
+        
         return true
     }
     
     private func reloadIndex() {
-        let formerIndex = self.index
-        self.index.deviations.removeAll(keepingCapacity: true)
+        let formerIndex = self.index.variationIndex
+        self.index.variationIndex.deviations.removeAll(keepingCapacity: true)
         
         var game = self.game
         
         for deviation in formerIndex.deviations {
             guard let variations = game.variations[checking: deviation.ply] else {
-                self.ply = game.endPly
+                self.index.ply = game.endPly
                 break
             }
             
             guard let variation = variations[deviation.move] else {
-                self.ply = deviation.ply
+                self.index.ply = deviation.ply
                 break
             }
             
             game = variation
             
-            self.index.deviations.append(deviation)
+            self.index.variationIndex.deviations.append(deviation)
         }
         
-        if !game.positions.indices.contains(self.ply) {
-            self.ply = game.endPly
+        if !game.positions.indices.contains(self.index.ply) {
+            self.index.ply = game.endPly
         }
+        
+        self.reloadMovePicker()
     }
     
-    public func delete(at index: Game.Index, from ply: Ply) {
-        self.game.delete(at: index, from: ply)
+    public func delete(from index: Game.PositionIndex) {
+        self.game.delete(from: index)
         self.reloadIndex()
     }
     
     public func delete() {
         let index = self.index
-        let ply = self.ply
         
         self.backward()
-        self.game.delete(at: index, from: ply)
+        self.game.delete(from: index)
     }
 }
 

@@ -82,25 +82,25 @@ extension Game {
     }
     
     /// Points to a specific (sub)variation of the game.
-    public struct Index {
+    public struct VariationIndex {
         internal var deviations: ArraySlice<Deviation>
         
         internal init(_ deviations: ArraySlice<Deviation> = []) {
             self.deviations = deviations
         }
         
-        internal var child: (child: Index, deviation: Deviation)? {
+        internal var child: (child: VariationIndex, deviation: Deviation)? {
             guard let deviation = self.deviations.first else { return nil }
-            return (Index(self.deviations.dropFirst()), deviation)
+            return (VariationIndex(self.deviations.dropFirst()), deviation)
         }
         
-        internal var parent: (parent: Index, deviation: Deviation)? {
+        internal var parent: (parent: VariationIndex, deviation: Deviation)? {
             guard let deviation = self.deviations.last else { return nil }
-            return (Index(self.deviations.dropLast()), deviation)
+            return (VariationIndex(self.deviations.dropLast()), deviation)
         }
     }
     
-    public subscript(index: Index) -> Game {
+    public subscript(index: VariationIndex) -> Game {
         get {
             return index.deviations.reduce(self) { game, pair in
                 guard let variation = game.variations[pair.ply][pair.move] else { fatalError("index is invalid") }
@@ -116,6 +116,12 @@ extension Game {
         }
     }
     
+    /// Points to a specific position of the game, possibly belonging to a (sub)variation.
+    public struct PositionIndex {
+        internal var variationIndex: VariationIndex
+        internal var ply: Ply
+    }
+    
     public func game(from ply: Ply) -> Game {
         return Game(
             startNumber: ply.number,
@@ -125,8 +131,8 @@ extension Game {
         )
     }
     
-    public func game(at index: Index, from ply: Ply) -> Game {
-        return self[index].game(from: ply)
+    public func game(from index: PositionIndex) -> Game {
+        return self[index.variationIndex].game(from: index.ply)
     }
     
     /// Deletes the move before the given ply, and all following moves, from the game.
@@ -140,6 +146,7 @@ extension Game {
         self.variations.remove(from: ply)
         
         if let (move, newTail) = self.variations[ply.predecessor].popFirst() {
+            // TODO: refactor
             self.moves.append(move)
             self.moves.append(contentsOf: newTail.moves)
             self.positions.append(contentsOf: newTail.positions)
@@ -149,8 +156,8 @@ extension Game {
         return false
     }
     
-    public mutating func delete(at index: Index, from ply: Ply) {
-        if self[index].delete(from: ply), let (parentIndex, deviation) = index.parent {
+    public mutating func delete(from index: PositionIndex) {
+        if self[index.variationIndex].delete(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
             self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
         }
     }
