@@ -48,11 +48,7 @@ extension Game {
             let withoutIndicator = pair.move.unambiguousNotation
             let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
             
-            if let onlyVariations = variationsNotation(of: pair.variations, at: ply) {
-                return "\(withoutVariations) \(onlyVariations)"
-            } else {
-                return withoutVariations
-            }
+            return variationsNotation(of: pair.variations, at: ply).map { "\(withoutVariations) \($0)" } ?? withoutVariations
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")
@@ -60,11 +56,7 @@ extension Game {
             ? withoutBlackPlyIndicator
             : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
         
-        if let onlyFinalVariations = variationsNotation(of: self.endVariations, at: self.endPly) {
-            return "\(withoutFinalVariations) \(onlyFinalVariations)"
-        } else {
-            return withoutFinalVariations
-        }
+        return variationsNotation(of: self.endVariations, at: self.endPly).map { "\(withoutFinalVariations) \($0)" } ?? withoutFinalVariations
     }
     
     public var pdn: String {
