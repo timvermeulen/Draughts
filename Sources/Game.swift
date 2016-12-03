@@ -174,7 +174,7 @@ extension Game {
     /// Deletes the move before the given ply, and all following moves, from the game.
     /// returns: `true` if the game's main variation ends up containing no moves, `false` otherwise
     @discardableResult
-    public mutating func delete(from ply: Ply) -> Bool {
+    public mutating func remove(from ply: Ply) -> Bool {
         guard ply > self.startPly else { return true }
 
         self.moves.remove(from: ply.predecessor)
@@ -189,8 +189,8 @@ extension Game {
         return false
     }
     
-    public mutating func delete(from index: PositionIndex) {
-        if self[index.variationIndex].delete(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
+    public mutating func remove(from index: PositionIndex) {
+        if self[index.variationIndex].remove(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
             self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
         }
     }

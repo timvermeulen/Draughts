@@ -86,9 +86,9 @@ extension GameHelper {
         self.reloadMovePicker()
     }
     
-    public func delete(from index: Index) {
+    public func remove(from index: Index) {
         let parentIndex = self.game.parentIndex(of: index)
-        self.game.delete(from: index)
+        self.game.remove(from: index)
         
         if index.isChild(of: self.index) {
             self.index = parentIndex ?? self.game.startIndex
