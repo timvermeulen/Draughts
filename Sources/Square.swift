@@ -47,13 +47,21 @@ public struct Square {
     public static let all = (1 ... 50).map(Square.init(humanValue:))
 }
 
-extension Square: Comparable {
+extension Square: Equatable {
     public static func == (left: Square, right: Square) -> Bool {
         return left.value == right.value
     }
-    
+}
+
+extension Square: Comparable {
     public static func < (left: Square, right: Square) -> Bool {
         return left.value < right.value
+    }
+}
+
+extension Square: Hashable {
+    public var hashValue: Int {
+        return self.value.hashValue
     }
 }
 

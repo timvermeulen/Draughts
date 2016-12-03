@@ -517,4 +517,39 @@ class DraughtsTests: SafeXCTestCase {
         helper.promote(at: helper.index)
         XCTAssertEqual(helper.game.pdn, "1. 32-28 (1. 33-28) 18-23")
     }
+    
+    func testDarkPosition() {
+        let fens: [(fen: String, expected: String)] = [
+            ("W:W28:B23,19,13,9", "W:W28:B23,19"),
+            ("W:W28,24:B23,19,13,9", "W:W28,24:B23,19,13")
+        ]
+        
+        for (fen, expected) in fens {
+            let position = SafeXCTAssertNotNil(Position(fen: fen))
+            let expectedDark = SafeXCTAssertNotNil(Position(fen: expected))
+            XCTAssertEqual(position.darkPosition, expectedDark)
+        }
+    }
+    
+    func testDarkPositions() {
+        let position = SafeXCTAssertNotNil(Position(fen: "B:W24,32,33:B2,10,13,14,23"))
+        let game = SafeXCTAssertNotNil(Game(pdn: "2-8 33-28 14-19", position: position))
+        
+        let expected: [(white: String, black: String)] = [
+            ("B:W24,32,33:B", "B:W:B2,10,13,14,23"),
+            ("W:W24,32,33:B", "W:W:B8,10,13,14,23"),
+            ("B:W24,28,32:B", "B:W28,32:B8,10,13,14,23"),
+            ("W:W24,28,32:B13,19,23", "W:W28,32:B8,10,13,19,23")
+        ]
+        
+        let darkPositions = game.positions.indices.map { game.darkPositions(at: Game.PositionIndex(ply: $0)) }
+        
+        for (expected, real) in zip(expected, darkPositions) {
+            let white = SafeXCTAssertNotNil(Position(fen: expected.white))
+            let black = SafeXCTAssertNotNil(Position(fen: expected.black))
+            
+            XCTAssertEqual(white, real.white)
+            XCTAssertEqual(black, real.black)
+        }
+    }
 }

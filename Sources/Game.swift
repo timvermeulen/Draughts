@@ -125,10 +125,19 @@ extension Game {
         internal var variationIndex: VariationIndex
         internal var ply: Ply
         
+        internal init(variationIndex: VariationIndex = VariationIndex(), ply: Ply) {
+            self.variationIndex = variationIndex
+            self.ply = ply
+        }
+        
         internal func isChild(of other: PositionIndex) -> Bool {
             guard self.ply >= other.ply && self.variationIndex.deviations.count >= other.variationIndex.deviations.count else { return false }
             return !zip(self.variationIndex.deviations, other.variationIndex.deviations).contains(where: !=)
         }
+    }
+    
+    public subscript(index: PositionIndex) -> Position {
+        return self[index.variationIndex].positions[index.ply]
     }
     
     internal func parentIndex(of index: PositionIndex) -> PositionIndex? {

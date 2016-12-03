@@ -26,6 +26,12 @@ extension Piece: Equatable {
     }
 }
 
+extension Piece: Hashable {
+    public var hashValue: Int {
+        return self.player.hashValue ^ self.square.hashValue
+    }
+}
+
 extension Piece: CustomStringConvertible {
     public var description: String {
         let symbol: Character

@@ -90,6 +90,20 @@ public final class Move {
         }
     }()
     
+    /// The squares that are required to be empty for this move to be legal
+    public lazy var interveningSquares: [Square] = {
+        guard self.piece.kind == .king else { return self.anyIntermediateSquares + [self.endSquare] }
+        
+        let squares = [self.startSquare] + self.anyIntermediateSquares + [self.endSquare]
+        
+        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).map { start, end in
+            guard let squares = start.squares(before: end) else { fatalError("invalid move") }
+            return squares
+        }
+        
+        return interveningSquares.joined() + [self.endSquare]
+    }()
+    
     public lazy var relevantSquares: [Square] = {
         let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
         return intermediateRelevantSquares + [self.startSquare, self.endSquare]
@@ -122,6 +136,12 @@ extension Move: Equatable {
         return left.white == right.white &&
             left.black == right.black &&
             left.kings == right.kings
+    }
+}
+
+extension Move: Hashable {
+    public var hashValue: Int {
+        return self.piece.hashValue ^ self.endSquare.hashValue ^ self.captures.map { $0.hashValue }.reduce(0, ^)
     }
 }
 

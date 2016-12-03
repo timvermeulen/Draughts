@@ -11,6 +11,12 @@ public final class GameHelper {
         self.movePicker = MovePicker(game.endPosition)
     }
     
+    public init(_ helper: GameHelper) {
+        self.game = helper.game
+        self.index = helper.index
+        self.movePicker = MovePicker(self.game[self.index])
+    }
+    
     public convenience init(position: Position) {
         self.init(game: Game(position: position))
     }
@@ -27,7 +33,7 @@ extension GameHelper {
     }
     
     fileprivate func reloadMovePicker() {
-        self.movePicker = MovePicker(self.variation.positions[self.index.ply])
+        self.movePicker = MovePicker(self.game[self.index])
     }
     
     /// returns: `true` if a variation could be popped, `false` otherwise
