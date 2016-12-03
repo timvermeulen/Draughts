@@ -86,7 +86,15 @@ extension GameHelper {
         self.reloadMovePicker()
     }
     
-    public func remove(from index: Index) {
+    public func canRemove(from index: Index) -> Bool {
+        return self.game.canRemove(from: index)
+    }
+    
+    /// returns: `true` if removal was allowed, `false` otherwise
+    @discardableResult
+    public func remove(from index: Index) -> Bool {
+        guard self.canRemove(from: index) else { return false }
+        
         let parentIndex = self.game.parentIndex(of: index)
         self.game.remove(from: index)
         
@@ -95,10 +103,17 @@ extension GameHelper {
         }
         
         self.reloadMovePicker()
+        return true
     }
     
-    public func promote(at index: Game.VariationIndex) {
-        self.game.promote(at: index)
+    public func canPromote(at index: Game.VariationIndex) -> Bool {
+        return self.game.canPromote(at: index)
+    }
+    
+    /// returns: `true` if promotion was allowed, `false` otherwise
+    @discardableResult
+    public func promote(at index: Game.VariationIndex) -> Bool {
+        return self.game.promote(at: index)
     }
 }
 

@@ -193,18 +193,35 @@ extension Game {
         return false
     }
     
-    public mutating func remove(from index: PositionIndex) {
+    public func canRemove(from index: PositionIndex) -> Bool {
+        return !self[index.variationIndex].isLocked
+    }
+    
+    /// returns: `true` if removal was allowed, `false` otherwise
+    @discardableResult
+    public mutating func remove(from index: PositionIndex) -> Bool {
+        guard self.canRemove(from: index) else { return false }
+
         if self[index.variationIndex].remove(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
             self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
         }
+
+        return true
+    }
+
+    public func canPromote(at index: VariationIndex) -> Bool {
+        guard let parent = index.parent?.parent else { return false }
+        return !self[parent].isLocked
     }
     
-    public mutating func promote(at index: VariationIndex) {
-        guard let (child, deviation) = index.child else { fatalError("something went wrong") }
+    /// returns: `true` if promotion was allowed, `false` otherwise
+    @discardableResult
+    public mutating func promote(at index: VariationIndex) -> Bool {
+        guard self.canPromote(at: index), let (child, deviation) = index.child else { return false }
         
         guard child.deviations.isEmpty else {
             self.variations[deviation.ply][deviation.move]?.promote(at: index)
-            return
+            return true
         }
         
         let newVariationMove = self.moves[deviation.ply]
@@ -217,6 +234,8 @@ extension Game {
         
         self.variations[deviation.ply][newVariationMove] = newVariation
         self[deviation] = nil
+        
+        return true
     }
 }
 
