@@ -171,15 +171,19 @@ extension Game {
         self.variations.append(contentsOf: game.variations)
     }
     
+    private mutating func removeWithoutReplacement(from ply: Ply) {
+        self.moves.remove(from: ply.predecessor)
+        self.positions.remove(from: ply)
+        self.variations.remove(from: ply)
+    }
+    
     /// Deletes the move before the given ply, and all following moves, from the game.
     /// returns: `true` if the game's main variation ends up containing no moves, `false` otherwise
     @discardableResult
     public mutating func remove(from ply: Ply) -> Bool {
         guard ply > self.startPly else { return true }
 
-        self.moves.remove(from: ply.predecessor)
-        self.positions.remove(from: ply)
-        self.variations.remove(from: ply)
+        self.removeWithoutReplacement(from: ply)
         
         if let (move, newTail) = self.variations[ply.predecessor].popFirst() {
             self.play(move)
@@ -206,25 +210,13 @@ extension Game {
         let newVariationMove = self.moves[deviation.ply]
         let newVariation = self.game(from: deviation.ply.successor)
         
-        // TODO: abstract
-        self.moves.remove(from: deviation.ply)
-        self.positions.remove(from: deviation.ply.successor)
-        self.variations.remove(from: deviation.ply.successor)
+        self.removeWithoutReplacement(from: deviation.ply.successor)
         
         self.play(deviation.move)
         self.appendGame(self[index])
         
         self.variations[deviation.ply][newVariationMove] = newVariation
         self[deviation] = nil
-        
-//        self.variations[deviation.ply][self.moves[deviation.ply]] = with(Game(position: self.positions[deviation.ply], startNumber: deviation.ply.number)) { (variation: inout Game) in
-//            variation.moves.append(contentsOf: self.moves.suffix(from: deviation.ply.successor))
-//            variation.positions.append(contentsOf: self.positions.suffix(from: deviation.ply))
-//            variation.variations.append([:])
-//            variation.variations.append(contentsOf: self.variations.suffix(from: deviation.ply.successor))
-//        }
-        
-        // TODO: stuff
     }
 }
 
