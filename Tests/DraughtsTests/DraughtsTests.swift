@@ -514,7 +514,7 @@ class DraughtsTests: SafeXCTestCase {
         XCTAssertTrue(helper.move(from: 32, to: 28))
         XCTAssertTrue(helper.move(from: 18, to: 23))
         
-        helper.promote(at: helper.index.variationIndex)
+        helper.promote(at: helper.index)
         XCTAssertEqual(helper.game.pdn, "1. 32-28 (1. 33-28) 18-23")
     }
 }

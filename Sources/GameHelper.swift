@@ -106,14 +106,14 @@ extension GameHelper {
         return true
     }
     
-    public func canPromote(at index: Game.VariationIndex) -> Bool {
-        return self.game.canPromote(at: index)
+    public func canPromote(at index: Index) -> Bool {
+        return self.game.canPromote(at: index.variationIndex)
     }
     
     /// returns: `true` if promotion was allowed, `false` otherwise
     @discardableResult
-    public func promote(at index: Game.VariationIndex) -> Bool {
-        return self.game.promote(at: index)
+    public func promote(at index: Index) -> Bool {
+        return self.game.promote(at: index.variationIndex)
     }
 }
 
