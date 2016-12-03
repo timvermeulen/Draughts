@@ -161,6 +161,16 @@ extension Game {
         return self[index.variationIndex].game(from: index.ply)
     }
     
+    private mutating func appendGame(_ game: Game) {
+        assert(self.endPosition == game.startPosition, "games do not match")
+        
+        self.moves.append(contentsOf: game.moves)
+        self.positions.append(contentsOf: game.positions.dropFirst())
+        
+        self.variations.removeLast()
+        self.variations.append(contentsOf: game.variations)
+    }
+    
     /// Deletes the move before the given ply, and all following moves, from the game.
     /// returns: `true` if the game's main variation ends up containing no moves, `false` otherwise
     @discardableResult
@@ -172,11 +182,8 @@ extension Game {
         self.variations.remove(from: ply)
         
         if let (move, newTail) = self.variations[ply.predecessor].popFirst() {
-            // TODO: refactor
-            self.moves.append(move)
-            self.moves.append(contentsOf: newTail.moves)
-            self.positions.append(contentsOf: newTail.positions)
-            self.variations.append(contentsOf: newTail.variations)
+            self.play(move)
+            self.appendGame(newTail)
         }
         
         return false
@@ -186,6 +193,38 @@ extension Game {
         if self[index.variationIndex].delete(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
             self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
         }
+    }
+    
+    public mutating func promote(at index: VariationIndex) {
+        guard let (child, deviation) = index.child else { fatalError("something went wrong") }
+        
+        guard child.deviations.isEmpty else {
+            self.variations[deviation.ply][deviation.move]?.promote(at: index)
+            return
+        }
+        
+        let newVariationMove = self.moves[deviation.ply]
+        let newVariation = self.game(from: deviation.ply.successor)
+        
+        // TODO: abstract
+        self.moves.remove(from: deviation.ply)
+        self.positions.remove(from: deviation.ply.successor)
+        self.variations.remove(from: deviation.ply.successor)
+        
+        self.play(deviation.move)
+        self.appendGame(self[index])
+        
+        self.variations[deviation.ply][newVariationMove] = newVariation
+        self[deviation] = nil
+        
+//        self.variations[deviation.ply][self.moves[deviation.ply]] = with(Game(position: self.positions[deviation.ply], startNumber: deviation.ply.number)) { (variation: inout Game) in
+//            variation.moves.append(contentsOf: self.moves.suffix(from: deviation.ply.successor))
+//            variation.positions.append(contentsOf: self.positions.suffix(from: deviation.ply))
+//            variation.variations.append([:])
+//            variation.variations.append(contentsOf: self.variations.suffix(from: deviation.ply.successor))
+//        }
+        
+        // TODO: stuff
     }
 }
 

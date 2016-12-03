@@ -505,4 +505,16 @@ class DraughtsTests: SafeXCTestCase {
         helper.delete(from: helper.index)
         XCTAssertEqual(helper.game.pdn, "1. 32-28 18-23 (1. ... 17-21)")
     }
+    
+    func testVariationPromotion() {
+        let helper = GameHelper(position: .start)
+        
+        XCTAssertTrue(helper.move(from: 33, to: 28))
+        XCTAssertTrue(helper.backward())
+        XCTAssertTrue(helper.move(from: 32, to: 28))
+        XCTAssertTrue(helper.move(from: 18, to: 23))
+        
+        helper.promote(at: helper.index.variationIndex)
+        XCTAssertEqual(helper.game.pdn, "1. 32-28 (1. 33-28) 18-23")
+    }
 }

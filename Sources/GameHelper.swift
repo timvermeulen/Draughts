@@ -81,6 +81,11 @@ extension GameHelper {
         return true
     }
     
+    public func move(to index: Index) {
+        self.index = index
+        self.reloadMovePicker()
+    }
+    
     public func delete(from index: Index) {
         let parentIndex = self.game.parentIndex(of: index)
         self.game.delete(from: index)
@@ -92,9 +97,8 @@ extension GameHelper {
         self.reloadMovePicker()
     }
     
-    public func move(to index: Index) {
-        self.index = index
-        self.reloadMovePicker()
+    public func promote(at index: Game.VariationIndex) {
+        self.game.promote(at: index)
     }
 }
 
