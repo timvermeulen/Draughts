@@ -123,7 +123,7 @@ extension Game {
     /// Points to a specific position of the game, possibly belonging to a (sub)variation.
     public struct PositionIndex {
         internal var variationIndex: VariationIndex
-        internal var ply: Ply
+        public var ply: Ply
         
         internal init(variationIndex: VariationIndex = VariationIndex(), ply: Ply) {
             self.variationIndex = variationIndex
