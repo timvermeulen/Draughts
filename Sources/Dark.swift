@@ -27,6 +27,8 @@ extension Position {
             return position(opponent: candidate.pieces(of: self.playerToMove.opponent).union(captures).union(obstacles))
         }
         
+        // The Array(first:next:) initialiser always returns a non-empty array, so
+        // this `!` is safe.
         return positions.last!
     }
     
