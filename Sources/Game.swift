@@ -170,6 +170,29 @@ extension Game {
         return self[index.variationIndex].game(from: index.ply)
     }
     
+    public func gameToPosition(at index: PositionIndex) -> Game {
+        let variations: [Game] = index.variationIndex.deviations.scan(self) { game, deviation in
+            guard let variation = game[deviation] else { fatalError("invalid game") }
+            return variation
+        }
+        
+        let deviations: [(Move?, Ply)] = index.variationIndex.deviations.map { ($0.move, $0.ply) } + [(nil, index.ply)]
+        
+        var game = Game(position: self.startPosition, startNumber: self.startNumber)
+        
+        for (variation, (move, ply)) in zip(variations, deviations) {
+            for move in variation.moves[game.endPly ..< ply] {
+                game.play(move)
+            }
+            
+            if let move = move {
+                game.play(move)
+            }
+        }
+        
+        return game
+    }
+    
     private mutating func appendGame(_ game: Game) {
         assert(self.endPosition == game.startPosition, "games do not match")
         

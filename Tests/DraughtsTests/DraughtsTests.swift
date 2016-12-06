@@ -552,4 +552,46 @@ class DraughtsTests: SafeXCTestCase {
             XCTAssertEqual(black, real.black)
         }
     }
+    
+    func testGameToPosition() {
+        let helper = GameHelper(position: .start)
+        
+        helper.move(from: 32, to: 28)
+        helper.move(from: 19, to: 23)
+        helper.backward()
+        helper.move(from: 18, to: 23)
+        helper.move(from: 37, to: 32)
+        helper.backward()
+        helper.move(from: 38, to: 32)
+        
+        let game = helper.game.gameToPosition(at: helper.index)
+        let expected = SafeXCTAssertNotNil(Game(pdn: "32-28 18-23 38-32"))
+        XCTAssertEqual(game, expected)
+    }
+    
+    func testTrace() {
+        let game = SafeXCTAssertNotNil(Game(pdn: "32-28 19-23 28x19 14x23"))
+        let expected = Trace(moved: [14: 23], removed: [32, 19], added: [])
+        
+        XCTAssertEqual(game.trace, expected)
+    }
+    
+    func testTraceNonLinear() {
+        let helper = GameHelper(position: .start)
+        
+        helper.move(from: 32, to: 28)
+        helper.move(from: 19, to: 24)
+        
+        let index1 = helper.index
+        
+        helper.backward()
+        helper.move(from: 19, to: 23)
+        
+        let index2 = helper.index
+        
+        let trace = helper.game.trace(from: index1, to: index2)
+        let expected = Trace(moved: [24: 23], removed: [], added: [])
+        
+        XCTAssertEqual(trace, expected)
+    }
 }
