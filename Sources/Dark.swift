@@ -27,7 +27,12 @@ extension Position {
             let captureBitboard = Bitboard(squares: capturedPieces.map { $0.square })
             let obstacleBitboard = Bitboard(squares: obstacleSquares)
             
-            return position(opponent: candidate.pieces(of: self.playerToMove.opponent).union(captureBitboard).union(obstacleBitboard))
+            let opponentBitboard = candidate
+                .pieces(of: self.playerToMove.opponent)
+                .union(captureBitboard)
+                .union(obstacleBitboard)
+            
+            return position(opponent: opponentBitboard)
         }
         
         // The Array(first:next:) initialiser always returns a non-empty array, so
