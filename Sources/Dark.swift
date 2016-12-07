@@ -21,10 +21,13 @@ extension Position {
             let legalMoves = ownMoves.subtracting(candidateMoves)
             let illegalMoves = candidateMoves.subtracting(ownMoves)
             
-            let captures = Bitboard(squares: Set(legalMoves.flatMap { $0.captures }).map { $0.square })
-            let obstacles = Bitboard(squares: illegalMoves.flatMap { $0.interveningSquares.first(where: opponent.contains) })
+            let capturedPieces = Set(legalMoves.flatMap { $0.captures })
+            let obstacleSquares = Set(illegalMoves.flatMap { $0.interveningSquares.first(where: opponent.contains) })
             
-            return position(opponent: candidate.pieces(of: self.playerToMove.opponent).union(captures).union(obstacles))
+            let captureBitboard = Bitboard(squares: capturedPieces.map { $0.square })
+            let obstacleBitboard = Bitboard(squares: obstacleSquares)
+            
+            return position(opponent: candidate.pieces(of: self.playerToMove.opponent).union(captureBitboard).union(obstacleBitboard))
         }
         
         // The Array(first:next:) initialiser always returns a non-empty array, so

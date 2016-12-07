@@ -193,7 +193,7 @@ extension Game {
             game.play(move)
         }
         
-        // variations is a result of `scan`, which always returns
+        // variations is the result of `scan`, which always returns
         // a non-empty array
         let lastVariation = variations.last!
         
