@@ -594,4 +594,27 @@ class DraughtsTests: SafeXCTestCase {
         
         XCTAssertEqual(trace, expected)
     }
+    
+    func testTraceRemoveAdd() {
+        let helper = GameHelper(position: .start)
+        
+        helper.move(from: 32, to: 28)
+        helper.move(from: 19, to: 23)
+        helper.move(from: 28, to: 19)
+        
+        let index1 = helper.index
+        
+        helper.backward()
+        helper.backward()
+        helper.move(from: 17, to: 21)
+        helper.move(from: 28, to: 22)
+        helper.move(from: 18, to: 27)
+        
+        let index2 = helper.index
+        
+        let trace = helper.game.trace(from: index1, to: index2)
+        let expected = Trace(moved: [17: 21, 18: 27], removed: [19], added: [19])
+        
+        XCTAssertEqual(trace, expected)
+    }
 }
