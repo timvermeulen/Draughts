@@ -9,21 +9,23 @@ public struct Trace {
     }
     
     public func followed(by other: Trace) -> Trace {
+        // All moves starting at a square that is transformed in `self`, but not necessarily in `other`
         let startMoved: [(Square, Square)] = self.moved.flatMap { start, inter in
             guard let end = other.destinationOfPiece(on: inter), start != end else { return nil }
             return (start, end)
         }
         
+        // All moves starting at a square that is transformed in `other`, but not necessarily in `self`
         let endMoved: [(Square, Square)] = other.moved.flatMap { inter, end in
             guard let start = self.originOfPiece(on: inter), start != end else { return nil }
             return (start, end)
         }
         
-        return Trace(
-            moved: DoubleDictionary(startMoved + endMoved),
-            removed: Set(self.removed + other.removed.flatMap(self.originOfPiece)),
-            added: Set(other.added + self.added.flatMap(other.destinationOfPiece))
-        )
+        let moved = DoubleDictionary(startMoved + endMoved)
+        let removed = Set(self.removed + other.removed.flatMap(self.originOfPiece))
+        let added = Set(other.added + self.added.flatMap(other.destinationOfPiece))
+        
+        return Trace(moved: moved, removed: removed, added: added)
     }
     
     public func destinationOfPiece(on square: Square) -> Square? {
