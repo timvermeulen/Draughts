@@ -181,7 +181,7 @@ extension Game {
             return variation
         }
         
-        let deviations: [(Move?, Ply)] = index.variationIndex.deviations.map { ($0.move, $0.ply) } + [(nil, index.ply)]
+        let deviations = index.variationIndex.deviations.map { ($0.move, $0.ply) }
         
         var game = Game(position: self.startPosition, startNumber: self.startNumber)
         
@@ -190,9 +190,15 @@ extension Game {
                 game.play(move)
             }
             
-            if let move = move {
-                game.play(move)
-            }
+            game.play(move)
+        }
+        
+        // variations is a result of `scan`, which always returns
+        // a non-empty array
+        let lastVariation = variations.last!
+        
+        for move in lastVariation.moves[game.endPly ..< index.ply] {
+            game.play(move)
         }
         
         return game
