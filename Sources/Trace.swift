@@ -10,28 +10,28 @@ public struct Trace {
     
     public func followed(by other: Trace) -> Trace {
         let startMoved: [(Square, Square)] = self.moved.flatMap { start, inter in
-            guard let end = other.destination(of: inter), start != end else { return nil }
+            guard let end = other.destinationOfPiece(on: inter), start != end else { return nil }
             return (start, end)
         }
         
         let endMoved: [(Square, Square)] = other.moved.flatMap { inter, end in
-            guard let start = self.origin(of: inter), start != end else { return nil }
+            guard let start = self.originOfPiece(on: inter), start != end else { return nil }
             return (start, end)
         }
         
         return Trace(
             moved: DoubleDictionary(startMoved + endMoved),
-            removed: Set(self.removed + other.removed.flatMap(self.origin)),
-            added: Set(other.added + self.added.flatMap(other.destination))
+            removed: Set(self.removed + other.removed.flatMap(self.originOfPiece)),
+            added: Set(other.added + self.added.flatMap(other.destinationOfPiece))
         )
     }
     
-    public func destination(of square: Square) -> Square? {
+    public func destinationOfPiece(on square: Square) -> Square? {
         guard !self.removed.contains(square) else { return nil }
         return self.moved[key1: square] ?? square
     }
     
-    public func origin(of square: Square) -> Square? {
+    public func originOfPiece(on square: Square) -> Square? {
         guard !self.added.contains(square) else { return nil }
         return self.moved[key2: square] ?? square
     }
