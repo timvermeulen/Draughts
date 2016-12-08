@@ -617,7 +617,7 @@ class DraughtsTests: SafeXCTestCase {
         helper.move(from: 19, to: 23)
         helper.move(from: 28, to: 19)
         
-        let index1 = helper.index
+        let index = helper.index
         
         helper.backward()
         helper.backward()
@@ -625,9 +625,7 @@ class DraughtsTests: SafeXCTestCase {
         helper.move(from: 28, to: 22)
         helper.move(from: 18, to: 27)
         
-        let index2 = helper.index
-        
-        let trace = helper.game.trace(from: index1, to: index2)
+        let trace = helper.move(to: index)
         let expected = Trace(
             moved: [
                 Piece(player: .black, kind: .man, square: 17): Piece(player: .black, kind: .man, square: 21),
@@ -642,5 +640,32 @@ class DraughtsTests: SafeXCTestCase {
         )
         
         XCTAssertEqual(trace, expected)
+    }
+    
+    func testTracePromote() {
+        let position = SafeXCTAssertNotNil(Position(fen: "W:W10:B41"))
+        let helper = GameHelper(position: position)
+        
+        let index1 = helper.index
+        
+        helper.toggle(5)
+        helper.toggle(46)
+        
+        let index2 = helper.index
+        let trace1 = helper.move(to: index1)
+        
+        let dest1 = SafeXCTAssertNotNil(trace1.destination(of: Piece(player: .white, kind: .king, square: 5)))
+        XCTAssertEqual(dest1, Piece(player: .white, kind: .man, square: 10))
+        
+        let dest2 = SafeXCTAssertNotNil(trace1.destination(of: Piece(player: .black, kind: .king, square: 46)))
+        XCTAssertEqual(dest2, Piece(player: .black, kind: .man, square: 41))
+        
+        let trace2 = helper.move(to: index2)
+        
+        let dest3 = SafeXCTAssertNotNil(trace2.destination(of: Piece(player: .white, kind: .man, square: 10)))
+        XCTAssertEqual(dest3, Piece(player: .white, kind: .king, square: 5))
+        
+        let dest4 = SafeXCTAssertNotNil(trace2.destination(of: Piece(player: .black, kind: .man, square: 41)))
+        XCTAssertEqual(dest4, Piece(player: .black, kind: .king, square: 46))
     }
 }

@@ -87,9 +87,14 @@ extension GameHelper {
         return true
     }
     
-    public func move(to index: Index) {
-        self.index = index
-        self.reloadMovePicker()
+    @discardableResult
+    public func move(to index: Index) -> Trace {
+        defer {
+            self.index = index
+            self.reloadMovePicker()
+        }
+        
+        return self.game.trace(from: self.index, to: index)
     }
     
     public func canRemove(from index: Index) -> Bool {
