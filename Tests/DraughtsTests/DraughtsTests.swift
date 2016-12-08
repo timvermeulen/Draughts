@@ -571,7 +571,16 @@ class DraughtsTests: SafeXCTestCase {
     
     func testTrace() {
         let game = SafeXCTAssertNotNil(Game(pdn: "32-28 19-23 28x19 14x23"))
-        let expected = Trace(moved: [14: 23], removed: [32, 19], added: [])
+        let expected = Trace(
+            moved: [
+                Piece(player: .black, kind: .man, square: 14): Piece(player: .black, kind: .man, square: 23)
+            ],
+            removed: [
+                Piece(player: .white, kind: .man, square: 32),
+                Piece(player: .black, kind: .man, square: 19)
+            ],
+            added: []
+        )
         
         XCTAssertEqual(game.trace, expected)
     }
@@ -590,7 +599,13 @@ class DraughtsTests: SafeXCTestCase {
         let index2 = helper.index
         
         let trace = helper.game.trace(from: index1, to: index2)
-        let expected = Trace(moved: [24: 23], removed: [], added: [])
+        let expected = Trace(
+            moved: [
+                Piece(player: .black, kind: .man, square: 24): Piece(player: .black, kind: .man, square: 23)
+            ],
+            removed: [],
+            added: []
+        )
         
         XCTAssertEqual(trace, expected)
     }
@@ -613,7 +628,18 @@ class DraughtsTests: SafeXCTestCase {
         let index2 = helper.index
         
         let trace = helper.game.trace(from: index1, to: index2)
-        let expected = Trace(moved: [17: 21, 18: 27], removed: [19], added: [19])
+        let expected = Trace(
+            moved: [
+                Piece(player: .black, kind: .man, square: 17): Piece(player: .black, kind: .man, square: 21),
+                Piece(player: .black, kind: .man, square: 18): Piece(player: .black, kind: .man, square: 27)
+            ],
+            removed: [
+                Piece(player: .white, kind: .man, square: 19)
+            ],
+            added: [
+                Piece(player: .black, kind: .man, square: 19)
+            ]
+        )
         
         XCTAssertEqual(trace, expected)
     }

@@ -1,5 +1,5 @@
 public final class Move {
-    public let piece: Piece
+    public let startPiece: Piece
     public let endSquare: Square
     public let captures: [Piece]
     public let startPosition: Position
@@ -10,11 +10,27 @@ public final class Move {
         return (self.white.value, self.black.value, self.kings.value)
     }
     
-    public var startSquare: Square { return self.piece.square }
+    public var isPromotion: Bool {
+        return startPiece.kind == .man && self.endSquare.isOnPromotionRow(of: self.player)
+    }
+    
+    public var endPiece: Piece {
+        let isKing = self.startPiece.kind == .king || self.isPromotion
+        
+        return Piece(
+            player: self.player,
+            kind: isKing ? .king : .man,
+            square: self.endSquare
+        )
+    }
+    
+    
+    public var player: Player { return self.startPiece.player }
+    public var startSquare: Square { return self.startPiece.square }
     public var isCapture: Bool { return !self.captures.isEmpty }
     
     public init(from origin: Piece, to destination: Square, over captures: [Piece] = [], position: Position) {
-        self.piece = origin
+        self.startPiece = origin
         self.endSquare = destination
         self.captures = captures
         
@@ -29,7 +45,7 @@ public final class Move {
             ? (playerBitboard, opponentBitboard)
             : (opponentBitboard, playerBitboard)
         
-        let promotion = piece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(square: destination) : .empty
+        let promotion = startPiece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(square: destination) : .empty
         let capturedKings = Bitboard(squares: self.captures.filter { $0.kind == .king }.map { $0.square })
         let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
         
@@ -48,7 +64,7 @@ public final class Move {
     }()
     
     public lazy var allIntermediateSquares: [[Square]] = {
-        guard self.piece.kind == .king else {
+        guard self.startPiece.kind == .king else {
             return self.anyIntermediateSquares.map { [$0] }
         }
         
@@ -72,7 +88,7 @@ public final class Move {
     }()
     
     public lazy var anyIntermediateSquares: [Square] = {
-        guard self.piece.kind == .man else {
+        guard self.startPiece.kind == .man else {
             return self.allIntermediateSquares.flatMap { $0.first }
         }
         
@@ -92,7 +108,7 @@ public final class Move {
     
     /// The squares that are required to be empty for this move to be legal
     public lazy var interveningSquares: [Square] = {
-        guard self.piece.kind == .king else { return self.anyIntermediateSquares + [self.endSquare] }
+        guard self.startPiece.kind == .king else { return self.anyIntermediateSquares + [self.endSquare] }
         
         let squares = [self.startSquare] + self.anyIntermediateSquares + [self.endSquare]
         
@@ -141,7 +157,7 @@ extension Move: Equatable {
 
 extension Move: Hashable {
     public var hashValue: Int {
-        return self.piece.hashValue ^ self.endSquare.hashValue ^ self.captures.map { $0.hashValue }.reduce(0, ^)
+        return self.startPiece.hashValue ^ self.endSquare.hashValue ^ self.captures.map { $0.hashValue }.reduce(0, ^)
     }
 }
 
