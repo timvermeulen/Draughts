@@ -628,14 +628,14 @@ class DraughtsTests: SafeXCTestCase {
         let trace = helper.move(to: index)
         let expected = Trace(
             moved: [
-                Piece(player: .black, kind: .man, square: 17): Piece(player: .black, kind: .man, square: 21),
-                Piece(player: .black, kind: .man, square: 18): Piece(player: .black, kind: .man, square: 27)
+                Piece(player: .black, kind: .man, square: 21): Piece(player: .black, kind: .man, square: 17),
+                Piece(player: .black, kind: .man, square: 27): Piece(player: .black, kind: .man, square: 18)
             ],
             removed: [
-                Piece(player: .white, kind: .man, square: 19)
+                Piece(player: .black, kind: .man, square: 19)
             ],
             added: [
-                Piece(player: .black, kind: .man, square: 19)
+                Piece(player: .white, kind: .man, square: 19)
             ]
         )
         
