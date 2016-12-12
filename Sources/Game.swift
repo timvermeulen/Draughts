@@ -5,10 +5,10 @@ public struct Game {
     
     public fileprivate(set) var moves: PlyArray<Move>
     
-    // Both `positions` and `variations` will contain exactly one
-    // element more than `moves`, and will therefore never be empty.
-    // Hence, the `startPosition`, `endPosition`, `startVariations`
-    // and `endVariations` properties are non-optional.
+    // Both `positions` and `variations` will at all times contain exactly
+    // one element more than `moves`, and will therefore never be empty.
+    // Hence, the `startPosition`, `endPosition`, `startVariations` and
+    // `endVariations` properties are non-optional.
     public fileprivate(set) var positions: PlyArray<Position>
     public fileprivate(set) var variations: PlyArray<OrderedDictionary<Move, Game>>
     
