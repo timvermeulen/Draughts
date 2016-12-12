@@ -1,24 +1,28 @@
 import XCTest
 
-let errorMessage = "`continueAfterFailure` should be set to `false` inside `setUp()`, and set to `true` inside `tearDown()`"
-
-public func SafeXCTFail(_ message: String = "", file: StaticString = #file, line: UInt = #line) -> Never {
+public func fail(_ message: String = "", file: StaticString = #file, line: UInt = #line) -> Never {
     XCTFail(message, file: file, line: line)
-    fatalError(errorMessage)
+    fatalError("Make sure to subclass `TestCase` instead of `XCTestCase`")
 }
 
-public func SafeXCTAssertNotNil<T>(_ expression: @autoclosure () throws -> T?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
-    XCTAssertNotNil(try expression(), message(), file: file, line: line)
+public func unwrapOrFail<T>(_ expression: @autoclosure () -> T?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
+    let result = expression()
+    XCTAssertNotNil(result, message(), file: file, line: line)
     
-    do {
-        guard let result = try expression() else { fatalError(errorMessage) }
-        return result
-    } catch {
-        fatalError(errorMessage)
-    }
+    guard let unwrapped = result else { fail(message(), file: file, line: line) }
+    return unwrapped
 }
 
-open class SafeXCTestCase: XCTestCase {
+public func tryOrFail<T>(_ expression: @autoclosure () throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) -> T {
+    let result: T
+    
+    do { result = try expression() }
+    catch { fail(message(), file: file, line: line) }
+    
+    return result
+}
+
+open class TestCase: XCTestCase {
     override open func setUp() {
         super.setUp()
         self.continueAfterFailure = false
