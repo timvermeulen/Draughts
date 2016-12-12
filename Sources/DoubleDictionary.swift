@@ -4,7 +4,7 @@ internal struct DoubleDictionary<Key1: Hashable, Key2: Hashable> {
 }
 
 extension DoubleDictionary {
-    internal init(_ dictionary: [Key1: Key2] = [:]) {
+    internal init(_ dictionary: [Key1: Key2]) {
         self.forward = dictionary
         self.backward = Dictionary(dictionary.map { ($1, $0) })
     }
