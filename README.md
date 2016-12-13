@@ -1,3 +1,3 @@
 # Draughts
 
-This is a very simple framework to play the international draughts board game.
+This is a very simple framework to play the international draughts board game, written in pure Swift.
