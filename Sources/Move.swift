@@ -6,8 +6,8 @@ public final class Move {
     
     internal let white, black, kings: Bitboard
     
-    public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
-        return (self.white.value, self.black.value, self.kings.value)
+    public var bitboards: (white: Bitboard, black: Bitboard, kings: Bitboard) {
+        return (self.white, self.black, self.kings)
     }
     
     public var isPromotion: Bool {

@@ -2,19 +2,23 @@ public final class Position {
     internal let white, black, kings, empty: Bitboard
     public let playerToMove: Player
     
-    public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
-        return (self.white.value, self.black.value, self.kings.value)
+    //    public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
+    //        return (self.white.value, self.black.value, self.kings.value)
+    //    }
+    
+    public var bitboards: (white: Bitboard, black: Bitboard, kings: Bitboard) {
+        return (self.white, self.black, self.kings)
     }
     
     public lazy var legalMoves: [Move] = {
         return self.moves(of: self.playerToMove)
     }()
     
-    internal func pieces(of player: Player) -> Bitboard {
+    public func pieces(of player: Player) -> Bitboard {
         return player == .white ? self.white : self.black
     }
     
-    internal func pieces(of player: Player, kind: Piece.Kind) -> Bitboard {
+    public func pieces(of player: Player, kind: Piece.Kind) -> Bitboard {
         return self.pieces(of: player).intersection(kind == .king ? self.kings : self.kings.inverse)
     }
     
