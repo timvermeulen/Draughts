@@ -1,5 +1,5 @@
-internal struct Bitboard {
-    internal var value: UInt64
+public struct Bitboard {
+    public var value: UInt64
     
     internal init(_ value: UInt64) {
         self.value = value
@@ -9,13 +9,13 @@ internal struct Bitboard {
 }
 
 extension Bitboard: Equatable {
-    internal static func == (left: Bitboard, right: Bitboard) -> Bool {
+    public static func == (left: Bitboard, right: Bitboard) -> Bool {
         return left.value == right.value
     }
 }
 
 extension Bitboard: Sequence {
-    internal func makeIterator() -> BitboardIterator {
+    public func makeIterator() -> BitboardIterator {
         return BitboardIterator(self)
     }
 }
@@ -33,7 +33,7 @@ extension Bitboard {
         self.init(squares: squares)
     }
     
-    internal var count: Int {
+    public var count: Int {
         let b0 = (self.value >> 0) & 0x5555555555555555
         let b1 = (self.value >> 1) & 0x5555555555555555
         let c = b0 + b1
@@ -86,7 +86,7 @@ extension Bitboard {
 }
 
 extension Bitboard: TextOutputStreamable {
-    internal func write<Target: TextOutputStream>(to target: inout Target) {
+    public func write<Target: TextOutputStream>(to target: inout Target) {
         let position = Position(white: .empty, black: self)
         position.write(to: &target)
     }
