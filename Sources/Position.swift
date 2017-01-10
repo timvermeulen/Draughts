@@ -2,10 +2,6 @@ public final class Position {
     internal let white, black, kings, empty: Bitboard
     public let playerToMove: Player
     
-    //    public var bitboards: (white: UInt64, black: UInt64, kings: UInt64) {
-    //        return (self.white.value, self.black.value, self.kings.value)
-    //    }
-    
     public var bitboards: (white: Bitboard, black: Bitboard, kings: Bitboard) {
         return (self.white, self.black, self.kings)
     }
@@ -36,7 +32,7 @@ public final class Position {
     // MARK: -
     // MARK: Initialising a Position
     
-    internal init(white: Bitboard, black: Bitboard, kings: Bitboard = .empty, playerToMove: Player = .white) {
+    public init(white: Bitboard, black: Bitboard, kings: Bitboard = .empty, playerToMove: Player = .white) {
         self.white = white
         self.black = black
         self.kings = kings
@@ -60,15 +56,6 @@ public final class Position {
             white: Bitboard(squares: white),
             black: Bitboard(squares: black),
             kings: Bitboard(squares: kings),
-            playerToMove: playerToMove
-        )
-    }
-    
-    public convenience init(bitboards: (white: UInt64, black: UInt64, kings: UInt64), playerToMove: Player = .white) {
-        self.init(
-            white: Bitboard(bitboards.white),
-            black: Bitboard(bitboards.black),
-            kings: Bitboard(bitboards.kings),
             playerToMove: playerToMove
         )
     }

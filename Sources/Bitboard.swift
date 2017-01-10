@@ -1,11 +1,11 @@
 public struct Bitboard {
     public var value: UInt64
     
-    internal init(_ value: UInt64) {
+    public init(_ value: UInt64) {
         self.value = value
     }
     
-    internal static var empty: Bitboard { return Bitboard(0 as UInt64) }
+    public static var empty: Bitboard { return Bitboard(0 as UInt64) }
 }
 
 extension Bitboard: Equatable {

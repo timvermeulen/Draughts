@@ -1,3 +1,4 @@
+// TODO: clean up the lazy vars
 public final class Move {
     public let startPiece: Piece
     public let endSquare: Square
