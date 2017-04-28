@@ -1,9 +1,10 @@
+// basically a dictionary that uses contiguous storage for performance reasons
 public struct OrderedDictionary<Key: Equatable, Value> {
     public typealias Element = (key: Key, value: Value)
     
     fileprivate var contents: ArraySlice<Element>
     
-    internal init(contents: ArraySlice<Element> = []) {
+    internal init(contents: ArraySlice<Element>) {
         self.contents = contents
     }
     
@@ -49,14 +50,6 @@ extension OrderedDictionary: RandomAccessCollection {
         return OrderedDictionary(contents: self.contents[range])
     }
     
-    public func index(_ index: Int, offsetBy offset: Int) -> Int {
-        return index + offset
-    }
-    
-    public func distance(from start: Int, to end: Int) -> Int {
-        return end - start
-    }
-    
     public var indices: CountableRange<Int> {
         return self.contents.indices
     }
@@ -64,8 +57,7 @@ extension OrderedDictionary: RandomAccessCollection {
 
 extension OrderedDictionary: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (Key, Value)...) {
-        // TODO: figure out why `self.init()` isn't allowed
-        self.init(contents: [])
+        contents = []
         
         for (key, value) in elements {
             self[key] = value
@@ -74,10 +66,12 @@ extension OrderedDictionary: ExpressibleByDictionaryLiteral {
 }
 
 // TODO: Conditional Conformance
-public func == <Key, Value: Equatable> (left: OrderedDictionary<Key, Value>, right: OrderedDictionary<Key, Value>) -> Bool {
-    return left.contents.count == right.contents.count && !left.contents.contains(where: { right[$0] != $1 })
-}
-
-public func != <Key, Value: Equatable> (left: OrderedDictionary<Key, Value>, right: OrderedDictionary<Key, Value>) -> Bool {
-    return !(left == right)
+extension OrderedDictionary where Value: Equatable {
+    public static func == (left: OrderedDictionary, right: OrderedDictionary) -> Bool {
+        return left.contents.count == right.contents.count && !left.contents.contains(where: { right[$0] != $1 })
+    }
+    
+    public static func != (left: OrderedDictionary, right: OrderedDictionary) -> Bool {
+        return !(left == right)
+    }
 }

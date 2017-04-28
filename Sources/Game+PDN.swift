@@ -32,13 +32,13 @@ extension Game {
         self = helper.game
     }
     
-    internal func pdn(includingInitialBlackIndicator: Bool) -> String {
+    internal func toPDN(includingInitialBlackIndicator: Bool) -> String {
         func variationsNotation(of variations: OrderedDictionary<Move, Game>, at ply: Ply) -> String? {
             guard !variations.isEmpty else { return nil }
             
             let notations: [String] = variations.map { move, variation in
                 let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
-                return variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.pdn(includingInitialBlackIndicator: false))"
+                return variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.toPDN(includingInitialBlackIndicator: false))"
             }
             
             return "(\(notations.joined(separator: "; ")))"
@@ -60,6 +60,6 @@ extension Game {
     }
     
     public var pdn: String {
-        return self.pdn(includingInitialBlackIndicator: true)
+        return self.toPDN(includingInitialBlackIndicator: true)
     }
 }

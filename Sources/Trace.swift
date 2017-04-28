@@ -1,22 +1,23 @@
-public struct Trace {
-    fileprivate let moved: DoubleDictionary<Piece, Piece>
-    public let removed, added: Set<Piece>
+public struct Trace<Element: Hashable> {
+    fileprivate let moved: DoubleDictionary<Element, Element>
+    public let removed: Set<Element>
+    public let added: Set<Element>
     
-    internal init(moved: DoubleDictionary<Piece, Piece> = [:], removed: Set<Piece> = [], added: Set<Piece> = []) {
+    internal init(moved: DoubleDictionary<Element, Element> = [:], removed: Set<Element> = [], added: Set<Element> = []) {
         self.moved = moved
         self.removed = removed
         self.added = added
     }
     
     public func followed(by other: Trace) -> Trace {
-        // All moves starting at a square that is transformed in `self`, but not necessarily in `other`
-        let startMoved: [(Piece, Piece)] = self.moved.flatMap { start, inter in
+        // All moves starting at an element that is transformed in `self`, but not necessarily in `other`
+        let startMoved: [(Element, Element)] = self.moved.flatMap { start, inter in
             guard let end = other.destination(of: inter), start != end else { return nil }
             return (start, end)
         }
         
-        // All moves starting at a square that is transformed in `other`, but not necessarily in `self`
-        let endMoved: [(Piece, Piece)] = other.moved.flatMap { inter, end in
+        // All moves ending at an element that is transformed in `other`, but not necessarily in `self`
+        let endMoved: [(Element, Element)] = other.moved.flatMap { inter, end in
             guard let start = self.origin(of: inter), start != end else { return nil }
             return (start, end)
         }
@@ -28,14 +29,14 @@ public struct Trace {
         return Trace(moved: moved, removed: removed, added: added)
     }
     
-    public func destination(of piece: Piece) -> Piece? {
-        guard !self.removed.contains(piece) else { return nil }
-        return self.moved[key1: piece] ?? piece
+    public func destination(of element: Element) -> Element? {
+        guard !self.removed.contains(element) else { return nil }
+        return self.moved[key1: element] ?? element
     }
     
-    public func origin(of piece: Piece) -> Piece? {
-        guard !self.added.contains(piece) else { return nil }
-        return self.moved[key2: piece] ?? piece
+    public func origin(of element: Element) -> Element? {
+        guard !self.added.contains(element) else { return nil }
+        return self.moved[key2: element] ?? element
     }
     
     public func reversed() -> Trace {
@@ -50,7 +51,7 @@ extension Trace: Equatable {
 }
 
 extension Move {
-    public var trace: Trace {
+    public var trace: Trace<Piece> {
         return Trace(
             moved: [self.startPiece: self.endPiece],
             removed: Set(self.captures)
@@ -59,13 +60,13 @@ extension Move {
 }
 
 extension Game {
-    public var trace: Trace {
+    public var trace: Trace<Piece> {
         return self.moves
             .map { $0.trace }
             .reduce(Trace()) { $0.followed(by: $1) }
     }
     
-    public func trace(from start: PositionIndex, to end: PositionIndex) -> Trace {
+    public func trace(from start: PositionIndex, to end: PositionIndex) -> Trace<Piece> {
         let first = self.gameToPosition(at: start).trace
         let second = self.gameToPosition(at: end).trace
         

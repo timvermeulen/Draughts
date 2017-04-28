@@ -1,5 +1,5 @@
 extension Sequence {
-    func scan<Result>(_ initial: Result, _ next: (Result, Iterator.Element) throws -> Result) rethrows -> [Result] {
+    internal func scan<Result>(_ initial: Result, _ next: (Result, Iterator.Element) throws -> Result) rethrows -> [Result] {
         var result = [initial]
         var last = initial
         

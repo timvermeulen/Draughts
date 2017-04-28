@@ -25,7 +25,6 @@ public final class Move {
         )
     }
     
-    
     public var player: Player { return self.startPiece.player }
     public var startSquare: Square { return self.startPiece.square }
     public var isCapture: Bool { return !self.captures.isEmpty }

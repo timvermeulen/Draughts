@@ -88,7 +88,7 @@ extension GameHelper {
     }
     
     @discardableResult
-    public func move(to index: Index) -> Trace {
+    public func move(to index: Index) -> Trace<Piece> {
         defer {
             self.index = index
             self.reloadMovePicker()
