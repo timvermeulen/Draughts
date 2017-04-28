@@ -37,6 +37,7 @@ extension Position {
         
         // The Array(first:next:) initialiser always returns a non-empty array, so
         // this `!` is safe.
+        // swiftlint:disable:next force_unwrapping
         return positions.last!
     }
     

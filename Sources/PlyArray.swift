@@ -73,12 +73,14 @@ extension PlyArray {
 }
 
 // TODO: Conditional Conformance
-public func == <T: Equatable> (left: PlyArray<T>, right: PlyArray<T>) -> Bool {
-    return left.contents == right.contents
-}
-
-public func != <T: Equatable> (left: PlyArray<T>, right: PlyArray<T>) -> Bool {
-    return !(left == right)
+extension PlyArray where Element: Equatable {
+    public static func == (left: PlyArray, right: PlyArray) -> Bool {
+        return left.contents == right.contents
+    }
+    
+    public static func != (left: PlyArray, right: PlyArray) -> Bool {
+        return !(left == right)
+    }
 }
 
 public func == <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {

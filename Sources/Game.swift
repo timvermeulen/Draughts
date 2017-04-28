@@ -12,11 +12,13 @@ public struct Game {
     public fileprivate(set) var positions: PlyArray<Position>
     public fileprivate(set) var variations: PlyArray<OrderedDictionary<Move, Game>>
     
+    // swiftlint:disable force_unwrapping
     public var startPosition: Position { return self.positions.first! }
     public var endPosition: Position { return self.positions.last! }
     
     internal var startVariations: OrderedDictionary<Move, Game> { return self.variations.first! }
     internal var endVariations: OrderedDictionary<Move, Game> { return self.variations.last! }
+    // swiftlint:enable force_unwrapping
 
     public var startPly: Ply { return Ply(player: self.startPosition.playerToMove, number: self.startNumber) }
     public var endPly: Ply { return Ply(player: self.endPosition.playerToMove, number: self.startNumber + self.moves.count) }
@@ -195,6 +197,7 @@ extension Game {
         
         // variations is the result of `scan`, which always returns
         // a non-empty array
+        // swiftlint:disable:next force_unwrapping
         let lastVariation = variations.last!
         
         for move in lastVariation.moves[game.endPly ..< index.ply] {
