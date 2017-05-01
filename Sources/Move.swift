@@ -134,17 +134,6 @@ public final class Move {
         
         return self.captures.filter(isRelevant).map { $0.square }
     }()
-    
-    public lazy var unambiguousNotation: String = {
-        let essentialCaptures = self.essentialCaptures.sorted()
-        guard let lastCapture = essentialCaptures.last else { return self.notation }
-        
-        let essentialDescription = essentialCaptures.count > 1
-            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture)"
-            : String(describing: lastCapture)
-        
-        return "\(self.notation) (over \(essentialDescription))"
-    }()
 }
 
 extension Move: Equatable {
@@ -162,6 +151,17 @@ extension Move: Hashable {
 }
 
 extension Move: CustomStringConvertible {
+    public var unambiguousNotation: String {
+        let essentialCaptures = self.essentialCaptures.sorted()
+        guard let lastCapture = essentialCaptures.last else { return self.notation }
+        
+        let essentialDescription = essentialCaptures.count > 1
+            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture)"
+            : String(describing: lastCapture)
+        
+        return "\(self.notation) (over \(essentialDescription))"
+    }
+    
     public var notation: String {
         return "\(self.startSquare)\(self.isCapture ? "x" : "-")\(self.endSquare)"
     }
