@@ -14,9 +14,17 @@ extension Bitboard: Equatable {
     }
 }
 
-extension Bitboard: Sequence {
-    public func makeIterator() -> BitboardIterator {
-        return BitboardIterator(self)
+extension Bitboard {
+    public func serialized() -> UnfoldSequence<Square, UInt64> {
+        return sequence(state: value) { (bitboard: inout UInt64) in
+            let zeroCount = bitboard.leadingZeroBitCount
+            guard zeroCount < 64 else { return nil }
+            
+            let offset = 63 - zeroCount
+            bitboard ^= 1 << offset
+            
+            return Square(value: offset)
+        }
     }
 }
 

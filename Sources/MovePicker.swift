@@ -5,7 +5,7 @@ public final class MovePicker {
     internal var requirements: Bitboard
     
     public var squares: [Square] {
-        return Array(requirements)
+        return Array(requirements.serialized())
     }
     
     public init(_ position: Position) {
@@ -25,9 +25,7 @@ extension MovePicker {
         let requirements = self.requirements
         self.restore()
         
-        for square in requirements {
-            self.toggle(square)
-        }
+        for square in requirements.serialized() { self.toggle(square) }
     }
     
     public func restore() {

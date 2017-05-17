@@ -5,6 +5,8 @@ extension Position {
         func pieceSymbols(of player: Player, kind: Piece.Kind) -> String? {
             let result = self
                 .pieces(of: player, kind: kind)
+                .serialized()
+                .reversed()
                 .map { "\(kind == .king ? "K" : "")\($0)" }
                 .joined(separator: ",")
             
