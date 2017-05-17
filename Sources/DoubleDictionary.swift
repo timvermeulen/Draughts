@@ -6,7 +6,7 @@ internal struct DoubleDictionary<Key1: Hashable, Key2: Hashable> {
 extension DoubleDictionary {
     internal init(_ dictionary: [Key1: Key2]) {
         self.forward = dictionary
-        self.backward = Dictionary(dictionary.map { ($1, $0) })
+        self.backward = Dictionary(dictionary.map { ($0.value, $0.key) })
     }
     
     internal init<S: Sequence>(_ sequence: S) where S.Iterator.Element == (Key1, Key2) {

@@ -11,13 +11,17 @@ public struct Trace<Element: Hashable> {
     
     public func followed(by other: Trace) -> Trace {
         // All moves starting at an element that is transformed in `self`, but not necessarily in `other`
-        let startMoved: [(Element, Element)] = self.moved.flatMap { start, inter in
+        let startMoved: [(Element, Element)] = self.moved.flatMap {
+            let (start, inter) = $0
+            
             guard let end = other.destination(of: inter), start != end else { return nil }
             return (start, end)
         }
         
         // All moves ending at an element that is transformed in `other`, but not necessarily in `self`
-        let endMoved: [(Element, Element)] = other.moved.flatMap { inter, end in
+        let endMoved: [(Element, Element)] = other.moved.flatMap {
+            let (inter, end) = $0
+            
             guard let start = self.origin(of: inter), start != end else { return nil }
             return (start, end)
         }

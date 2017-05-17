@@ -71,7 +71,9 @@ public final class Move {
         guard let firstCapture = self.captures.first else { return [] }
         guard var direction = self.startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(self.captures, self.captures.dropFirst()).map { start, end in
+        return zip(self.captures, self.captures.dropFirst()).map {
+            let (start, end) = $0
+            
             if let squares = start.square.squares(before: end.square) {
                 return squares
             } else {
@@ -95,7 +97,9 @@ public final class Move {
         guard let firstCapture = self.captures.first else { return [] }
         guard var direction = self.startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(self.captures, self.captures.dropFirst()).map { start, end in
+        return zip(self.captures, self.captures.dropFirst()).map {
+            let (start, end) = $0
+            
             guard
                 let neighbor = start.square.neighbor(to: direction),
                 let newDirection = neighbor.direction(to: end.square)
@@ -112,7 +116,9 @@ public final class Move {
         
         let squares = [self.startSquare] + self.anyIntermediateSquares + [self.endSquare]
         
-        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).map { start, end in
+        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).map {
+            let (start, end) = $0
+            
             guard let squares = start.squares(before: end) else { fatalError("invalid move") }
             return squares
         }

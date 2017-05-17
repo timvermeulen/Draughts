@@ -84,7 +84,7 @@ extension PlyArray where Element: Equatable {
 }
 
 public func == <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {
-    return left.contents.count == right.contents.count && !zip(left.contents, right.contents).contains(where: !=)
+    return left.contents.count == right.contents.count && !zip(left.contents, right.contents).contains(where: { $0.0 != $0.1 })
 }
 
 public func != <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {

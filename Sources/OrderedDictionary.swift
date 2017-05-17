@@ -68,7 +68,7 @@ extension OrderedDictionary: ExpressibleByDictionaryLiteral {
 // TODO: Conditional Conformance
 extension OrderedDictionary where Value: Equatable {
     public static func == (left: OrderedDictionary, right: OrderedDictionary) -> Bool {
-        return left.contents.count == right.contents.count && !left.contents.contains(where: { right[$0] != $1 })
+        return left.contents.count == right.contents.count && !left.contents.contains(where: { right[$0.key] != $0.value })
     }
     
     public static func != (left: OrderedDictionary, right: OrderedDictionary) -> Bool {

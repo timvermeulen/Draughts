@@ -139,7 +139,7 @@ extension Game {
         
         internal func isChild(of other: PositionIndex) -> Bool {
             guard self.ply >= other.ply && self.variationIndex.deviations.count >= other.variationIndex.deviations.count else { return false }
-            return !zip(self.variationIndex.deviations, other.variationIndex.deviations).contains(where: !=)
+            return !zip(self.variationIndex.deviations, other.variationIndex.deviations).contains(where: { $0.0 != $0.1 })
         }
     }
     

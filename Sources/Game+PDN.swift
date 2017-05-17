@@ -36,7 +36,9 @@ extension Game {
         func variationsNotation(of variations: OrderedDictionary<Move, Game>, at ply: Ply) -> String? {
             guard !variations.isEmpty else { return nil }
             
-            let notations: [String] = variations.map { move, variation in
+            let notations: [String] = variations.map {
+                let (move, variation) = $0
+                
                 let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
                 return variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.toPDN(includingInitialBlackIndicator: false))"
             }
@@ -44,11 +46,13 @@ extension Game {
             return "(\(notations.joined(separator: "; ")))"
         }
         
-        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map { (ply: Ply, pair: (move: Move, variations: OrderedDictionary<Move, Game>)) in
-            let withoutIndicator = pair.move.unambiguousNotation
+        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map {
+            let (ply, (move, variations)) = $0
+            
+            let withoutIndicator = move.unambiguousNotation
             let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
             
-            return variationsNotation(of: pair.variations, at: ply).map { "\(withoutVariations) \($0)" } ?? withoutVariations
+            return variationsNotation(of: variations, at: ply).map { "\(withoutVariations) \($0)" } ?? withoutVariations
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")
