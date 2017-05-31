@@ -9,10 +9,14 @@ extension Game {
         
         for component in enhanced.components(separatedBy: .whitespacesAndNewlines) {
             switch component {
-            case "": break
-            case "(": helper.backward()
-            case ")": if !helper.popVariation() || !helper.forward() { return nil }
-            case ";": if !helper.popVariation() { return nil }
+            case "":
+                break
+            case "(":
+                helper.backward()
+            case ")":
+                if !helper.popVariation() || !helper.forward() { return nil }
+            case ";":
+                if !helper.popVariation() { return nil }
             default:
                 guard !component.hasSuffix(".") else { continue }
                 

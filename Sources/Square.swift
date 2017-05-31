@@ -39,8 +39,10 @@ public struct Square {
     
     public func isOnPromotionRow(of player: Player) -> Bool {
         switch player {
-        case .white: return value < 5
-        case .black: return value >= 49
+        case .white:
+            return value < 5
+        case .black:
+            return value >= 49
         }
     }
     
@@ -88,43 +90,59 @@ extension Square {
         
         public init(player: Player, pieceDirection: Piece.Direction) {
             switch (player, pieceDirection) {
-            case (.white, .left): self = .topLeft
-            case (.white, .right): self = .topRight
-            case (.black, .left): self = .bottomLeft
-            case (.black, .right): self = .bottomRight
+            case (.white, .left):
+                self = .topLeft
+            case (.white, .right):
+                self = .topRight
+            case (.black, .left):
+                self = .bottomLeft
+            case (.black, .right):
+                self = .bottomRight
             }
         }
         
         internal var offset: Int {
             switch self {
-            case .topLeft: return -6
-            case .topRight: return -5
-            case .bottomRight: return 6
-            case .bottomLeft: return 5
+            case .topLeft:
+                return -6
+            case .topRight:
+                return -5
+            case .bottomRight:
+                return 6
+            case .bottomLeft:
+                return 5
             }
         }
         
         public func turned(to relativeDirection: Side) -> Direction {
             switch (self, relativeDirection) {
-            case (.topLeft, .front), (.topRight, .left), (.bottomRight, .back), (.bottomLeft, .right): return .topLeft
-            case (.topLeft, .right), (.topRight, .front), (.bottomRight, .left), (.bottomLeft, .back): return .topRight
-            case (.topLeft, .back), (.topRight, .right), (.bottomRight, .front), (.bottomLeft, .left): return .bottomRight
-            case (.topLeft, .left), (.topRight, .back), (.bottomRight, .right), (.bottomLeft, .front): return .bottomLeft
+            case (.topLeft, .front), (.topRight, .left), (.bottomRight, .back), (.bottomLeft, .right):
+                return .topLeft
+            case (.topLeft, .right), (.topRight, .front), (.bottomRight, .left), (.bottomLeft, .back):
+                return .topRight
+            case (.topLeft, .back), (.topRight, .right), (.bottomRight, .front), (.bottomLeft, .left):
+                return .bottomRight
+            case (.topLeft, .left), (.topRight, .back), (.bottomRight, .right), (.bottomLeft, .front):
+                return .bottomLeft
             }
         }
         
         internal var edge: Bitboard {
             switch self {
-            case .topLeft: return Bitboard.topLeftEdge
-            case .topRight: return Bitboard.topRightEdge
-            case .bottomRight: return Bitboard.bottomRightEdge
-            case .bottomLeft: return Bitboard.bottomLeftEdge
+            case .topLeft:
+                return Bitboard.topLeftEdge
+            case .topRight:
+                return Bitboard.topRightEdge
+            case .bottomRight:
+                return Bitboard.bottomRightEdge
+            case .bottomLeft:
+                return Bitboard.bottomLeftEdge
             }
         }
         
-        public static var all: [Direction] = [.topLeft, .topRight, .bottomRight, .bottomLeft]
-        public static var top: [Direction] = [.topLeft, .topRight]
-        public static var bottom: [Direction] = [.bottomRight, .bottomLeft]
+        public static let all: [Direction] = [.topLeft, .topRight, .bottomRight, .bottomLeft]
+        public static let top: [Direction] = [.topLeft, .topRight]
+        public static let bottom: [Direction] = [.bottomRight, .bottomLeft]
     }
 }
 

@@ -665,9 +665,41 @@ class DraughtsTests: XCTestCase {
         XCTAssertEqual(dest4, Piece(player: .black, kind: .king, square: 46))
     }
     
-    func testData() throws {
-        let game = try Game(pdn: "1. 32-28 17-22 2. 28x17 11x22 3. 37-32 6-11 4. 41-37 12-17 5. 34-30 19-23 6. 46-41 7-12 7. 32-28 23x32 8. 37x28 22-27 9. 31x22 18x27 10. 30-24 20x29 11. 33x24 17-21 12. 38-32 27x38 13. 42x33 21-27 14. 43-38 16-21 15. 41-37 11-16 16. 37-32 1-6 17. 40-34 14-20 18. 45-40 20x29 19. 33x24 10-14 20. 39-33 5-10 21. 44-39 14-20 22. 50-45 20x29 23. 33x24 10-14 24. 39-33 12-18 25. 34-29 14-20 26. 48-42 20-25 27. 42-37 21-26 28. 32x21 26x17 29. 37-32 17-21 30. 40-34 6-11 31. 47-42 11-17 32. 42-37 18-22 33. 45-40 8-12 34. 49-43 3-8 35. 29-23 13-18 36. 34-29 21-27 37. 32x21 16x27").unwrap()
-        print(game)
-        print(Array(game.data))
+//    func testData() throws {
+//        let pdn = """
+//        1. 32-28 17-22 2. 28x17 11x22 3. 37-32 6-11 4. 41-37 12-17 5. 34-30 19-23
+//        6. 46-41 7-12 7. 32-28 23x32 8. 37x28 22-27 9. 31x22 18x27 10. 30-24 20x29
+//        11. 33x24 17-21 12. 38-32 27x38 13. 42x33 21-27 14. 43-38 16-21 15. 41-37 11-16
+//        16. 37-32 1-6 17. 40-34 14-20 18. 45-40 20x29 19. 33x24 10-14 20. 39-33 5-10
+//        21. 44-39 14-20 22. 50-45 20x29 23. 33x24 10-14 24. 39-33 12-18 25. 34-29 14-20
+//        26. 48-42 20-25 27. 42-37 21-26 28. 32x21 26x17 29. 37-32 17-21 30. 40-34 6-11
+//        31. 47-42 11-17 32. 42-37 18-22 33. 45-40 8-12 34. 49-43 3-8 35. 29-23 13-18
+//        36. 34-29 21-27 37. 32x21 16x27
+//        """
+//        let game = try Game(pdn: pdn).unwrap()
+//        print(game)
+//        print(Array(game.data))
+//    }
+    
+    func testMultithreadedAccess() {
+        let exp = expectation(description: "")
+        var safeArray: [Int] = []
+        let count = 100
+        let serialQueue = DispatchQueue(label: "serial")
+        
+        XCTAssertTrue(safeArray.isEmpty)
+        
+        DispatchQueue.concurrentPerform(iterations: count) { index in
+            serialQueue.sync {
+                safeArray.append(index)
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(safeArray.count, count)
+            exp.fulfill()
+        }
+        
+        waitForExpectations(timeout: 0.5)
     }
 }

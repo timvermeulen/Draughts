@@ -11,8 +11,10 @@ public struct Ply {
 extension Ply {
     public var indicator: String {
         switch self.player {
-        case .white: return "\((self.number + 1) / 2 + 1)."
-        case .black: return "\(self.number / 2 + 1). ..."
+        case .white:
+            return "\((self.number + 1) / 2 + 1)."
+        case .black:
+            return "\(self.number / 2 + 1). ..."
         }
     }
 }

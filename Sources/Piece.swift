@@ -37,10 +37,14 @@ extension Piece: CustomStringConvertible {
         let symbol: Character
         
         switch (self.player, self.kind) {
-        case (.white, .man): symbol = "w"
-        case (.white, .king): symbol = "W"
-        case (.black, .man): symbol = "b"
-        case (.black, .king): symbol = "B"
+        case (.white, .man):
+            symbol = "w"
+        case (.white, .king):
+            symbol = "W"
+        case (.black, .man):
+            symbol = "b"
+        case (.black, .king):
+            symbol = "B"
         }
         
         return "\(symbol)\(self.square)"

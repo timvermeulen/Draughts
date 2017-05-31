@@ -3,8 +3,10 @@ public enum Player {
     
     public var opponent: Player {
         switch self {
-        case .white: return .black
-        case .black: return .white
+        case .white:
+            return .black
+        case .black:
+            return .white
         }
     }
 }

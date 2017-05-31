@@ -45,15 +45,19 @@ extension Position {
             
             for man in men {
                 switch player {
-                case .white: white.formUnion(Bitboard(square: man))
-                case .black: black.formUnion(Bitboard(square: man))
+                case .white:
+                    white.formUnion(Bitboard(square: man))
+                case .black:
+                    black.formUnion(Bitboard(square: man))
                 }
             }
             
             for king in theKings {
                 switch player {
-                case .white: white.formUnion(Bitboard(square: king))
-                case .black: black.formUnion(Bitboard(square: king))
+                case .white:
+                    white.formUnion(Bitboard(square: king))
+                case .black:
+                    black.formUnion(Bitboard(square: king))
                 }
                 
                 kings.formUnion(Bitboard(square: king))

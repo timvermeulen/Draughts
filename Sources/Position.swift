@@ -251,11 +251,16 @@ extension Position: TextOutputStreamable {
                 let separator: Character
                 
                 switch (white.contains(square), black.contains(square), kings.contains(square)) {
-                case (true, _, true): separator = "O"
-                case (true, _, _):    separator = "o"
-                case (_, true, true): separator = "X"
-                case (_, true, _):    separator = "x"
-                default:              separator = "-"
+                case (true, _, true):
+                    separator = "O"
+                case (true, _, _):
+                    separator = "o"
+                case (_, true, true):
+                    separator = "X"
+                case (_, true, _):
+                    separator = "x"
+                default:
+                    separator = "-"
                 }
                 
                 target.write(onSide == .left ? "\(separator)   " : "  \(separator) ")
