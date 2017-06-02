@@ -24,7 +24,7 @@ extension Position {
             let capturedPieces = Set(legalMoves.flatMap { $0.captures })
             let obstacleSquares = Set(illegalMoves.flatMap { $0.interveningSquares.first(where: opponent.contains) })
             
-            let captureBitboard = Bitboard(squares: capturedPieces.map { $0.square })
+            let captureBitboard = Bitboard(squares: capturedPieces.lazy.map { $0.square })
             let obstacleBitboard = Bitboard(squares: obstacleSquares)
             
             let opponentBitboard = candidate

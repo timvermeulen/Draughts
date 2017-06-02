@@ -183,7 +183,7 @@ extension Game {
             return variation
         }
         
-        let deviations = index.variationIndex.deviations.map { ($0.move, $0.ply) }
+        let deviations = index.variationIndex.deviations.lazy.map { ($0.move, $0.ply) }
         
         var game = Game(position: self.startPosition, startNumber: self.startNumber)
         

@@ -66,6 +66,7 @@ extension Move {
 extension Game {
     public var trace: Trace<Piece> {
         return self.moves
+            .lazy
             .map { $0.trace }
             .reduce(Trace()) { $0.followed(by: $1) }
     }

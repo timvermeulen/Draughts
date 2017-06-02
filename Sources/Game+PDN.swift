@@ -40,7 +40,7 @@ extension Game {
         func variationsNotation(of variations: OrderedDictionary<Move, Game>, at ply: Ply) -> String? {
             guard !variations.isEmpty else { return nil }
             
-            let notations: [String] = variations.map {
+            let notations: [String] = variations.lazy.map {
                 let (move, variation) = $0
                 
                 let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"

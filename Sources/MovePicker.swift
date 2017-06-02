@@ -76,7 +76,7 @@ extension MovePicker: TextOutputStreamable {
         print(
             "position:", self.position,
             "required squares:", self.requirements,
-            "candidate moves:", self.candidates.map { $0.unambiguousNotation }.joined(separator: ", "),
+            "candidate moves:", self.candidates.lazy.map { $0.unambiguousNotation }.joined(separator: ", "),
             separator: "\n", terminator: "",
             to: &target
         )

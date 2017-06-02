@@ -6,6 +6,7 @@ extension Position {
             let result = self
                 .pieces(of: player, kind: kind)
                 .serialized()
+                .lazy
                 .reversed()
                 .map { "\(kind == .king ? "K" : "")\($0)" }
                 .joined(separator: ",")
@@ -34,11 +35,13 @@ extension Position {
             let pieceStrings = String(component.characters.dropFirst()).components(separatedBy: ",")
             
             let men = pieceStrings
+                .lazy
                 .filter { $0.characters.first != "K" }
                 .flatMap { Int($0) }
                 .map(Square.init(humanValue:))
             
             let theKings = pieceStrings
+                .lazy
                 .filter { $0.characters.first == "K" }
                 .flatMap { Int($0.substring(from: $0.index(after: $0.startIndex))) }
                 .map(Square.init(humanValue:))

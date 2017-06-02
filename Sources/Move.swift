@@ -38,6 +38,7 @@ public final class Move {
         
         let playerBitboard = Bitboard(square: origin.square).symmetricDifference(Bitboard(square: destination))
         let opponentBitboard = captures
+            .lazy
             .map { Bitboard(square: $0.square) }
             .reduce(Bitboard.empty) { $0.symmetricDifference($1) }
         
@@ -46,7 +47,7 @@ public final class Move {
             : (opponentBitboard, playerBitboard)
         
         let promotion = startPiece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(square: destination) : .empty
-        let capturedKings = Bitboard(squares: self.captures.filter { $0.kind == .king }.map { $0.square })
+        let capturedKings = Bitboard(squares: self.captures.lazy.filter { $0.kind == .king }.map { $0.square })
         let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
         
         kings = promotion
@@ -116,7 +117,7 @@ public final class Move {
         
         let squares = [self.startSquare] + self.anyIntermediateSquares + [self.endSquare]
         
-        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).map {
+        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).lazy.map {
             let (start, end) = $0
             
             guard let squares = start.squares(before: end) else { fatalError("invalid move") }
@@ -127,7 +128,7 @@ public final class Move {
     }()
     
     public lazy var relevantSquares: [Square] = {
-        let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.map { $0.square }
+        let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.lazy.map { $0.square }
         return intermediateRelevantSquares + [self.startSquare, self.endSquare]
     }()
     
@@ -152,7 +153,7 @@ extension Move: Equatable {
 
 extension Move: Hashable {
     public var hashValue: Int {
-        return self.startPiece.hashValue ^ self.endSquare.hashValue ^ self.captures.map { $0.hashValue }.reduce(0, ^)
+        return self.startPiece.hashValue ^ self.endSquare.hashValue ^ self.captures.lazy.map { $0.hashValue }.reduce(0, ^)
     }
 }
 
@@ -162,7 +163,7 @@ extension Move: CustomStringConvertible {
         guard let lastCapture = essentialCaptures.last else { return self.notation }
         
         let essentialDescription = essentialCaptures.count > 1
-            ? "\(essentialCaptures.dropLast().map { String(describing: $0) }.joined()) and \(lastCapture)"
+            ? essentialCaptures.dropLast().lazy.map { String(describing: $0) }.joined() + " and \(lastCapture)"
             : String(describing: lastCapture)
         
         return "\(self.notation) (over \(essentialDescription))"

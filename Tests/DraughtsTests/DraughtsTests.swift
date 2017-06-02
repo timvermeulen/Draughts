@@ -5,7 +5,7 @@ class DraughtsTests: XCTestCase {
     func testOpeningMoves() throws {
         let position = Position.start
         
-        let moves = Set(position.legalMoves.map { $0.notation })
+        let moves = Set(position.legalMoves.lazy.map { $0.notation })
         let expected: Set = ["31-26", "31-27", "32-27", "32-28", "33-28", "33-29", "34-29", "34-30", "35-30"]
         
         XCTAssertEqual(moves, expected)
@@ -17,7 +17,7 @@ class DraughtsTests: XCTestCase {
         let move = try openingMoves.first.unwrap()
         
         let pos2 = move.endPosition
-        let returnMoves = Set(pos2.legalMoves.map { $0.notation })
+        let returnMoves = Set(pos2.legalMoves.lazy.map { $0.notation })
         let expected: Set = ["16-21", "17-21", "17-22", "18-22", "18-23", "19-23", "19-24", "20-24", "20-25"]
         
         XCTAssertEqual(returnMoves, expected)
@@ -26,7 +26,7 @@ class DraughtsTests: XCTestCase {
     func testKingSlidingMoves() throws {
         let position = try Position(fen: "W:WK33:B").unwrap()
         
-        let moves = Set(position.legalMoves.map { $0.notation })
+        let moves = Set(position.legalMoves.lazy.map { $0.notation })
         let expected: Set = ["33-28", "33-22", "33-17", "33-11", "33-6", "33-29", "33-24", "33-20", "33-15", "33-38", "33-42", "33-47", "33-39", "33-44", "33-50"]
         
         XCTAssertEqual(moves, expected)
@@ -538,7 +538,7 @@ class DraughtsTests: XCTestCase {
             ("W:W24,28,32:B13,19,23", "W:W28,32:B8,10,13,19,23")
         ]
         
-        let darkPositions = game.positions.indices.map { game.darkPositions(at: Game.PositionIndex(ply: $0)) }
+        let darkPositions = game.positions.indices.lazy.map { game.darkPositions(at: Game.PositionIndex(ply: $0)) }
         
         for (expected, real) in zip(expected, darkPositions) {
             let white = try Position(fen: expected.white).unwrap()
