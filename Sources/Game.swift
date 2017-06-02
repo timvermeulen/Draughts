@@ -13,27 +13,27 @@ public struct Game {
     public fileprivate(set) var variations: PlyArray<OrderedDictionary<Move, Game>>
     
     // swiftlint:disable force_unwrapping
-    public var startPosition: Position { return self.positions.first! }
-    public var endPosition: Position { return self.positions.last! }
+    public var startPosition: Position { return positions.first! }
+    public var endPosition: Position { return positions.last! }
     
-    internal var startVariations: OrderedDictionary<Move, Game> { return self.variations.first! }
-    internal var endVariations: OrderedDictionary<Move, Game> { return self.variations.last! }
+    internal var startVariations: OrderedDictionary<Move, Game> { return variations.first! }
+    internal var endVariations: OrderedDictionary<Move, Game> { return variations.last! }
     // swiftlint:enable force_unwrapping
 
-    public var startPly: Ply { return Ply(player: self.startPosition.playerToMove, number: self.startNumber) }
-    public var endPly: Ply { return Ply(player: self.endPosition.playerToMove, number: self.startNumber + self.moves.count) }
+    public var startPly: Ply { return Ply(player: startPosition.playerToMove, number: startNumber) }
+    public var endPly: Ply { return Ply(player: endPosition.playerToMove, number: startNumber + moves.count) }
 
     public init(position: Position = .start, startNumber: Int = 0) {
         let ply = Ply(player: position.playerToMove, number: startNumber)
         
         self.startNumber = startNumber
         
-        self.moves = PlyArray(ply: ply)
-        self.positions = PlyArray(ply: ply)
-        self.variations = PlyArray(ply: ply)
+        moves = PlyArray(ply: ply)
+        positions = PlyArray(ply: ply)
+        variations = PlyArray(ply: ply)
         
-        self.positions.append(position)
-        self.variations.append([:])
+        positions.append(position)
+        variations.append([:])
     }
     
     internal init(startNumber: Int, moves: PlyArray<Move>, positions: PlyArray<Position>, variations: PlyArray<OrderedDictionary<Move, Game>>) {
@@ -45,9 +45,9 @@ public struct Game {
     }
     
     public mutating func play(_ move: Move) {
-        self.moves.append(move)
-        self.positions.append(move.endPosition)
-        self.variations.append([:])
+        moves.append(move)
+        positions.append(move.endPosition)
+        variations.append([:])
     }
     
     /// returns:
@@ -55,18 +55,18 @@ public struct Game {
     /// - inVariation: `true` is a variation was created, `false` otherwise
     @discardableResult
     public mutating func play(_ move: Move, at ply: Ply) -> (game: Game, inVariation: Bool) {
-        assert(self.positions[ply].moveIsValid(move), "invalid move")
+        assert(positions[ply].moveIsValid(move), "invalid move")
         
-        if !self.isLocked && ply == self.endPly {
-            self.play(move)
+        if !isLocked && ply == endPly {
+            play(move)
             return (self, false)
-        } else if !self.isLocked && self.moves[ply] == move {
+        } else if !isLocked && moves[ply] == move {
             return (self, false)
-        } else if let variation = self.variations[ply][move] {
+        } else if let variation = variations[ply][move] {
             return (variation, true)
         } else {
             let variation = Game(position: move.endPosition, startNumber: ply.number + 1)
-            self.variations[ply][move] = variation
+            variations[ply][move] = variation
             return (variation, true)
         }
     }
@@ -84,11 +84,11 @@ extension Game {
     
     internal subscript(deviation: Deviation) -> Game? {
         get {
-            return self.variations[checking: deviation.ply]?[deviation.move]
+            return variations[checking: deviation.ply]?[deviation.move]
         }
         set {
-            guard self.variations.indices.contains(deviation.ply) else { return }
-            self.variations[deviation.ply][deviation.move] = newValue
+            guard variations.indices.contains(deviation.ply) else { return }
+            variations[deviation.ply][deviation.move] = newValue
         }
     }
     
@@ -101,13 +101,13 @@ extension Game {
         }
         
         internal var child: (child: VariationIndex, deviation: Deviation)? {
-            guard let deviation = self.deviations.first else { return nil }
-            return (VariationIndex(self.deviations.dropFirst()), deviation)
+            guard let deviation = deviations.first else { return nil }
+            return (VariationIndex(deviations.dropFirst()), deviation)
         }
         
         internal var parent: (parent: VariationIndex, deviation: Deviation)? {
-            guard let deviation = self.deviations.last else { return nil }
-            return (VariationIndex(self.deviations.dropLast()), deviation)
+            guard let deviation = deviations.last else { return nil }
+            return (VariationIndex(deviations.dropLast()), deviation)
         }
     }
     
@@ -120,7 +120,7 @@ extension Game {
         }
         set {
             if let (childIndex, deviation) = index.child {
-                self.variations[deviation.ply][deviation.move]?[childIndex] = newValue
+                variations[deviation.ply][deviation.move]?[childIndex] = newValue
             } else {
                 self = newValue
             }
@@ -138,8 +138,8 @@ extension Game {
         }
         
         internal func isChild(of other: PositionIndex) -> Bool {
-            guard self.ply >= other.ply && self.variationIndex.deviations.count >= other.variationIndex.deviations.count else { return false }
-            return !zip(self.variationIndex.deviations, other.variationIndex.deviations).contains(where: { $0.0 != $0.1 })
+            guard ply >= other.ply && variationIndex.deviations.count >= other.variationIndex.deviations.count else { return false }
+            return !zip(variationIndex.deviations, other.variationIndex.deviations).contains(where: { $0.0 != $0.1 })
         }
     }
     
@@ -162,14 +162,14 @@ extension Game {
         )
     }
     
-    internal var startIndex: PositionIndex { return PositionIndex(variationIndex: Game.VariationIndex(), ply: self.startPly) }
+    internal var startIndex: PositionIndex { return PositionIndex(variationIndex: Game.VariationIndex(), ply: startPly) }
     
     public func game(from ply: Ply) -> Game {
         return Game(
             startNumber: ply.number,
-            moves: self.moves.suffix(from: ply),
-            positions: self.positions.suffix(from: ply),
-            variations: self.variations.suffix(from: ply)
+            moves: moves.suffix(from: ply),
+            positions: positions.suffix(from: ply),
+            variations: variations.suffix(from: ply)
         )
     }
     
@@ -185,7 +185,7 @@ extension Game {
         
         let deviations = index.variationIndex.deviations.lazy.map { ($0.move, $0.ply) }
         
-        var game = Game(position: self.startPosition, startNumber: self.startNumber)
+        var game = Game(position: startPosition, startNumber: startNumber)
         
         for (variation, (move, ply)) in zip(variations, deviations) {
             for move in variation.moves[game.endPly ..< ply] {
@@ -208,32 +208,32 @@ extension Game {
     }
     
     private mutating func appendGame(_ game: Game) {
-        assert(self.endPosition == game.startPosition, "games do not match")
+        assert(endPosition == game.startPosition, "games do not match")
         
-        self.moves.append(contentsOf: game.moves)
-        self.positions.append(contentsOf: game.positions.dropFirst())
+        moves.append(contentsOf: game.moves)
+        positions.append(contentsOf: game.positions.dropFirst())
         
-        self.variations.removeLast()
-        self.variations.append(contentsOf: game.variations)
+        variations.removeLast()
+        variations.append(contentsOf: game.variations)
     }
     
     private mutating func removeWithoutReplacement(from ply: Ply) {
-        self.moves = self.moves[..<ply.predecessor]
-        self.positions = self.positions[..<ply]
-        self.variations = self.variations[..<ply]
+        moves = moves[..<ply.predecessor]
+        positions = positions[..<ply]
+        variations = variations[..<ply]
     }
     
     /// Deletes the move before the given ply, and all following moves, from the game.
     /// returns: `true` if the game's main variation ends up containing no moves, `false` otherwise
     @discardableResult
     public mutating func remove(from ply: Ply) -> Bool {
-        guard ply > self.startPly else { return true }
+        guard ply > startPly else { return true }
 
-        self.removeWithoutReplacement(from: ply)
+        removeWithoutReplacement(from: ply)
         
-        if let (move, newTail) = self.variations[ply.predecessor].popFirst() {
-            self.play(move)
-            self.appendGame(newTail)
+        if let (move, newTail) = variations[ply.predecessor].popFirst() {
+            play(move)
+            appendGame(newTail)
         }
         
         return false
@@ -246,7 +246,7 @@ extension Game {
     /// returns: `true` if removal was allowed, `false` otherwise
     @discardableResult
     public mutating func remove(from index: PositionIndex) -> Bool {
-        guard self.canRemove(from: index) else { return false }
+        guard canRemove(from: index) else { return false }
 
         if self[index.variationIndex].remove(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
             self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
@@ -263,22 +263,22 @@ extension Game {
     /// returns: `true` if promotion was allowed, `false` otherwise
     @discardableResult
     public mutating func promote(at index: VariationIndex) -> Bool {
-        guard self.canPromote(at: index), let (child, deviation) = index.child else { return false }
+        guard canPromote(at: index), let (child, deviation) = index.child else { return false }
         
         guard child.deviations.isEmpty else {
-            self.variations[deviation.ply][deviation.move]?.promote(at: index)
+            variations[deviation.ply][deviation.move]?.promote(at: index)
             return true
         }
         
-        let newVariationMove = self.moves[deviation.ply]
-        let newVariation = self.game(from: deviation.ply.successor)
+        let newVariationMove = moves[deviation.ply]
+        let newVariation = game(from: deviation.ply.successor)
         
-        self.removeWithoutReplacement(from: deviation.ply.successor)
+        removeWithoutReplacement(from: deviation.ply.successor)
         
-        self.play(deviation.move)
-        self.appendGame(self[index])
+        play(deviation.move)
+        appendGame(self[index])
         
-        self.variations[deviation.ply][newVariationMove] = newVariation
+        variations[deviation.ply][newVariationMove] = newVariation
         self[deviation] = nil
         
         return true
@@ -294,7 +294,7 @@ extension Game: Equatable {
 extension Game: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         print(
-            self.startPosition, self.pdn, self.endPosition,
+            startPosition, pdn, endPosition,
             separator: "\n", terminator: "",
             to: &target
         )

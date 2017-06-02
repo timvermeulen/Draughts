@@ -3,27 +3,27 @@ public final class Position {
     public let playerToMove: Player
     
     public var bitboards: (white: Bitboard, black: Bitboard, kings: Bitboard) {
-        return (self.white, self.black, self.kings)
+        return (white, black, kings)
     }
     
     public lazy var legalMoves: [Move] = {
-        return self.moves(of: self.playerToMove)
+        return moves(of: playerToMove)
     }()
     
     public func pieces(of player: Player) -> Bitboard {
-        return player == .white ? self.white : self.black
+        return player == .white ? white : black
     }
     
     public func pieces(of player: Player, kind: Piece.Kind) -> Bitboard {
-        return self.pieces(of: player).intersection(kind == .king ? self.kings : self.kings.inverse)
+        return pieces(of: player).intersection(kind == .king ? kings : kings.inverse)
     }
     
     public subscript(square: Square) -> Piece? {
-        let kind: Piece.Kind = self.kings.contains(square) ? .king : .man
+        let kind: Piece.Kind = kings.contains(square) ? .king : .man
         let player: Player
         
-        if self.white.contains(square) { player = .white }
-        else if self.black.contains(square) { player = .black }
+        if white.contains(square) { player = .white }
+        else if black.contains(square) { player = .black }
         else { return nil }
         
         return Piece(player: player, kind: kind, square: square)
@@ -36,11 +36,11 @@ public final class Position {
         self.white = white
         self.black = black
         self.kings = kings
-        self.empty = white.inverse
+        self.playerToMove = playerToMove
+        
+        empty = white.inverse
             .intersection(black.inverse)
             .intersection(Bitboard.realBoard)
-        
-        self.playerToMove = playerToMove
     }
     
     public convenience init(pieces: [Piece], playerToMove: Player = .white) {
@@ -69,7 +69,7 @@ public final class Position {
     
     internal func moves(of player: Player) -> [Move] {
         let captures = self.captures(of: player)
-        return captures.isEmpty ? self.slidingMoves(of: player) : captures
+        return captures.isEmpty ? slidingMoves(of: player) : captures
     }
     
     // MARK: Captures
@@ -109,7 +109,7 @@ public final class Position {
                     let opponentPiece = self[victim],
                     opponentPiece.player == piece.player.opponent && !step.captures.contains(opponentPiece),
                     let destination = victim.neighbor(to: step.direction),
-                    self.squareIsEmpty(destination) || destination == square
+                    squareIsEmpty(destination) || destination == square
                     else { continue }
                 
                 let newMove = Move(from: piece, to: destination, over: step.captures + [opponentPiece], position: self)
@@ -119,12 +119,12 @@ public final class Position {
         case .king:
             while let step = steps.popLast() {
                 guard
-                    let victim = self.firstOccupiedSquare(from: step.square, to: step.direction, ignoring: square),
+                    let victim = firstOccupiedSquare(from: step.square, to: step.direction, ignoring: square),
                     let opponentPiece = self[victim],
                     opponentPiece.player == piece.player.opponent && !step.captures.contains(opponentPiece)
                     else { continue }
                 
-                let destinations = self.emptySquares(from: victim, to: step.direction, ignoring: square)
+                let destinations = emptySquares(from: victim, to: step.direction, ignoring: square)
                 let captures = step.captures + [opponentPiece]
                 
                 for destination in destinations {
@@ -142,7 +142,7 @@ public final class Position {
     }
     
     internal func captures(of player: Player) -> [Move] {
-        let captures = self.pieces(of: player).serialized().map { self.captures(of: $0) }
+        let captures = pieces(of: player).serialized().map { self.captures(of: $0) }
         guard let maxCapture = captures.map({ $0.amount }).max() else { return [] }
         let maxCaptures = captures.filter { $0.amount == maxCapture }
         return maxCaptures.flatMap { $0.captures }
@@ -152,7 +152,7 @@ public final class Position {
     // MARK: Sliding moves
     
     internal func slidingMoves(of player: Player) -> [Move] {
-        return self.slidingManMoves(of: player) + self.slidingKingMoves(of: player)
+        return slidingManMoves(of: player) + slidingKingMoves(of: player)
     }
     
     internal func slidingKingMoves(of square: Square) -> [Move] {
@@ -165,15 +165,15 @@ public final class Position {
     }
     
     internal func slidingKingMoves(of player: Player) -> [Move] {
-        return self.pieces(of: player).serialized().flatMap { self.slidingKingMoves(of: $0) }
+        return pieces(of: player).serialized().flatMap { slidingKingMoves(of: $0) }
     }
     
     internal func slidingManMoves(of player: Player) -> [Move] {
-        return self.slidingManMoves(of: player, to: .left) + self.slidingManMoves(of: player, to: .right)
+        return slidingManMoves(of: player, to: .left) + slidingManMoves(of: player, to: .right)
     }
     
     internal func slidingManMoves(of player: Player, to pieceDirection: Piece.Direction) -> [Move] {
-        let squares = self.menThatCanSlide(to: pieceDirection, of: player).intersection(self.kings.inverse)
+        let squares = menThatCanSlide(to: pieceDirection, of: player).intersection(kings.inverse)
         
         return squares.serialized().flatMap { square in
             let direction = Square.Direction(player: player, pieceDirection: pieceDirection)
@@ -184,12 +184,12 @@ public final class Position {
     }
     
     internal func squaresThatCanSlide(to direction: Square.Direction) -> Bitboard {
-        return direction.edge.inverse.intersection(self.empty.shift(to: direction.turned(to: .back)))
+        return direction.edge.inverse.intersection(empty.shift(to: direction.turned(to: .back)))
     }
     
     internal func menThatCanSlide(to direction: Piece.Direction, of player: Player) -> Bitboard {
         let pieces = self.pieces(of: player)
-        let squares = self.squaresThatCanSlide(to: Square.Direction(player: player, pieceDirection: direction))
+        let squares = squaresThatCanSlide(to: Square.Direction(player: player, pieceDirection: direction))
         
         return pieces.intersection(squares)
     }
@@ -198,7 +198,7 @@ public final class Position {
     // MARK: Helper functions
     
     internal func firstOccupiedSquare(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> Square? {
-        return square.squares(to: direction).first(where: { $0 != squareToIgnore && !self.squareIsEmpty($0) })
+        return square.squares(to: direction).first(where: { $0 != squareToIgnore && !squareIsEmpty($0) })
     }
     
     internal func squareIsEmpty(_ square: Square) -> Bool {
@@ -206,10 +206,10 @@ public final class Position {
     }
     
     internal func emptySquares(from square: Square, to direction: Square.Direction, ignoring squareToIgnore: Square? = nil) -> [Square] {
-        guard let neighbor = square.neighbor(to: direction), self.squareIsEmpty(neighbor) || neighbor == squareToIgnore else { return [] }
+        guard let neighbor = square.neighbor(to: direction), squareIsEmpty(neighbor) || neighbor == squareToIgnore else { return [] }
         
         return Array(first: neighbor, next: {
-            return Optional($0.neighbor(to: direction), where: { self.squareIsEmpty($0) || $0 == squareToIgnore })
+            return Optional($0.neighbor(to: direction), where: { squareIsEmpty($0) || $0 == squareToIgnore })
         })
     }
     

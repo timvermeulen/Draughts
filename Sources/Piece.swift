@@ -6,12 +6,6 @@ public struct Piece {
     public let player: Player
     public var kind: Kind
     public var square: Square
-    
-    public init(player: Player, kind: Kind, square: Square) {
-        self.player = player
-        self.kind = kind
-        self.square = square
-    }
 }
 
 extension Piece {
@@ -28,7 +22,7 @@ extension Piece: Equatable {
 
 extension Piece: Hashable {
     public var hashValue: Int {
-        return self.player.hashValue ^ self.square.hashValue
+        return player.hashValue ^ square.hashValue
     }
 }
 
@@ -36,7 +30,7 @@ extension Piece: CustomStringConvertible {
     public var description: String {
         let symbol: Character
         
-        switch (self.player, self.kind) {
+        switch (player, kind) {
         case (.white, .man):
             symbol = "w"
         case (.white, .king):
@@ -47,6 +41,6 @@ extension Piece: CustomStringConvertible {
             symbol = "B"
         }
         
-        return "\(symbol)\(self.square)"
+        return "\(symbol)\(square)"
     }
 }

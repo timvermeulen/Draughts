@@ -22,29 +22,29 @@ public struct Trace<Element: Hashable> {
         let endMoved: [(Element, Element)] = other.moved.flatMap {
             let (inter, end) = $0
             
-            guard let start = self.origin(of: inter), start != end else { return nil }
+            guard let start = origin(of: inter), start != end else { return nil }
             return (start, end)
         }
         
         let moved = DoubleDictionary(startMoved + endMoved)
-        let removed = Set(self.removed + other.removed.flatMap(self.origin))
+        let removed = Set(self.removed + other.removed.flatMap(origin))
         let added = Set(other.added + self.added.flatMap(other.destination))
         
         return Trace(moved: moved, removed: removed, added: added)
     }
     
     public func destination(of element: Element) -> Element? {
-        guard !self.removed.contains(element) else { return nil }
-        return self.moved[key1: element] ?? element
+        guard !removed.contains(element) else { return nil }
+        return moved[key1: element] ?? element
     }
     
     public func origin(of element: Element) -> Element? {
-        guard !self.added.contains(element) else { return nil }
-        return self.moved[key2: element] ?? element
+        guard !added.contains(element) else { return nil }
+        return moved[key2: element] ?? element
     }
     
     public func reversed() -> Trace {
-        return Trace(moved: self.moved.reversed(), removed: self.added, added: self.removed)
+        return Trace(moved: moved.reversed(), removed: added, added: removed)
     }
 }
 
@@ -57,23 +57,23 @@ extension Trace: Equatable {
 extension Move {
     public var trace: Trace<Piece> {
         return Trace(
-            moved: [self.startPiece: self.endPiece],
-            removed: Set(self.captures)
+            moved: [startPiece: endPiece],
+            removed: Set(captures)
         )
     }
 }
 
 extension Game {
     public var trace: Trace<Piece> {
-        return self.moves
+        return moves
             .lazy
             .map { $0.trace }
             .reduce(Trace()) { $0.followed(by: $1) }
     }
     
     public func trace(from start: PositionIndex, to end: PositionIndex) -> Trace<Piece> {
-        let first = self.gameToPosition(at: start).trace
-        let second = self.gameToPosition(at: end).trace
+        let first = gameToPosition(at: start).trace
+        let second = gameToPosition(at: end).trace
         
         return first.reversed().followed(by: second)
     }

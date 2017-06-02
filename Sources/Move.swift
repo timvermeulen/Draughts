@@ -8,33 +8,33 @@ public final class Move {
     internal let white, black, kings: Bitboard
     
     public var bitboards: (white: Bitboard, black: Bitboard, kings: Bitboard) {
-        return (self.white, self.black, self.kings)
+        return (white, black, kings)
     }
     
     public var isPromotion: Bool {
-        return startPiece.kind == .man && self.endSquare.isOnPromotionRow(of: self.player)
+        return startPiece.kind == .man && endSquare.isOnPromotionRow(of: player)
     }
     
     public var endPiece: Piece {
-        let isKing = self.startPiece.kind == .king || self.isPromotion
+        let isKing = startPiece.kind == .king || isPromotion
         
         return Piece(
-            player: self.player,
+            player: player,
             kind: isKing ? .king : .man,
-            square: self.endSquare
+            square: endSquare
         )
     }
     
-    public var player: Player { return self.startPiece.player }
-    public var startSquare: Square { return self.startPiece.square }
-    public var isCapture: Bool { return !self.captures.isEmpty }
+    public var player: Player { return startPiece.player }
+    public var startSquare: Square { return startPiece.square }
+    public var isCapture: Bool { return !captures.isEmpty }
     
     public init(from origin: Piece, to destination: Square, over captures: [Piece] = [], position: Position) {
-        self.startPiece = origin
-        self.endSquare = destination
-        self.captures = captures
+        startPiece = origin
+        endSquare = destination
+        startPosition = position
         
-        self.startPosition = position
+        self.captures = captures
         
         let playerBitboard = Bitboard(square: origin.square).symmetricDifference(Bitboard(square: destination))
         let opponentBitboard = captures
@@ -47,7 +47,7 @@ public final class Move {
             : (opponentBitboard, playerBitboard)
         
         let promotion = startPiece.kind == .man && destination.isOnPromotionRow(of: origin.player) ? Bitboard(square: destination) : .empty
-        let capturedKings = Bitboard(squares: self.captures.lazy.filter { $0.kind == .king }.map { $0.square })
+        let capturedKings = Bitboard(squares: captures.lazy.filter { $0.kind == .king }.map { $0.square })
         let movedKing = origin.kind == .king ? Bitboard(squares: origin.square, destination) : .empty
         
         kings = promotion
@@ -57,22 +57,22 @@ public final class Move {
     
     public lazy var endPosition: Position = {
         return Position(
-            white: self.white.symmetricDifference(self.startPosition.white),
-            black: self.black.symmetricDifference(self.startPosition.black),
-            kings: self.kings.symmetricDifference(self.startPosition.kings),
-            playerToMove: self.startPosition.playerToMove.opponent
+            white: white.symmetricDifference(startPosition.white),
+            black: black.symmetricDifference(startPosition.black),
+            kings: kings.symmetricDifference(startPosition.kings),
+            playerToMove: startPosition.playerToMove.opponent
         )
     }()
     
     public lazy var allIntermediateSquares: [[Square]] = {
-        guard self.startPiece.kind == .king else {
-            return self.anyIntermediateSquares.map { [$0] }
+        guard startPiece.kind == .king else {
+            return anyIntermediateSquares.map { [$0] }
         }
         
-        guard let firstCapture = self.captures.first else { return [] }
-        guard var direction = self.startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        guard let firstCapture = captures.first else { return [] }
+        guard var direction = startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(self.captures, self.captures.dropFirst()).map {
+        return zip(captures, captures.dropFirst()).map {
             let (start, end) = $0
             
             if let squares = start.square.squares(before: end.square) {
@@ -91,14 +91,14 @@ public final class Move {
     }()
     
     public lazy var anyIntermediateSquares: [Square] = {
-        guard self.startPiece.kind == .man else {
-            return self.allIntermediateSquares.flatMap { $0.first }
+        guard startPiece.kind == .man else {
+            return allIntermediateSquares.flatMap { $0.first }
         }
         
-        guard let firstCapture = self.captures.first else { return [] }
-        guard var direction = self.startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        guard let firstCapture = captures.first else { return [] }
+        guard var direction = startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(self.captures, self.captures.dropFirst()).map {
+        return zip(captures, captures.dropFirst()).map {
             let (start, end) = $0
             
             guard
@@ -113,9 +113,9 @@ public final class Move {
     
     /// The squares that are required to be empty for this move to be legal
     public lazy var interveningSquares: [Square] = {
-        guard self.startPiece.kind == .king else { return self.anyIntermediateSquares + [self.endSquare] }
+        guard startPiece.kind == .king else { return anyIntermediateSquares + [endSquare] }
         
-        let squares = [self.startSquare] + self.anyIntermediateSquares + [self.endSquare]
+        let squares = [startSquare] + anyIntermediateSquares + [endSquare]
         
         let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).lazy.map {
             let (start, end) = $0
@@ -124,22 +124,22 @@ public final class Move {
             return squares
         }
         
-        return interveningSquares.joined() + [self.endSquare]
+        return interveningSquares.joined() + [endSquare]
     }()
     
     public lazy var relevantSquares: [Square] = {
-        let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.lazy.map { $0.square }
-        return intermediateRelevantSquares + [self.startSquare, self.endSquare]
+        let intermediateRelevantSquares = allIntermediateSquares.joined() + captures.lazy.map { $0.square }
+        return intermediateRelevantSquares + [startSquare, endSquare]
     }()
     
     public lazy var essentialCaptures: [Square] = {
-        let similarMoves = self.startPosition.legalMoves.filter { $0.startSquare == self.startSquare && $0.endSquare == self.endSquare }
+        let similarMoves = startPosition.legalMoves.filter { $0.startSquare == startSquare && $0.endSquare == endSquare }
         
         func isRelevant(_ capture: Piece) -> Bool {
             return similarMoves.contains(where: { !$0.captures.contains(capture) })
         }
         
-        return self.captures.filter(isRelevant).map { $0.square }
+        return captures.filter(isRelevant).map { $0.square }
     }()
 }
 
@@ -153,27 +153,27 @@ extension Move: Equatable {
 
 extension Move: Hashable {
     public var hashValue: Int {
-        return self.startPiece.hashValue ^ self.endSquare.hashValue ^ self.captures.lazy.map { $0.hashValue }.reduce(0, ^)
+        return startPiece.hashValue ^ endSquare.hashValue ^ captures.lazy.map { $0.hashValue }.reduce(0, ^)
     }
 }
 
 extension Move: CustomStringConvertible {
     public var unambiguousNotation: String {
         let essentialCaptures = self.essentialCaptures.sorted()
-        guard let lastCapture = essentialCaptures.last else { return self.notation }
+        guard let lastCapture = essentialCaptures.last else { return notation }
         
         let essentialDescription = essentialCaptures.count > 1
             ? essentialCaptures.dropLast().lazy.map { String(describing: $0) }.joined() + " and \(lastCapture)"
             : String(describing: lastCapture)
         
-        return "\(self.notation) (over \(essentialDescription))"
+        return "\(notation) (over \(essentialDescription))"
     }
     
     public var notation: String {
-        return "\(self.startSquare)\(self.isCapture ? "x" : "-")\(self.endSquare)"
+        return "\(startSquare)\(isCapture ? "x" : "-")\(endSquare)"
     }
     
     public var description: String {
-        return self.unambiguousNotation
+        return unambiguousNotation
     }
 }

@@ -11,51 +11,51 @@ public final class MovePicker {
     public init(_ position: Position) {
         self.position = position
         
-        self.candidates = position.legalMoves
-        self.requirements = []
+        candidates = position.legalMoves
+        requirements = []
     }
 }
 
 extension MovePicker {
     public var onlyCandidate: Move? {
-        return Optional(self.candidates.first, where: { _ in self.candidates.count == 1 })
+        return Optional(candidates.first, where: { _ in candidates.count == 1 })
     }
     
     private func generateCandidates() {
         let requirements = self.requirements
-        self.restore()
+        restore()
         
-        for square in requirements.serialized() { self.toggle(square) }
+        for square in requirements.serialized() { toggle(square) }
     }
     
     public func restore() {
-        self.candidates = position.legalMoves
-        self.requirements = .empty
+        candidates = position.legalMoves
+        requirements = .empty
     }
     
     @discardableResult
     public func toggle(_ square: Square) -> Move? {
-        guard !self.requirements.contains(square) else {
-            self.requirements.remove(square)
-            self.generateCandidates()
+        guard !requirements.contains(square) else {
+            requirements.remove(square)
+            generateCandidates()
             return nil
         }
         
-        let newCandidates = self.candidates.filter { $0.relevantSquares.contains(square) }
+        let newCandidates = candidates.filter { $0.relevantSquares.contains(square) }
         
         if newCandidates.isEmpty {
-            let otherCandidates = self.position.legalMoves.filter { $0.startSquare == square }
+            let otherCandidates = position.legalMoves.filter { $0.startSquare == square }
             
             if !otherCandidates.isEmpty {
-                self.candidates = otherCandidates
-                self.requirements = Bitboard(square: square)
+                candidates = otherCandidates
+                requirements = Bitboard(square: square)
             }
         } else {
-            self.requirements.insert(square)
-            self.candidates = newCandidates
+            requirements.insert(square)
+            candidates = newCandidates
         }
         
-        return self.onlyCandidate
+        return onlyCandidate
     }
     
     public func onlyCandidate(from start: Square, to end: Square) -> Move? {
@@ -67,16 +67,16 @@ extension MovePicker {
             return Optional(moves.first, where: { _ in moves.count == 1 })
         }
         
-        return onlyMove(of: self.candidates.filter(includeMove)) ?? onlyMove(of: self.position.legalMoves.filter(includeMove))
+        return onlyMove(of: candidates.filter(includeMove)) ?? onlyMove(of: position.legalMoves.filter(includeMove))
     }
 }
 
 extension MovePicker: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         print(
-            "position:", self.position,
-            "required squares:", self.requirements,
-            "candidate moves:", self.candidates.lazy.map { $0.unambiguousNotation }.joined(separator: ", "),
+            "position:", position,
+            "required squares:", requirements,
+            "candidate moves:", candidates.lazy.map { $0.unambiguousNotation }.joined(separator: ", "),
             separator: "\n", terminator: "",
             to: &target
         )

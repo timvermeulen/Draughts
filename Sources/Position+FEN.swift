@@ -18,7 +18,7 @@ extension Position {
             return [pieceSymbols(of: player, kind: .man), pieceSymbols(of: player, kind: .king)].flatMap { $0 }.joined(separator: ",")
         }
         
-        return "\(self.playerToMove == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
+        return "\(playerToMove == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
     }
     
     public convenience init?(fen: String) {

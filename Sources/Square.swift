@@ -63,17 +63,17 @@ extension Square: Comparable {
 
 extension Square: Hashable {
     public var hashValue: Int {
-        return self.value.hashValue
+        return value.hashValue
     }
 }
 
 extension Square: Strideable {
     public func advanced(by distance: Int) -> Square {
-        return Square(humanValue: self.humanValue + distance)
+        return Square(humanValue: humanValue + distance)
     }
     
     public func distance(to other: Square) -> Int {
-        return other.humanValue - self.humanValue
+        return other.humanValue - humanValue
     }
 }
 
@@ -148,23 +148,23 @@ extension Square {
 
 extension Square {
     public func neighbor(to direction: Direction) -> Square? {
-        return Square(checking: self.value + direction.offset)
+        return Square(checking: value + direction.offset)
     }
     
     public func squares(to direction: Direction) -> [Square] {
-        guard let neighbor = self.neighbor(to: direction) else { return [] }
+        guard let neighbor = neighbor(to: direction) else { return [] }
         return Array(first: neighbor, next: { $0.neighbor(to: direction) })
     }
     
     public func direction(to square: Square) -> Direction? {
         // TODO: improve performance, based on offsets
-        return Direction.all.first(where: { self.squares(to: $0).contains(square) })
+        return Direction.all.first(where: { squares(to: $0).contains(square) })
     }
     
     // returns nil if the two squares aren't on one line (or are equal), and [] if they are neighbors
     public func squares(before square: Square) -> [Square]? {
-        guard let direction = self.direction(to: square) else { return nil }
-        guard let neighbor = self.neighbor(to: direction) else { fatalError("edge of board reached before destination square") }
+        guard let direction = direction(to: square) else { return nil }
+        guard let neighbor = neighbor(to: direction) else { fatalError("edge of board reached before destination square") }
         guard neighbor != square else { return [] }
 
         return Array(first: neighbor, next: { inBetween in
@@ -186,6 +186,6 @@ extension Square: CustomStringConvertible {
     }
     
     public var description: String {
-        return String(self.humanValue)
+        return String(humanValue)
     }
 }

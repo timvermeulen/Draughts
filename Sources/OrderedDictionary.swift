@@ -10,17 +10,17 @@ public struct OrderedDictionary<Key: Equatable, Value> {
     
     public subscript(key: Key) -> Value? {
         get {
-            return self.contents.first(where: { $0.key == key }).map { $0.value }
+            return contents.first(where: { $0.key == key }).map { $0.value }
         }
         set {
             if let value = newValue {
-                if let index = self.contents.index(where: { $0.key == key }) {
-                    self.contents[index] = (key, value)
+                if let index = contents.index(where: { $0.key == key }) {
+                    contents[index] = (key, value)
                 } else {
-                    self.contents.append((key, value))
+                    contents.append((key, value))
                 }
-            } else if let index = self.contents.index(where: { $0.key == key }) {
-                self.contents.remove(at: index)
+            } else if let index = contents.index(where: { $0.key == key }) {
+                contents.remove(at: index)
             }
         }
     }
@@ -36,22 +36,22 @@ public struct OrderedDictionary<Key: Equatable, Value> {
 extension OrderedDictionary: RandomAccessCollection {
     public typealias SubSequence = OrderedDictionary
     
-    public var startIndex: Int { return self.contents.startIndex }
-    public var endIndex: Int { return self.contents.endIndex }
+    public var startIndex: Int { return contents.startIndex }
+    public var endIndex: Int { return contents.endIndex }
     
     public func index(before index: Int) -> Int { return index - 1 }
     public func index(after index: Int) -> Int { return index + 1 }
     
     public subscript(index: Int) -> Element {
-        return self.contents[index]
+        return contents[index]
     }
     
     public subscript(range: Range<Int>) -> OrderedDictionary {
-        return OrderedDictionary(contents: self.contents[range])
+        return OrderedDictionary(contents: contents[range])
     }
     
     public var indices: CountableRange<Int> {
-        return self.contents.indices
+        return contents.indices
     }
 }
 

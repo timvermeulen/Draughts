@@ -5,7 +5,7 @@ extension Array {
         var last = first
         
         while let nextElement = try next(last) {
-            self.append(nextElement)
+            append(nextElement)
             last = nextElement
         }
     }

@@ -10,27 +10,27 @@ public struct Ply {
 
 extension Ply {
     public var indicator: String {
-        switch self.player {
+        switch player {
         case .white:
-            return "\((self.number + 1) / 2 + 1)."
+            return "\((number + 1) / 2 + 1)."
         case .black:
-            return "\(self.number / 2 + 1). ..."
+            return "\(number / 2 + 1). ..."
         }
     }
 }
 
 extension Ply {
     fileprivate func isCompatible(with other: Ply) -> Bool {
-        let offset = other.number - self.number
+        let offset = other.number - number
         
         let offsetIsEven = offset % 2 == 0
-        let playersEqual = self.player == other.player
+        let playersEqual = player == other.player
         
         return offsetIsEven == playersEqual
     }
     
     fileprivate func compatibilityCheck(with other: Ply) {
-        assert(self.isCompatible(with: other), "\(self) is incompatible with \(other)")
+        assert(isCompatible(with: other), "\(self) is incompatible with \(other)")
     }
 }
 
@@ -48,32 +48,32 @@ extension Ply: Comparable {
 
 extension Ply: Strideable {
     public func advanced(by offset: Int) -> Ply {
-        assert(self.number + offset >= 0)
+        assert(number + offset >= 0)
         return Ply(
-            player: offset % 2 == 0 ? self.player : self.player.opponent,
-            number: self.number + offset
+            player: offset % 2 == 0 ? player : player.opponent,
+            number: number + offset
         )
     }
     
     public func distance(to other: Ply) -> Int {
-        self.compatibilityCheck(with: other)
-        return other.number - self.number
+        compatibilityCheck(with: other)
+        return other.number - number
     }
     
     public var predecessor: Ply {
-        assert(self.number > 0)
-        return Ply(player: self.player.opponent, number: self.number - 1)
+        assert(number > 0)
+        return Ply(player: player.opponent, number: number - 1)
     }
     
     public var successor: Ply {
-        return Ply(player: self.player.opponent, number: self.number + 1)
+        return Ply(player: player.opponent, number: number + 1)
     }
     
     public mutating func formPredecessor() {
-        self = self.predecessor
+        self = predecessor
     }
     
     public mutating func formSuccessor() {
-        self = self.successor
+        self = successor
     }
 }

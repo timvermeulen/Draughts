@@ -4,18 +4,18 @@ public struct PlyArray<Element> {
     public var startPly: Ply
     
     internal init(ply: Ply, contents: ArraySlice<Element> = []) {
-        self.startPly = ply
+        startPly = ply
         self.contents = contents
     }
 }
 
 extension PlyArray {
     fileprivate func sliceIndex(of ply: Ply) -> Int {
-        return ply.number - self.startPly.number + self.contents.startIndex
+        return ply.number - startPly.number + contents.startIndex
     }
     
     fileprivate func sliceRange(of range: Range<Ply>) -> Range<Int> {
-        return self.sliceIndex(of: range.lowerBound) ..< self.sliceIndex(of: range.upperBound)
+        return sliceIndex(of: range.lowerBound) ..< sliceIndex(of: range.upperBound)
     }
 }
 
@@ -24,8 +24,8 @@ extension PlyArray: RandomAccessCollection {
     public typealias Indices = DefaultRandomAccessIndices<PlyArray>
     public typealias SubSequence = PlyArray
     
-    public var startIndex: Ply { return self.startPly }
-    public var endIndex: Ply { return self.index(self.startPly, offsetBy: self.contents.count) }
+    public var startIndex: Ply { return startPly }
+    public var endIndex: Ply { return index(startPly, offsetBy: contents.count) }
     
     public func index(before ply: Ply) -> Ply {
         return ply.predecessor
@@ -47,12 +47,12 @@ extension PlyArray: RandomAccessCollection {
     }
     
     public subscript(ply: Ply) -> Element {
-        get { return self.contents[self.sliceIndex(of: ply)] }
-        set { self.contents[self.sliceIndex(of: ply)] = newValue }
+        get { return contents[sliceIndex(of: ply)] }
+        set { contents[sliceIndex(of: ply)] = newValue }
     }
     
     public subscript(range: Range<Ply>) -> PlyArray {
-        get { return PlyArray(ply: range.lowerBound, contents: self.contents[self.sliceRange(of: range)]) }
+        get { return PlyArray(ply: range.lowerBound, contents: contents[sliceRange(of: range)]) }
         set { fatalError() }
     }
     
@@ -63,12 +63,12 @@ extension PlyArray: RandomAccessCollection {
 
 extension PlyArray {
     internal mutating func append(_ element: Element) {
-        self.contents.append(element)
+        contents.append(element)
     }
     
     internal mutating func append(contentsOf other: PlyArray) {
-        assert(self.endIndex == other.startIndex, "ply arrays to be concatenated don't match")
-        self.contents.append(contentsOf: other.contents)
+        assert(endIndex == other.startIndex, "ply arrays to be concatenated don't match")
+        contents.append(contentsOf: other.contents)
     }
 }
 

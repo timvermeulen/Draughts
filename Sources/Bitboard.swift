@@ -30,11 +30,11 @@ extension Bitboard {
 
 extension Bitboard {
     internal init(square: Square) {
-        self.value = 1 << UInt64(square.value)
+        value = 1 << UInt64(square.value)
     }
     
     internal init<S: Sequence>(squares: S) where S.Iterator.Element == Square {
-        self.value = squares.reduce(0) { $0 ^ Bitboard(square: $1).value }
+        value = squares.reduce(0) { $0 ^ Bitboard(square: $1).value }
     }
     
     internal init(squares: Square...) {

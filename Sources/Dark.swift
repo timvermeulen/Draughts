@@ -1,14 +1,14 @@
 extension Position {
     public var darkPosition: Position {
-        let player = self.pieces(of: self.playerToMove)
-        let opponent = self.pieces(of: self.playerToMove.opponent)
+        let player = pieces(of: playerToMove)
+        let opponent = pieces(of: playerToMove.opponent)
         
         func position(opponent: Bitboard = .empty) -> Position {
             return Position(
-                white: self.playerToMove == .white ? player : opponent,
-                black: self.playerToMove == .black ? player : opponent,
-                kings: self.kings.intersection(player.union(opponent)),
-                playerToMove: self.playerToMove
+                white: playerToMove == .white ? player : opponent,
+                black: playerToMove == .black ? player : opponent,
+                kings: kings.intersection(player.union(opponent)),
+                playerToMove: playerToMove
             )
         }
         
@@ -28,7 +28,7 @@ extension Position {
             let obstacleBitboard = Bitboard(squares: obstacleSquares)
             
             let opponentBitboard = candidate
-                .pieces(of: self.playerToMove.opponent)
+                .pieces(of: playerToMove.opponent)
                 .union(captureBitboard)
                 .union(obstacleBitboard)
             
@@ -47,18 +47,18 @@ extension Position {
         
         let darkPosition = position?.darkPosition
         
-        let (white, black): (Bitboard, Bitboard) = self.playerToMove == .white
+        let (white, black): (Bitboard, Bitboard) = playerToMove == .white
             ? (darkPosition?.white ?? .empty, self.black)
             : (self.white, darkPosition?.black ?? .empty)
         
         opponent = Position(
             white: white,
             black: black,
-            kings: self.kings.intersection(white).intersection(black),
-            playerToMove: self.playerToMove
+            kings: kings.intersection(white).intersection(black),
+            playerToMove: playerToMove
         )
         
-        return self.playerToMove == .white
+        return playerToMove == .white
             ? (player, opponent)
             : (opponent, player)
     }
@@ -78,6 +78,6 @@ extension Game {
 
 extension GameHelper {
     public var darkPositions: (white: Position, black: Position) {
-        return self.game.darkPositions(at: self.index)
+        return game.darkPositions(at: index)
     }
 }

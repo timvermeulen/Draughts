@@ -50,7 +50,7 @@ extension Game {
             return "(\(notations.joined(separator: "; ")))"
         }
         
-        let moveNotations: [String] = zip(self.moves.indices, zip(self.moves, self.variations)).map {
+        let moveNotations: [String] = zip(moves.indices, zip(moves, variations)).map {
             let (ply, (move, variations)) = $0
             
             let withoutIndicator = move.unambiguousNotation
@@ -60,14 +60,14 @@ extension Game {
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")
-        let withoutFinalVariations = self.startPly.player == .white || !includingInitialBlackIndicator
+        let withoutFinalVariations = startPly.player == .white || !includingInitialBlackIndicator
             ? withoutBlackPlyIndicator
-            : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
+            : "\(startPly.indicator) \(withoutBlackPlyIndicator)"
         
-        return variationsNotation(of: self.endVariations, at: self.endPly).map { "\(withoutFinalVariations) \($0)" } ?? withoutFinalVariations
+        return variationsNotation(of: endVariations, at: endPly).map { "\(withoutFinalVariations) \($0)" } ?? withoutFinalVariations
     }
     
     public var pdn: String {
-        return self.toPDN(includingInitialBlackIndicator: true)
+        return toPDN(includingInitialBlackIndicator: true)
     }
 }
