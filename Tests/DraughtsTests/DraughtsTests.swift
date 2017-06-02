@@ -680,26 +680,4 @@ class DraughtsTests: XCTestCase {
 //        print(game)
 //        print(Array(game.data))
 //    }
-    
-    func testMultithreadedAccess() {
-        let exp = expectation(description: "")
-        var safeArray: [Int] = []
-        let count = 100
-        let serialQueue = DispatchQueue(label: "serial")
-        
-        XCTAssertTrue(safeArray.isEmpty)
-        
-        DispatchQueue.concurrentPerform(iterations: count) { index in
-            serialQueue.sync {
-                safeArray.append(index)
-            }
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(safeArray.count, count)
-            exp.fulfill()
-        }
-        
-        waitForExpectations(timeout: 0.5)
-    }
 }
