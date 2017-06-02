@@ -218,9 +218,9 @@ extension Game {
     }
     
     private mutating func removeWithoutReplacement(from ply: Ply) {
-        self.moves.remove(from: ply.predecessor)
-        self.positions.remove(from: ply)
-        self.variations.remove(from: ply)
+        self.moves = self.moves[..<ply.predecessor]
+        self.positions = self.positions[..<ply]
+        self.variations = self.variations[..<ply]
     }
     
     /// Deletes the move before the given ply, and all following moves, from the game.
