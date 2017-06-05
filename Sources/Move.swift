@@ -57,22 +57,22 @@ public final class Move {
     
     public lazy var endPosition: Position = {
         return Position(
-            white: white.symmetricDifference(startPosition.white),
-            black: black.symmetricDifference(startPosition.black),
-            kings: kings.symmetricDifference(startPosition.kings),
-            playerToMove: startPosition.playerToMove.opponent
+            white: self.white.symmetricDifference(self.startPosition.white),
+            black: self.black.symmetricDifference(self.startPosition.black),
+            kings: self.kings.symmetricDifference(self.startPosition.kings),
+            playerToMove: self.startPosition.playerToMove.opponent
         )
     }()
     
     public lazy var allIntermediateSquares: [[Square]] = {
-        guard startPiece.kind == .king else {
-            return anyIntermediateSquares.map { [$0] }
+        guard self.startPiece.kind == .king else {
+            return self.anyIntermediateSquares.map { [$0] }
         }
         
-        guard let firstCapture = captures.first else { return [] }
-        guard var direction = startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        guard let firstCapture = self.captures.first else { return [] }
+        guard var direction = self.startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(captures, captures.dropFirst()).map {
+        return zip(self.captures, self.captures.dropFirst()).map {
             let (start, end) = $0
             
             if let squares = start.square.squares(before: end.square) {
@@ -91,14 +91,14 @@ public final class Move {
     }()
     
     public lazy var anyIntermediateSquares: [Square] = {
-        guard startPiece.kind == .man else {
-            return allIntermediateSquares.flatMap { $0.first }
+        guard self.startPiece.kind == .man else {
+            return self.allIntermediateSquares.flatMap { $0.first }
         }
         
-        guard let firstCapture = captures.first else { return [] }
-        guard var direction = startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
+        guard let firstCapture = self.captures.first else { return [] }
+        guard var direction = self.startSquare.direction(to: firstCapture.square) else { fatalError("invalid move") }
         
-        return zip(captures, captures.dropFirst()).map {
+        return zip(self.captures, self.captures.dropFirst()).map {
             let (start, end) = $0
             
             guard
@@ -113,33 +113,33 @@ public final class Move {
     
     /// The squares that are required to be empty for this move to be legal
     public lazy var interveningSquares: [Square] = {
-        guard startPiece.kind == .king else { return anyIntermediateSquares + [endSquare] }
+        guard self.startPiece.kind == .king else { return self.anyIntermediateSquares + [self.endSquare] }
         
-        let squares = [startSquare] + anyIntermediateSquares + [endSquare]
+        let squares = [self.startSquare] + self.anyIntermediateSquares + [self.endSquare]
         
-        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).lazy.map {
+        let interveningSquares: [[Square]] = zip(squares, squares.dropFirst()).map {
             let (start, end) = $0
             
             guard let squares = start.squares(before: end) else { fatalError("invalid move") }
             return squares
         }
         
-        return interveningSquares.joined() + [endSquare]
+        return interveningSquares.joined() + [self.endSquare]
     }()
     
     public lazy var relevantSquares: [Square] = {
-        let intermediateRelevantSquares = allIntermediateSquares.joined() + captures.lazy.map { $0.square }
-        return intermediateRelevantSquares + [startSquare, endSquare]
+        let intermediateRelevantSquares = self.allIntermediateSquares.joined() + self.captures.lazy.map { $0.square }
+        return intermediateRelevantSquares + [self.startSquare, self.endSquare]
     }()
     
     public lazy var essentialCaptures: [Square] = {
-        let similarMoves = startPosition.legalMoves.filter { $0.startSquare == startSquare && $0.endSquare == endSquare }
+        let similarMoves = self.startPosition.legalMoves.filter { $0.startSquare == self.startSquare && $0.endSquare == self.endSquare }
         
         func isRelevant(_ capture: Piece) -> Bool {
             return similarMoves.contains(where: { !$0.captures.contains(capture) })
         }
         
-        return captures.filter(isRelevant).map { $0.square }
+        return self.captures.filter(isRelevant).map { $0.square }
     }()
 }
 

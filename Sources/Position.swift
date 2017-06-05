@@ -7,7 +7,7 @@ public final class Position {
     }
     
     public lazy var legalMoves: [Move] = {
-        return moves(of: playerToMove)
+        return self.moves(of: self.playerToMove)
     }()
     
     public func pieces(of player: Player) -> Bitboard {
