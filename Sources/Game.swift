@@ -188,7 +188,7 @@ extension Game {
         var game = Game(position: startPosition, startNumber: startNumber)
         
         for (variation, (move, ply)) in zip(variations, deviations) {
-            for move in variation.moves[game.endPly ..< ply] {
+            for move in variation.moves[game.endPly..<ply] {
                 game.play(move)
             }
             
@@ -200,7 +200,7 @@ extension Game {
         // swiftlint:disable:next force_unwrapping
         let lastVariation = variations.last!
         
-        for move in lastVariation.moves[game.endPly ..< index.ply] {
+        for move in lastVariation.moves[game.endPly..<index.ply] {
             game.play(move)
         }
         

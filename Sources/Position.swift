@@ -222,8 +222,8 @@ public final class Position {
     
     public static var start: Position {
         return Position(
-            white: Bitboard(squares: 31 ... 50),
-            black: Bitboard(squares: 1 ... 20)
+            white: Bitboard(squares: 31...50),
+            black: Bitboard(squares: 1...20)
         )
     }
     
@@ -244,7 +244,7 @@ extension Position: TextOutputStreamable {
         let border = " " + String(repeating: "-", count: 21)
         print(border, to: &target)
         
-        let grid = [1, 11, 21, 31, 41].lazy.map { ($0 ..< $0 + 10).map(Square.init(humanValue:)) }
+        let grid = [1, 11, 21, 31, 41].lazy.map { ($0..<($0 + 10)).map(Square.init(humanValue:)) }
         
         for squares in grid {
             func addSquare(_ square: Square, onSide: Piece.Direction) {
@@ -268,13 +268,13 @@ extension Position: TextOutputStreamable {
             
             target.write("| ")
             
-            for square in squares[0 ..< 5] {
+            for square in squares[0..<5] {
                 addSquare(square, onSide: .right)
             }
             
             target.write("|\n| ")
             
-            for square in squares[5 ..< 10] {
+            for square in squares[5..<10] {
                 addSquare(square, onSide: .left)
             }
             

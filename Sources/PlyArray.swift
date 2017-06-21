@@ -15,7 +15,7 @@ extension PlyArray {
     }
     
     fileprivate func sliceRange(of range: Range<Ply>) -> Range<Int> {
-        return sliceIndex(of: range.lowerBound) ..< sliceIndex(of: range.upperBound)
+        return sliceIndex(of: range.lowerBound)..<sliceIndex(of: range.upperBound)
     }
 }
 
