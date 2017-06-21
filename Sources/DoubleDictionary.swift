@@ -4,13 +4,9 @@ internal struct DoubleDictionary<Key1: Hashable, Key2: Hashable> {
 }
 
 extension DoubleDictionary {
-    internal init(_ dictionary: [Key1: Key2]) {
-        forward = dictionary
-        backward = Dictionary(dictionary.lazy.map { ($0.value, $0.key) })
-    }
-    
     internal init<S: Sequence>(_ sequence: S) where S.Iterator.Element == (Key1, Key2) {
-        self = [:]
+        forward = [:]
+        backward = [:]
         
         for (key1, key2) in sequence {
             insert(key1, key2)
@@ -63,12 +59,7 @@ extension DoubleDictionary: Equatable {
 
 extension DoubleDictionary: ExpressibleByDictionaryLiteral {
     internal init(dictionaryLiteral elements: (Key1, Key2)...) {
-        self.init([:])
-        
-        for (key1, key2) in elements {
-            forward[key1] = key2
-            backward[key2] = key1
-        }
+        self.init(elements)
     }
 }
 

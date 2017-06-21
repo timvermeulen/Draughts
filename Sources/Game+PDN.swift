@@ -23,7 +23,7 @@ extension Game {
                 let squares = component
                     .components(separatedBy: separators)
                     .flatMap { Int($0) }
-                    .filter((1 ... 50).contains)
+                    .filter((1...50).contains)
                     .map { Square(humanValue: $0) }
                 
                 guard

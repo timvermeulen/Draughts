@@ -15,8 +15,8 @@ extension Bitboard: Equatable {
 }
 
 extension Bitboard {
-    public func serialized() -> UnfoldSequence<Square, UInt64> {
-        return sequence(state: value) { (bitboard: inout UInt64) in
+    public func serialized() -> [Square] {
+        return Array(state: value) { (bitboard: inout UInt64) in
             let zeroCount = bitboard.leadingZeroBitCount
             guard zeroCount < 64 else { return nil }
             
@@ -63,8 +63,8 @@ extension Bitboard {
 }
 
 extension Bitboard {
-    internal static let topEdge: Bitboard = Bitboard(squares: 1 ... 5)
-    internal static let bottomEdge: Bitboard = Bitboard(squares: 46 ... 50)
+    internal static let topEdge: Bitboard = Bitboard(squares: 1...5)
+    internal static let bottomEdge: Bitboard = Bitboard(squares: 46...50)
     internal static let leftEdge: Bitboard = Bitboard(squares: 6, 16, 26, 36, 46)
     internal static let rightEdge: Bitboard = Bitboard(squares: 5, 15, 25, 35, 45)
     

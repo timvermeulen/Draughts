@@ -14,7 +14,7 @@
  */
 
 private func valueIsValid(_ value: Int) -> Bool {
-    return (0 ... 53).contains(value) && value % 11 != 10
+    return (0...53).contains(value) && value % 11 != 10
 }
 
 public struct Square {
@@ -23,7 +23,7 @@ public struct Square {
     public var humanValue: Int { return (value / 11) * 10 + (value % 11) + 1 }
     
     public init(humanValue value: Int) {
-        assert((1 ... 50).contains(value), "\(value) is not a valid square")
+        assert((1...50).contains(value), "\(value) is not a valid square")
         self.init(value: ((value - 1) / 10) * 11 + ((value - 1) % 10))
     }
     
@@ -46,7 +46,7 @@ public struct Square {
         }
     }
     
-    public static let all = (1 ... 50).map(Square.init(humanValue:))
+    public static let all = (1...50).map(Square.init(humanValue:))
 }
 
 extension Square: Equatable {
