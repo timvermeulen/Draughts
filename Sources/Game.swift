@@ -285,7 +285,7 @@ extension Game {
         return true
     }
     
-    var endPositions: Set<Draughts.Position> {
+    public var endPositions: Set<Draughts.Position> {
         return variations
             .joined()
             .lazy
@@ -293,7 +293,7 @@ extension Game {
             .reduce([endPosition], { $0.union($1) })
     }
     
-    var isValidTactic: Bool {
+    public var isValidTactic: Bool {
         return startPosition.playerToMove == .white && !endPositions.contains(where: { $0.playerToMove == .white })
     }
 }
