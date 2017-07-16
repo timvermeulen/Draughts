@@ -1,13 +1,10 @@
-import Foundation
-
 extension Game {
     // TODO: make this a throwing initializer
     public init?(pdn: String, position: Position = .start) {
-        let separators = CharacterSet(charactersIn: "-x")
-        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.replacingOccurrences(of: $1, with: " \($1) ") }
+        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.replacing($1, with: " \($1) ") }
         let helper = GameHelper(position: position)
         
-        for component in enhanced.components(separatedBy: .whitespacesAndNewlines) {
+        for component in enhanced.components(separatedByCharactersIn: " ") {
             switch component {
             case "":
                 break
@@ -21,7 +18,7 @@ extension Game {
                 guard !component.hasSuffix(".") else { continue }
                 
                 let squares = component
-                    .components(separatedBy: separators)
+                    .components(separatedByCharactersIn: "-x")
                     .flatMap { Int($0) }
                     .filter((1...50).contains)
                     .map { Square(humanValue: $0) }

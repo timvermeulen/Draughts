@@ -1,5 +1,3 @@
-import Foundation
-
 extension Position {
     public var fen: String {
         func pieceSymbols(of player: Player, kind: Piece.Kind) -> String? {
@@ -22,7 +20,7 @@ extension Position {
     }
     
     public convenience init?(fen: String) {
-        let components = fen.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: ":")
+        let components = fen.components(separatedByCharactersIn: ":")
         guard components.count == 3 && !components[1].isEmpty && !components[2].isEmpty else { return nil }
         
         var white = Bitboard.empty
@@ -32,7 +30,7 @@ extension Position {
         let player: Player = components[0] == "W" ? .white : .black
         
         for (component, player): (String, Player) in [(components[1], .white), (components[2], .black)] {
-            let pieceStrings = String(component.characters.dropFirst()).components(separatedBy: ",")
+            let pieceStrings = String(component.characters.dropFirst()).components(separatedByCharactersIn: ",")
             
             let men = pieceStrings
                 .lazy
