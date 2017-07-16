@@ -239,6 +239,12 @@ extension Position: Equatable {
     }
 }
 
+extension Position: Hashable {
+    public var hashValue: Int {
+        return white.hashValue &* black.hashValue &* kings.hashValue
+    }
+}
+
 extension Position: TextOutputStreamable {
     public func write<Target: TextOutputStream>(to target: inout Target) {
         let border = " " + String(repeating: "-", count: 21)

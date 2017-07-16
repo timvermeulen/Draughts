@@ -284,6 +284,18 @@ extension Game {
         
         return true
     }
+    
+    var endPositions: Set<Draughts.Position> {
+        return variations
+            .joined()
+            .lazy
+            .map { $0.value.endPositions }
+            .reduce([endPosition], { $0.union($1) })
+    }
+    
+    var isValidTactic: Bool {
+        return startPosition.playerToMove == .white && !endPositions.contains(where: { $0.playerToMove == .white })
+    }
 }
 
 extension Game: Equatable {

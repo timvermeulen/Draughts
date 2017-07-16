@@ -33,38 +33,38 @@ extension Game {
         self = helper.game
     }
     
-    internal func toPDN(includingInitialBlackIndicator: Bool) -> String {
-        func variationsNotation(of variations: OrderedDictionary<Move, Game>, at ply: Ply) -> String? {
-            guard !variations.isEmpty else { return nil }
+    private func variationsNotation(of variations: OrderedDictionary<Draughts.Move, Game>, at ply: Ply, includeVariation: (Game) throws -> Bool) rethrows -> String? {
+        let notations: [String] = try variations.flatMap { move, variation in
+            guard try includeVariation(variation) else { return nil }
             
-            let notations: [String] = variations.lazy.map {
-                let (move, variation) = $0
-                
-                let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
-                return variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.toPDN(includingInitialBlackIndicator: false))"
-            }
-            
-            return "(\(notations.joined(separator: "; ")))"
+            let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
+            return try variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.makePDN(includingInitialBlackIndicator: false, includeVariation: includeVariation))"
         }
         
-        let moveNotations: [String] = zip(moves.indices, zip(moves, variations)).map {
-            let (ply, (move, variations)) = $0
-            
-            let withoutIndicator = move.unambiguousNotation
+        return notations.isEmpty ? nil : "(\(notations.joined(separator: "; ")))"
+    }
+    
+    internal func makePDN(includingInitialBlackIndicator: Bool = true, includeVariation: (Game) throws -> Bool) rethrows -> String {
+        let moveNotations: [String] = try zip(moves.indices, zip(moves, variations)).map { (ply: Ply, pair: (move: Draughts.Move, variations: OrderedDictionary<Draughts.Move, Game>)) in
+            let withoutIndicator = pair.move.unambiguousNotation
             let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
             
-            return variationsNotation(of: variations, at: ply).map { "\(withoutVariations) \($0)" } ?? withoutVariations
+            return try variationsNotation(of: pair.variations, at: ply, includeVariation: includeVariation).map { "\(withoutVariations) \($0)" } ?? withoutVariations
         }
         
         let withoutBlackPlyIndicator = moveNotations.joined(separator: " ")
         let withoutFinalVariations = startPly.player == .white || !includingInitialBlackIndicator
             ? withoutBlackPlyIndicator
-            : "\(startPly.indicator) \(withoutBlackPlyIndicator)"
+            : "\(self.startPly.indicator) \(withoutBlackPlyIndicator)"
         
-        return variationsNotation(of: endVariations, at: endPly).map { "\(withoutFinalVariations) \($0)" } ?? withoutFinalVariations
+        return try variationsNotation(of: endVariations, at: endPly, includeVariation: includeVariation).map { "\(withoutFinalVariations) \($0)" } ?? withoutFinalVariations
+    }
+    
+    public var relevantPDN: String {
+        return makePDN(includeVariation: { !game(from: $0.startPly).endPositions.isSuperset(of: $0.endPositions) })
     }
     
     public var pdn: String {
-        return toPDN(includingInitialBlackIndicator: true)
+        return makePDN(includingInitialBlackIndicator: true, includeVariation: { _ in true })
     }
 }

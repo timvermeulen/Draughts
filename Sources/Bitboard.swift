@@ -14,6 +14,12 @@ extension Bitboard: Equatable {
     }
 }
 
+extension Bitboard: Hashable {
+    public var hashValue: Int {
+        return value.hashValue
+    }
+}
+
 extension Bitboard {
     public func serialized() -> [Square] {
         return Array(state: value) { (bitboard: inout UInt64) in
