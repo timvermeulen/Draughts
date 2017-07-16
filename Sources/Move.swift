@@ -3,7 +3,7 @@ public final class Move {
     public let startPiece: Piece
     public let endSquare: Square
     public let captures: [Piece]
-    public let startPosition: Position
+    public unowned let startPosition: Position
     
     internal let white, black, kings: Bitboard
     
