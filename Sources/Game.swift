@@ -286,7 +286,7 @@ extension Game {
     }
     
     internal func allMoves(startingFrom position: Position) -> Set<Move> {
-        let ownMoves = Set(moves.filter { $0.endPosition == position })
+        let ownMoves = Set(moves.filter { $0.startPosition == position })
         return variations
             .joined()
             .lazy
