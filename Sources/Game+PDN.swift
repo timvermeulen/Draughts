@@ -33,9 +33,9 @@ extension Game {
         self = helper.game
     }
     
-    private func variationsNotation(of variations: OrderedDictionary<Draughts.Move, Game>, at ply: Ply, includeVariation: (Game) throws -> Bool) rethrows -> String? {
+    private func variationsNotation(of variations: OrderedDictionary<Draughts.Move, Game>, at ply: Ply, includeVariation: (_ variation: Game, _ parentVariation: Game) throws -> Bool) rethrows -> String? {
         let notations: [String] = try variations.flatMap { move, variation in
-            guard try includeVariation(variation) else { return nil }
+            guard try includeVariation(variation, self) else { return nil }
             
             let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"
             return try variation.moves.isEmpty ? withoutVariation : "\(withoutVariation) \(variation.makePDN(includingInitialBlackIndicator: false, includeVariation: includeVariation))"
@@ -44,7 +44,7 @@ extension Game {
         return notations.isEmpty ? nil : "(\(notations.joined(separator: "; ")))"
     }
     
-    internal func makePDN(includingInitialBlackIndicator: Bool = true, includeVariation: (Game) throws -> Bool) rethrows -> String {
+    internal func makePDN(includingInitialBlackIndicator: Bool = true, includeVariation: (_ variation: Game, _ parentVariation: Game) throws -> Bool) rethrows -> String {
         let moveNotations: [String] = try zip(moves.indices, zip(moves, variations)).map { (ply: Ply, pair: (move: Draughts.Move, variations: OrderedDictionary<Draughts.Move, Game>)) in
             let withoutIndicator = pair.move.unambiguousNotation
             let withoutVariations = ply.player == .white ? "\(ply.indicator) \(withoutIndicator)" : withoutIndicator
@@ -61,7 +61,7 @@ extension Game {
     }
     
     public var relevantPDN: String {
-        return makePDN(includeVariation: { !game(from: $0.startPly).endPositions.isSuperset(of: $0.endPositions) })
+        return makePDN(includeVariation: { !$1.game(from: $0.startPly).endPositions.isSuperset(of: $0.endPositions) })
     }
     
     public var pdn: String {

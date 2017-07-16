@@ -19,10 +19,10 @@ public struct Game {
     internal var startVariations: OrderedDictionary<Move, Game> { return variations.first! }
     internal var endVariations: OrderedDictionary<Move, Game> { return variations.last! }
     // swiftlint:enable force_unwrapping
-
+    
     public var startPly: Ply { return Ply(player: startPosition.playerToMove, number: startNumber) }
     public var endPly: Ply { return Ply(player: endPosition.playerToMove, number: startNumber + moves.count) }
-
+    
     public init(position: Position = .start, startNumber: Int = 0) {
         let ply = Ply(player: position.playerToMove, number: startNumber)
         
@@ -76,7 +76,7 @@ extension Game {
     internal struct Deviation: Equatable {
         internal let ply: Ply
         internal let move: Move
-
+        
         internal static func == (left: Deviation, right: Deviation) -> Bool {
             return left.ply == right.ply && left.move == right.move
         }
@@ -229,7 +229,7 @@ extension Game {
     @discardableResult
     public mutating func remove(from ply: Ply) -> Bool {
         guard ply > startPly else { return true }
-
+        
         removeWithoutReplacement(from: ply)
         
         if let (move, newTail) = variations[ply.predecessor].popFirst() {
@@ -248,14 +248,14 @@ extension Game {
     @discardableResult
     public mutating func remove(from index: PositionIndex) -> Bool {
         guard canRemove(from: index) else { return false }
-
+        
         if self[index.variationIndex].remove(from: index.ply), let (parentIndex, deviation) = index.variationIndex.parent {
             self[parentIndex].variations[deviation.ply].removeValue(forKey: deviation.move)
         }
-
+        
         return true
     }
-
+    
     public func canPromote(at index: VariationIndex) -> Bool {
         guard let parent = index.parent?.parent else { return false }
         return !self[parent].isLocked
