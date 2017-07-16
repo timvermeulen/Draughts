@@ -285,16 +285,30 @@ extension Game {
         return true
     }
     
-    public var endPositions: Set<Draughts.Position> {
+    internal func allMoves(startingFrom position: Position) -> Set<Move> {
+        let ownMoves = Set(moves.filter { $0.endPosition == position })
         return variations
             .joined()
             .lazy
-            .map { $0.value.endPositions }
+            .map { $0.value.allMoves(startingFrom: position) }
+            .reduce(ownMoves, { $0.union($1) })
+        
+    }
+    
+    internal func getEndPositions(allowCrossVariationMoves: Bool) -> Set<Position> {
+        let endPositions: Set<Position> = variations
+            .joined()
+            .lazy
+            .map { $0.value.getEndPositions(allowCrossVariationMoves: false) }
             .reduce([endPosition], { $0.union($1) })
+        
+        guard allowCrossVariationMoves else { return endPositions }
+        
+        return endPositions.filter { allMoves(startingFrom: $0).isEmpty }
     }
     
     public var isValidTactic: Bool {
-        return startPosition.playerToMove == .white && !endPositions.contains(where: { $0.playerToMove == .white })
+        return startPosition.playerToMove == .white && !getEndPositions(allowCrossVariationMoves: true).contains(where: { $0.playerToMove == .white })
     }
 }
 

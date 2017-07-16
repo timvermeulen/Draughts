@@ -60,8 +60,8 @@ extension Game {
         return try variationsNotation(of: endVariations, at: endPly, includeVariation: includeVariation).map { "\(withoutFinalVariations) \($0)" } ?? withoutFinalVariations
     }
     
-    public var relevantPDN: String {
-        return makePDN(includeVariation: { !$1.game(from: $0.startPly).endPositions.isSuperset(of: $0.endPositions) })
+    public var pdnWithoutRedundantVariations: String {
+        return makePDN(includeVariation: { !$1.game(from: $0.startPly).getEndPositions(allowCrossVariationMoves: false).isSuperset(of: $0.getEndPositions(allowCrossVariationMoves: true)) })
     }
     
     public var pdn: String {
