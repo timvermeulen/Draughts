@@ -15,7 +15,7 @@ extension Game {
             case ";":
                 if !helper.popVariation() { return nil }
             default:
-                guard !component.hasSuffix(".") else { continue }
+                guard component.characters.last != "." else { continue }
                 
                 let squares = component
                     .components(separatedByCharactersIn: "-x")
