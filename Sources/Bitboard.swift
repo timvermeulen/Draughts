@@ -35,15 +35,15 @@ extension Bitboard {
 }
 
 extension Bitboard {
-    internal init(square: Square) {
+    public init(square: Square) {
         value = 1 << UInt64(square.value)
     }
     
-    internal init<S: Sequence>(squares: S) where S.Iterator.Element == Square {
+    public init<S: Sequence>(squares: S) where S.Iterator.Element == Square {
         value = squares.reduce(0) { $0 ^ Bitboard(square: $1).value }
     }
     
-    internal init(squares: Square...) {
+    public init(squares: Square...) {
         self.init(squares: squares)
     }
     
