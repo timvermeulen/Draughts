@@ -1,7 +1,7 @@
 import XCTest
 @testable import Draughts
 
-class DraughtsTests: XCTestCase {
+final class DraughtsTests: XCTestCase {
     func testOpeningMoves() throws {
         let position = Position.start
         

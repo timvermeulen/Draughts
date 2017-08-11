@@ -218,10 +218,9 @@ extension Game {
     }
     
     private mutating func removeWithoutReplacement(from ply: Ply) {
-        // TODO(swift4): remove `startIndex`
-        moves = moves[moves.startIndex..<ply.predecessor]
-        positions = positions[moves.startIndex..<ply]
-        variations = variations[moves.startIndex..<ply]
+        moves = moves[..<ply.predecessor]
+        positions = positions[..<ply]
+        variations = variations[..<ply]
     }
     
     /// Deletes the move before the given ply, and all following moves, from the game.

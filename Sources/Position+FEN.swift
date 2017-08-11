@@ -20,7 +20,7 @@ extension Position {
     }
     
     public convenience init?(fen: String) {
-        let components = fen.components(separatedByCharactersIn: ":")
+        let components = fen.split(separator: ":", omittingEmptySubsequences: false)
         guard components.count == 3 && !components[1].isEmpty && !components[2].isEmpty else { return nil }
         
         var white = Bitboard.empty
@@ -29,8 +29,8 @@ extension Position {
         
         let player: Player = components[0] == "W" ? .white : .black
         
-        for (component, player): (String, Player) in [(components[1], .white), (components[2], .black)] {
-            let pieceStrings = String(component.characters.dropFirst()).components(separatedByCharactersIn: ",")
+        for (component, player): (Substring, Player) in [(components[1], .white), (components[2], .black)] {
+            let pieceStrings = component.dropFirst().split(separator: ",")
             
             let men = pieceStrings
                 .lazy
@@ -40,8 +40,8 @@ extension Position {
             
             let theKings = pieceStrings
                 .lazy
-                .filter { $0.characters.first == "K" }
-                .flatMap { Int($0.substring(from: $0.index(after: $0.startIndex))) }
+                .filter { $0.first == "K" }
+                .flatMap { Int($0[$0.index(after: $0.startIndex)...]) }
                 .map(Square.init(humanValue:))
             
             for man in men {

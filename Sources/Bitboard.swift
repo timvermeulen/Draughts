@@ -5,7 +5,7 @@ public struct Bitboard {
         self.value = value
     }
     
-    public static var empty: Bitboard { return Bitboard(0 as UInt64) }
+    public static var empty: Bitboard { return Bitboard(0) }
 }
 
 extension Bitboard: Equatable {
@@ -49,27 +49,6 @@ extension Bitboard {
     
     public var count: Int {
         return value.nonzeroBitCount
-    }
-}
-
-// TODO(swift4): remove this extension
-extension UInt64 {
-    internal static func << (left: UInt64, right: Int) -> UInt64 {
-        guard right >= 0 else { return left >> -right }
-        return left << UInt64(right)
-    }
-    
-    internal static func >> (left: UInt64, right: Int) -> UInt64 {
-        guard right >= 0 else { return left << -right }
-        return left >> UInt64(right)
-    }
-    
-    var nonzeroBitCount: Int {
-        return (0..<64).filter { (1 << (63 - $0)) & self > 0 }.count
-    }
-    
-    var leadingZeroBitCount: Int {
-        return (0..<64).first(where: { (1 << (63 - $0)) & self > 0 }) ?? 64
     }
 }
 

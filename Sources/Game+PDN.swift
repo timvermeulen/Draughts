@@ -1,10 +1,10 @@
 extension Game {
     // TODO: make this a throwing initializer
     public init?(pdn: String, position: Position = .start) {
-        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.replacing($1, with: " \($1) ") }
+        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.split(separator: $1).joined(separator: " \($1) ") }
         let helper = GameHelper(position: position)
         
-        for component in enhanced.components(separatedByCharactersIn: " ") {
+        for component in enhanced.split(separator: " ") {
             switch component {
             case "":
                 break
@@ -18,7 +18,9 @@ extension Game {
                 guard component.characters.last != "." else { continue }
                 
                 let squares = component
-                    .components(separatedByCharactersIn: "-x")
+                    .split(separator: "-")
+                    .map { $0.split(separator: "x") }
+                    .joined()
                     .flatMap { Int($0) }
                     .filter((1...50).contains)
                     .map { Square(humanValue: $0) }
@@ -65,6 +67,6 @@ extension Game {
     }
     
     public var pdn: String {
-        return makePDN(includingInitialBlackIndicator: true, includeVariation: { _ in true })
+        return makePDN(includingInitialBlackIndicator: true, includeVariation: { _,_  in true })
     }
 }
