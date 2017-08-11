@@ -32,6 +32,10 @@ extension Bitboard {
             return Square(value: offset)
         }
     }
+    
+    public var opposite: Bitboard {
+        return Bitboard(~value)
+    }
 }
 
 extension Bitboard {
@@ -54,12 +58,10 @@ extension Bitboard {
 
 extension Bitboard {
     internal static func << (bitboard: Bitboard, int: Int) -> Bitboard {
-        guard int >= 0 else { return bitboard >> (-int) }
         return Bitboard(bitboard.value << int)
     }
     
     internal static func >> (bitboard: Bitboard, int: Int) -> Bitboard {
-        guard int >= 0 else { return bitboard << (-int) }
         return Bitboard(bitboard.value >> int)
     }
     
@@ -88,3 +90,4 @@ extension Bitboard: TextOutputStreamable {
         position.write(to: &target)
     }
 }
+
