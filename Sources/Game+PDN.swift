@@ -1,7 +1,7 @@
 extension Game {
     // TODO: make this a throwing initializer
     public init?(pdn: String, position: Position = .start) {
-        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.split(separator: $1).joined(separator: " \($1) ") }
+        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.split(separator: $1, omittingEmptySubsequences: false).joined(separator: " \($1) ") }
         let helper = GameHelper(position: position)
         
         for component in enhanced.split(separator: " ") {

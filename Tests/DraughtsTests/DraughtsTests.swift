@@ -429,6 +429,14 @@ final class DraughtsTests: XCTestCase {
             let position = try Position(fen: fen).unwrap()
             XCTAssertNotNil(Game(pdn: pdn, position: position))
         }
+        
+        do {
+            let fen = "W:W29,31,32,34,36,37,40,41,42,43:B3,8,9,12,16,17,18,19,20,26"
+            let pdn = "1. 32-27 17-22 (1... 17-21 2. 40-35 21x32 3. 37x28 26x30 4. 35x02 (4. 35x04)) 2. 37-32 26x30 3. 40-35 22x31 4. 35x04"
+            
+            let position = try Position(fen: fen).unwrap()
+            XCTAssertNotNil(Game(pdn: pdn, position: position))
+        }
     }
     
     func testGameDelete() throws {
