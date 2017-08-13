@@ -17,13 +17,22 @@ private func valueIsValid(_ value: Int) -> Bool {
     return (0...53).contains(value) && value % 11 != 10
 }
 
+private func humanValueIsValid(_ value: Int) -> Bool {
+    return (1...50).contains(value)
+}
+
 public struct Square {
     internal let value: Int
     
     public var humanValue: Int { return (value / 11) * 10 + (value % 11) + 1 }
     
+    public init?(checkingHumanValue value: Int) {
+        guard humanValueIsValid(value) else { return nil }
+        self.init(humanValue: value)
+    }
+    
     public init(humanValue value: Int) {
-        assert((1...50).contains(value), "\(value) is not a valid square")
+        assert(humanValueIsValid(value), "\(value) is not a valid square")
         self.init(value: ((value - 1) / 10) * 11 + ((value - 1) % 10))
     }
     
@@ -46,7 +55,7 @@ public struct Square {
         }
     }
     
-    public static let all = (1...50).map(Square.init(humanValue:))
+    public static let all = (1...50).flatMap(Square.init(checkingHumanValue:))
 }
 
 extension Square: Equatable {

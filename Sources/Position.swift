@@ -44,9 +44,11 @@ public final class Position {
     }
     
     public convenience init(pieces: [Piece], playerToMove: Player = .white) {
-        let white = Bitboard(squares: pieces.lazy.filter { $0.player == .white }.map { $0.square })
-        let black = Bitboard(squares: pieces.lazy.filter { $0.player == .black }.map { $0.square })
-        let kings = Bitboard(squares: pieces.lazy.filter { $0.kind == .king }.map { $0.square })
+        let validPieces = pieces.filter { $0.isValid }
+        
+        let white = Bitboard(squares: validPieces.lazy.filter { $0.player == .white }.map { $0.square })
+        let black = Bitboard(squares: validPieces.lazy.filter { $0.player == .black }.map { $0.square })
+        let kings = Bitboard(squares: validPieces.lazy.filter { $0.kind   == .king  }.map { $0.square })
         
         self.init(white: white, black: black, kings: kings, playerToMove: playerToMove)
     }
@@ -250,7 +252,7 @@ extension Position: TextOutputStreamable {
         let border = " " + String(repeating: "-", count: 21)
         print(border, to: &target)
         
-        let grid = [1, 11, 21, 31, 41].lazy.map { ($0..<($0 + 10)).map(Square.init(humanValue:)) }
+        let grid = [1, 11, 21, 31, 41].lazy.map { ($0..<($0 + 10)).flatMap(Square.init(checkingHumanValue:)) }
         
         for squares in grid {
             func addSquare(_ square: Square, onSide: Piece.Direction) {

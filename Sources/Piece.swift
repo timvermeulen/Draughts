@@ -9,6 +9,12 @@ public struct Piece {
 }
 
 extension Piece {
+    public var isValid: Bool {
+        return kind == .king || !square.isOnPromotionRow(of: player)
+    }
+}
+
+extension Piece {
     public enum Direction {
         case left, right
     }

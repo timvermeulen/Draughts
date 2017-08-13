@@ -1,0 +1,12 @@
+{
+  "autoPin": true,
+  "pins": [
+    {
+      "package": "Parser",
+      "reason": null,
+      "repositoryURL": "https://github.com/timvermeulen/Parser.git",
+      "version": "0.0.6"
+    }
+  ],
+  "version": 1
+}

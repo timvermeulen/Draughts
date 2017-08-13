@@ -22,8 +22,7 @@ extension Game {
                     .map { $0.split(separator: "x") }
                     .joined()
                     .flatMap { Int($0) }
-                    .filter((1...50).contains)
-                    .map { Square(humanValue: $0) }
+                    .flatMap { Square(checkingHumanValue: $0) }
                 
                 guard
                     let start = squares.first, let end = squares.last,
