@@ -20,10 +20,6 @@ extension PlyArray {
 }
 
 extension PlyArray: RandomAccessCollection {
-    // this should be the default, but leaving it out makes the compiler unhappy
-    public typealias Indices = DefaultRandomAccessIndices<PlyArray>
-    public typealias SubSequence = PlyArray
-    
     public var startIndex: Ply { return startPly }
     public var endIndex: Ply { return index(startPly, offsetBy: contents.count) }
     
@@ -72,21 +68,8 @@ extension PlyArray {
     }
 }
 
-// TODO: Conditional Conformance
-extension PlyArray where Element: Equatable {
+extension PlyArray: Equatable where Element: Equatable {
     public static func == (left: PlyArray, right: PlyArray) -> Bool {
         return left.contents == right.contents
     }
-    
-    public static func != (left: PlyArray, right: PlyArray) -> Bool {
-        return !(left == right)
-    }
-}
-
-public func == <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {
-    return left.contents.count == right.contents.count && !zip(left.contents, right.contents).contains(where: { $0.0 != $0.1 })
-}
-
-public func != <Key, Value: Equatable>(left: PlyArray<OrderedDictionary<Key, Value>>, right: PlyArray<OrderedDictionary<Key, Value>>) -> Bool {
-    return !(left == right)
 }

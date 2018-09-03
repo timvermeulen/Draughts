@@ -11,7 +11,7 @@ public struct Trace<Element: Hashable> {
     
     public func followed(by other: Trace) -> Trace {
         // All moves starting at an element that is transformed in `self`, but not necessarily in `other`
-        let startMoved: [(Element, Element)] = self.moved.flatMap {
+        let startMoved: [(Element, Element)] = self.moved.compactMap {
             let (start, inter) = $0
             
             guard let end = other.destination(of: inter), start != end else { return nil }
@@ -19,7 +19,7 @@ public struct Trace<Element: Hashable> {
         }
         
         // All moves ending at an element that is transformed in `other`, but not necessarily in `self`
-        let endMoved: [(Element, Element)] = other.moved.flatMap {
+        let endMoved: [(Element, Element)] = other.moved.compactMap {
             let (inter, end) = $0
             
             guard let start = origin(of: inter), start != end else { return nil }
@@ -27,8 +27,8 @@ public struct Trace<Element: Hashable> {
         }
         
         let moved = DoubleDictionary(startMoved + endMoved)
-        let removed = Set(self.removed + other.removed.flatMap(origin))
-        let added = Set(other.added + self.added.flatMap(other.destination))
+        let removed = Set(self.removed + other.removed.compactMap(origin))
+        let added = Set(other.added + self.added.compactMap(other.destination))
         
         return Trace(moved: moved, removed: removed, added: added)
     }

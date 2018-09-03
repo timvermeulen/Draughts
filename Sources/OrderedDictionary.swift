@@ -27,9 +27,8 @@ public struct OrderedDictionary<Key: Equatable, Value> {
     
     @discardableResult
     public mutating func removeValue(forKey key: Key) -> Value? {
-        guard let value = self[key] else { return nil }
         defer { self[key] = nil }
-        return value
+        return self[key]
     }
 }
 
@@ -65,13 +64,8 @@ extension OrderedDictionary: ExpressibleByDictionaryLiteral {
     }
 }
 
-// TODO: Conditional Conformance
-extension OrderedDictionary where Value: Equatable {
+extension OrderedDictionary: Equatable where Value: Equatable {
     public static func == (left: OrderedDictionary, right: OrderedDictionary) -> Bool {
         return left.contents.count == right.contents.count && !left.contents.contains(where: { right[$0.key] != $0.value })
-    }
-    
-    public static func != (left: OrderedDictionary, right: OrderedDictionary) -> Bool {
-        return !(left == right)
     }
 }

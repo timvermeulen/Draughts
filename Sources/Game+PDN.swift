@@ -1,33 +1,51 @@
+import Parser
+
 extension Game {
-    // TODO: make this a throwing initializer
     public init?(pdn: String, position: Position = .start) {
-        let enhanced = ["(", ")", ";"].reduce(pdn) { $0.split(separator: $1, omittingEmptySubsequences: false).joined(separator: " \($1) ") }
+        struct Move {
+            let start, end: Square
+            let intermediate: [Square]
+            
+            init?(squares: [Square]) {
+                guard let first = squares.first, let last = squares.last, squares.count >= 2 else { return nil }
+                
+                start = first
+                end = last
+                intermediate = Array(squares.dropFirst().dropLast())
+            }
+        }
+        
+        enum Token {
+            case move(Move)
+            case startVariation
+            case endVariation
+            case nextVariation
+        }
+        
+        let square = Parser.number.flatMap(Square.init(checkingHumanValue:))
+        let move = square.any(separator: .anyCharacter(from: "x-")).flatMap(Move.init).map(Token.move)
+        
+        let token: StringParser<Token> = move
+            <|> Parser.character("(").onMatch(.startVariation)
+            <|> Parser.character(")").onMatch(.endVariation)
+            <|> Parser.character(";").onMatch(.nextVariation)
+        
+        let filling = ((Parser.number.optional.ignored <* Parser.character(".").many) <|> Parser.character(" ").ignored).any
+        let parser = filling *> token.any(separator: filling) <* filling
+        
+        guard let tokens = parser.run(pdn)?.result else { return nil }
         let helper = GameHelper(position: position)
         
-        for component in enhanced.split(separator: " ") {
-            switch component {
-            case "":
-                break
-            case "(":
+        for token in tokens {
+            switch token {
+            case .startVariation:
                 helper.backward()
-            case ")":
+            case .endVariation:
                 if !helper.popVariation() || !helper.forward() { return nil }
-            case ";":
+            case .nextVariation:
                 if !helper.popVariation() { return nil }
-            default:
-                guard component.characters.last != "." else { continue }
-                
-                let squares = component
-                    .split(separator: "-")
-                    .map { $0.split(separator: "x") }
-                    .joined()
-                    .flatMap { Int($0) }
-                    .flatMap { Square(checkingHumanValue: $0) }
-                
-                guard
-                    let start = squares.first, let end = squares.last,
-                    squares.dropFirst().dropLast().contains(where: helper.toggle) || helper.move(from: start, to: end)
-                    else { return nil }
+            case .move(let move):
+                if !move.intermediate.contains(where: helper.toggle) && !helper.move(from: move.start, to: move.end) { return nil }
             }
         }
         
@@ -35,7 +53,7 @@ extension Game {
     }
     
     private func variationsNotation(of variations: OrderedDictionary<Draughts.Move, Game>, at ply: Ply, includeVariation: (_ variation: Game, _ parentVariation: Game) throws -> Bool) rethrows -> String? {
-        let notations: [String] = try variations.flatMap { move, variation in
+        let notations: [String] = try variations.compactMap { move, variation in
             guard try includeVariation(variation, self) else { return nil }
             
             let withoutVariation = "\(ply.indicator) \(move.unambiguousNotation)"

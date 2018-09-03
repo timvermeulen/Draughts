@@ -92,7 +92,7 @@ public final class Move {
     
     public lazy var anyIntermediateSquares: [Square] = {
         guard self.startPiece.kind == .man else {
-            return self.allIntermediateSquares.flatMap { $0.first }
+            return self.allIntermediateSquares.compactMap { $0.first }
         }
         
         guard let firstCapture = self.captures.first else { return [] }

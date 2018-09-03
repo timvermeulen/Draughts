@@ -55,7 +55,7 @@ public struct Square {
         }
     }
     
-    public static let all = (1...50).flatMap(Square.init(checkingHumanValue:))
+    public static let all = (1...50).compactMap(Square.init(checkingHumanValue:))
 }
 
 extension Square: Equatable {

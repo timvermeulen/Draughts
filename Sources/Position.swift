@@ -177,7 +177,7 @@ public final class Position {
     internal func slidingManMoves(of player: Player, to pieceDirection: Piece.Direction) -> [Move] {
         let squares = menThatCanSlide(to: pieceDirection, of: player).intersection(kings.inverse)
         
-        return squares.serialized().flatMap { square in
+        return squares.serialized().compactMap { square in
             let direction = Square.Direction(player: player, pieceDirection: pieceDirection)
             guard let destination = square.neighbor(to: direction) else { return nil }
             
@@ -252,7 +252,7 @@ extension Position: TextOutputStreamable {
         let border = " " + String(repeating: "-", count: 21)
         print(border, to: &target)
         
-        let grid = [1, 11, 21, 31, 41].lazy.map { ($0..<($0 + 10)).flatMap(Square.init(checkingHumanValue:)) }
+        let grid = [1, 11, 21, 31, 41].lazy.map { ($0..<($0 + 10)).compactMap(Square.init(checkingHumanValue:)) }
         
         for squares in grid {
             func addSquare(_ square: Square, onSide: Piece.Direction) {

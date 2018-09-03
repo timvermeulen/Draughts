@@ -14,11 +14,8 @@ extension Position {
             return Optional(result, where: { !$0.isEmpty })
         }
         
-        func pieceSymbols(of player: Player) -> String {
-            return [pieceSymbols(of: player, kind: .man), pieceSymbols(of: player, kind: .king)].flatMap { $0 }.joined(separator: ",")
-        }
-        
-        return "\(playerToMove == .white ? "W" : "B"):W\(pieceSymbols(of: .white)):B\(pieceSymbols(of: .black))"
+        let pieceSymbolsOfPlayer = { [pieceSymbols(of: $0, kind: .man), pieceSymbols(of: $0, kind: .king)].compactMap { $0 }.joined(separator: ",") }
+        return "\(playerToMove == .white ? "W" : "B"):W\(pieceSymbolsOfPlayer(.white)):B\(pieceSymbolsOfPlayer(.black))"
     }
     
     public convenience init?(fen: String) {
@@ -28,11 +25,11 @@ extension Position {
             let man  = curry(Piece.init) <^> .result(player) <*>                    .result(.man)  <*> square
             let king = curry(Piece.init) <^> .result(player) <*> .character("K") *> .result(.king) <*> square
             
-            return  (man ?? king).any(separator: .character(",")) <* Parser.character(",").optional
+            return  (man <|> king).any(separator: .character(",")) <* Parser.character(",").optional
         }
         
-        let playerToMove: StringParser<Player> = (.character("W") ?? .character("B")).map { $0 == "W" ? .white : .black }
-        let tuple = makeTuple <^> playerToMove <* .string(":W") <*> pieces(for: .white) <*> .string(":B") *> pieces(for: .black)
+        let playerToMove: StringParser<Player> = Parser.character("W").onMatch(.white) <|> Parser.character("B").onMatch(.black)
+        let tuple = makeTuple <^> playerToMove <* .string(":W") <*> pieces(for: .white) <* .string(":B") <*> pieces(for: .black)
         
         guard let ((player, whitePieces, blackPieces), _) = tuple.run(fen) else { return nil }
         self.init(pieces: whitePieces + blackPieces, playerToMove: player)
