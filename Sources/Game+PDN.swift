@@ -23,14 +23,14 @@ extension Game {
         }
         
         let square = Parser.number.flatMap(Square.init(checkingHumanValue:))
-        let move = square.any(separator: .anyCharacter(from: "x-")).flatMap(Move.init).map(Token.move)
+        let move = square.any(separator: .character("x") <|> .character("-")).flatMap(Move.init).map(Token.move)
         
         let token: StringParser<Token> = move
             <|> Parser.character("(").onMatch(.startVariation)
             <|> Parser.character(")").onMatch(.endVariation)
             <|> Parser.character(";").onMatch(.nextVariation)
         
-        let filling = ((Parser.number.optional.ignored <* Parser.character(".").many) <|> Parser.character(" ").ignored).any
+        let filling = ((Parser.number.optional.ignored <* Parser.character(".").many as StringParser<String>) <|> Parser.character(" ").ignored).any
         let parser = filling *> token.any(separator: filling) <* filling
         
         guard let tokens = parser.run(pdn)?.result else { return nil }

@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Parser",
+        "repositoryURL": "https://github.com/timvermeulen/Parser.git",
+        "state": {
+          "branch": null,
+          "revision": "9b4283fb2468cbe67ecc0c76971a9acaabaa7d91",
+          "version": "0.0.12"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
