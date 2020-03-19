@@ -20,17 +20,8 @@ extension Piece {
     }
 }
 
-extension Piece: Equatable {
-    public static func == (left: Piece, right: Piece) -> Bool {
-        return left.player == right.player && left.kind == right.kind && left.square == right.square
-    }
-}
-
-extension Piece: Hashable {
-    public var hashValue: Int {
-        return player.hashValue ^ square.hashValue
-    }
-}
+extension Piece: Equatable {}
+extension Piece: Hashable {}
 
 extension Piece: CustomStringConvertible {
     public var description: String {

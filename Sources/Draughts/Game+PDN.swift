@@ -22,8 +22,8 @@ extension Game {
             case nextVariation
         }
         
-        let square = Parser.number.flatMap(Square.init(checkingHumanValue:))
-        let move = square.any(separator: .character("x") <|> .character("-")).flatMap(Move.init).map(Token.move)
+        let square = Parser.number.compactMap(Square.init(checkingHumanValue:))
+        let move = square.any(separator: .character("x") <|> .character("-")).compactMap(Move.init).map(Token.move)
         
         let token: StringParser<Token> = move
             <|> Parser.character("(").onMatch(.startVariation)

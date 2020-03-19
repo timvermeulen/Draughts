@@ -20,7 +20,7 @@ extension Position {
     
     public convenience init?(fen: String) {
         func pieces(for player: Player) -> StringParser<[Piece]> {
-            let square = Parser.number.flatMap(Square.init(checkingHumanValue:))
+            let square = Parser.number.compactMap(Square.init(checkingHumanValue:))
             
             let man  = curry(Piece.init) <^> .result(player) <*>                    .result(.man)  <*> square
             let king = curry(Piece.init) <^> .result(player) <*> .character("K") *> .result(.king) <*> square

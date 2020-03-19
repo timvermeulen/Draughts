@@ -242,8 +242,10 @@ extension Position: Equatable {
 }
 
 extension Position: Hashable {
-    public var hashValue: Int {
-        return white.hashValue &* black.hashValue &* kings.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(white)
+        hasher.combine(black)
+        hasher.combine(kings)
     }
 }
 

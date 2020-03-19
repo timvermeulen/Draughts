@@ -152,8 +152,10 @@ extension Move: Equatable {
 }
 
 extension Move: Hashable {
-    public var hashValue: Int {
-        return startPiece.hashValue ^ endSquare.hashValue ^ captures.lazy.map { $0.hashValue }.reduce(0, ^)
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(white)
+        hasher.combine(black)
+        hasher.combine(kings)
     }
 }
 

@@ -14,12 +14,12 @@ public struct OrderedDictionary<Key: Equatable, Value> {
         }
         set {
             if let value = newValue {
-                if let index = contents.index(where: { $0.key == key }) {
+                if let index = contents.firstIndex(where: { $0.key == key }) {
                     contents[index] = (key, value)
                 } else {
                     contents.append((key, value))
                 }
-            } else if let index = contents.index(where: { $0.key == key }) {
+            } else if let index = contents.firstIndex(where: { $0.key == key }) {
                 contents.remove(at: index)
             }
         }

@@ -1,8 +1,23 @@
+// swift-tools-version:5.2
+
 import PackageDescription
 
 let package = Package(
     name: "Draughts",
-    dependencies: [
-        .Package(url: "https://github.com/timvermeulen/Parser.git", majorVersion: 0)
+    products: [
+        .library(
+            name: "Draughts",
+            targets: ["Draughts"]
+        ),
+    ],
+    targets: [
+        .target(
+            name: "Draughts",
+            dependencies: []
+        ),
+        .testTarget(
+            name: "DraughtsTests",
+            dependencies: ["Draughts"]
+        ),
     ]
 )

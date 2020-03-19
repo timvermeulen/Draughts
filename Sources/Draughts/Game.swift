@@ -291,7 +291,6 @@ extension Game {
             .lazy
             .map { $0.value.allMoves(startingFrom: position) }
             .reduce(ownMoves, { $0.union($1) })
-        
     }
     
     internal func getEndPositions(allowCrossVariationMoves: Bool) -> Set<Position> {
@@ -303,7 +302,7 @@ extension Game {
         
         guard allowCrossVariationMoves else { return endPositions }
         
-        return endPositions.filter { allMoves(startingFrom: $0).isEmpty }
+        return Set(endPositions.filter { allMoves(startingFrom: $0).isEmpty })
     }
     
     public var isValidTactic: Bool {

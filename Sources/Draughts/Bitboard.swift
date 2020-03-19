@@ -14,11 +14,7 @@ extension Bitboard: Equatable {
     }
 }
 
-extension Bitboard: Hashable {
-    public var hashValue: Int {
-        return value.hashValue
-    }
-}
+extension Bitboard: Hashable {}
 
 extension Bitboard {
     public func serialized() -> [Square] {

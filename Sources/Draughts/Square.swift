@@ -24,7 +24,7 @@ private func humanValueIsValid(_ value: Int) -> Bool {
 public struct Square {
     internal let value: Int
     
-    public var humanValue: Int { return (value / 11) * 10 + (value % 11) + 1 }
+    public var humanValue: Int { (value / 11) * 10 + (value % 11) + 1 }
     
     public init?(checkingHumanValue value: Int) {
         guard humanValueIsValid(value) else { return nil }
@@ -58,23 +58,9 @@ public struct Square {
     public static let all = (1...50).compactMap(Square.init(checkingHumanValue:))
 }
 
-extension Square: Equatable {
-    public static func == (left: Square, right: Square) -> Bool {
-        return left.value == right.value
-    }
-}
-
-extension Square: Comparable {
-    public static func < (left: Square, right: Square) -> Bool {
-        return left.value < right.value
-    }
-}
-
-extension Square: Hashable {
-    public var hashValue: Int {
-        return value.hashValue
-    }
-}
+extension Square: Equatable {}
+extension Square: Comparable {}
+extension Square: Hashable {}
 
 extension Square: Strideable {
     public func advanced(by distance: Int) -> Square {
