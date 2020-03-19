@@ -10,10 +10,17 @@ let package = Package(
             targets: ["Draughts"]
         ),
     ],
+    dependencies: [
+        .package(
+            name: "Parser",
+            url: "https://github.com/timvermeulen/swift-parser",
+            from: .init(0, 0, 15)
+        ),
+    ],
     targets: [
         .target(
             name: "Draughts",
-            dependencies: []
+            dependencies: ["Parser"]
         ),
         .testTarget(
             name: "DraughtsTests",

@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Parser",
+        "repositoryURL": "https://github.com/timvermeulen/swift-parser",
+        "state": {
+          "branch": null,
+          "revision": "7f18bca66fe5967e1e3ad61614d5119b28e82cf5",
+          "version": "0.0.15"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
